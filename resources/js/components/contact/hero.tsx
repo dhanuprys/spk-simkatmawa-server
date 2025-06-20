@@ -1,5 +1,6 @@
+import { cn } from '@/lib/utils';
 import { ContactIcon, InstagramIcon, YoutubeIcon } from 'lucide-react';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import SafeWidth from '../safe-width';
 
 interface Social {
@@ -26,13 +27,42 @@ const socials: Social[] = [
     },
 ];
 
+const images = ['/assets/images/1.avif', '/assets/images/2.avif'];
+
 export default function Hero() {
+    const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+
+    useEffect(() => {
+        let currentIndex = 0;
+        const counter = setInterval(() => {
+            if (currentIndex >= images.length - 1) {
+                currentIndex = -1;
+            }
+
+            currentIndex++;
+            setActiveSlideIndex(currentIndex);
+        }, 4000);
+
+        return () => clearInterval(counter);
+    }, []);
+
     return (
         <div className="relative flex h-screen flex-col items-center justify-center">
-            <div className="absolute top-0 left-0 size-full bg-black">hello</div>
+            <div className="absolute top-0 left-0 size-full bg-black">
+                {images.map((image) => (
+                    <img
+                        key={image}
+                        className={cn(
+                            'absolute top-0 left-0 size-full object-cover opacity-0 transition-opacity duration-1000',
+                            image === images[activeSlideIndex] && 'opacity-10',
+                        )}
+                        src={image}
+                    />
+                ))}
+            </div>
             <SafeWidth className="relative z-[1] space-y-4 text-white">
                 <h1 className="font-luckiest text-center text-6xl md:text-8xl">Terhubung Bersama Komunitas Sinema.</h1>
-                <p className="text-center">
+                <p className="mx-auto max-w-[65rem] text-center">
                     Film Festival Nitisara membuka ruang dialog bagi sineas, penonton, partner, dan komunitas. Punya
                     ide, pertanyaan, atau ingin berkolaborasi? Tim kami siap mendengar.
                 </p>
