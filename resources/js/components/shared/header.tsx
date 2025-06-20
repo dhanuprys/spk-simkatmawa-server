@@ -2,6 +2,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import { useWindowScroll } from '@uidotdev/usehooks';
+import { ListIcon, XIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import SafeWidth from '../safe-width';
 
@@ -34,6 +35,7 @@ export default function Header({ autoHide, alwaysSeamless, className }: HeaderPr
     const isMobile = useIsMobile();
     const [{ y: scrollY }] = useWindowScroll();
     const [isHide, setHideStatus] = useState<boolean>(alwaysSeamless !== undefined ? alwaysSeamless : false);
+    const [isNavHide, setNavHide] = useState<boolean>(true);
 
     useEffect(() => {
         if (!autoHide) return;
@@ -43,13 +45,18 @@ export default function Header({ autoHide, alwaysSeamless, className }: HeaderPr
     if (isMobile) {
         return (
             <header className={cn('fixed z-10 w-full backdrop-blur-lg', className)}>
-                <section className={cn('py-4 transition-all')}>
-                    <SafeWidth className={cn('flex justify-between')}>
+                <section>
+                    <SafeWidth className={cn('flex items-center justify-between py-4')}>
                         <h1 className={cn('font-luckiest text-2xl')}>NITISARA</h1>
+                        {isNavHide ? (
+                            <ListIcon onClick={() => setNavHide(false)} />
+                        ) : (
+                            <XIcon onClick={() => setNavHide(true)} />
+                        )}
                     </SafeWidth>
-                    <nav className="!hidden flex gap-x-8">
+                    <nav className={cn('flex flex-col bg-white shadow-2xl', isNavHide && 'hidden')}>
                         {navigations.map((nav) => (
-                            <Link prefetch className="hover:font-semibold" href={nav.path}>
+                            <Link prefetch className="px-4 py-2 text-black hover:font-semibold" href={nav.path}>
                                 {nav.label}
                             </Link>
                         ))}
