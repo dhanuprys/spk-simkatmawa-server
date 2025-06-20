@@ -1,7 +1,9 @@
+import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import { useWindowScroll } from '@uidotdev/usehooks';
 import { useEffect, useState } from 'react';
+import SafeWidth from '../safe-width';
 
 const navigations = [
     {
@@ -27,6 +29,7 @@ interface HeaderProps {
 }
 
 export default function Header({ autoHide }: HeaderProps) {
+    const isMobile = useIsMobile();
     const [{ y: scrollY }] = useWindowScroll();
     const [isHide, setHideStatus] = useState<boolean>(false);
 
@@ -35,17 +38,39 @@ export default function Header({ autoHide }: HeaderProps) {
         setHideStatus(scrollY !== null && scrollY > 30);
     }, [scrollY, autoHide]);
 
+    if (isMobile) {
+        return (
+            <header className={cn('fixed w-full backdrop-blur-lg')}>
+                <section className={cn('py-4 transition-all')}>
+                    <SafeWidth className={cn('flex justify-between')}>
+                        <h1 className={cn('font-luckiest text-2xl')}>NITISARA</h1>
+                    </SafeWidth>
+                    <nav className="!hidden flex gap-x-8">
+                        {navigations.map((nav) => (
+                            <Link prefetch className="hover:font-semibold" href={nav.path}>
+                                {nav.label}
+                            </Link>
+                        ))}
+                    </nav>
+                </section>
+            </header>
+        );
+    }
+
     return (
         <header className={cn('fixed w-full backdrop-blur-lg', !isHide && 'border-b')}>
             {!isHide && <section className="font-luckiest py-6 text-center text-4xl">NITISARA</section>}
-            <section className={cn('flex justify-center py-4 transition-all', isHide && 'py-6')}>
-                <nav className="flex gap-x-8">
-                    {navigations.map((nav) => (
-                        <Link prefetch className="hover:font-semibold" href={nav.path}>
-                            {nav.label}
-                        </Link>
-                    ))}
-                </nav>
+            <section className={cn('py-4 transition-all', isHide && 'py-6')}>
+                <SafeWidth className={cn('flex justify-between', !isHide && '!justify-center')}>
+                    <h1 className={cn('font-luckiest text-2xl', !isHide && '!hidden')}>NITISARA</h1>
+                    <nav className="flex gap-x-8">
+                        {navigations.map((nav) => (
+                            <Link prefetch className="hover:font-semibold" href={nav.path}>
+                                {nav.label}
+                            </Link>
+                        ))}
+                    </nav>
+                </SafeWidth>
             </section>
         </header>
     );
