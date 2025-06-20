@@ -87,11 +87,11 @@ export default function Winners() {
                         <div
                             key={winner.id}
                             className={cn(
-                                'pointer-events-none fixed top-0 left-0 flex h-screen w-full items-center justify-center text-white opacity-0',
+                                'pointer-events-none fixed top-0 left-0 z-[999] flex h-screen w-full items-center justify-center text-white opacity-0',
                                 winner.id === currentActive.id && 'opacity-100',
                             )}
                         >
-                            <div className="absolute top-0 left-0 z-[1] h-screen w-full">
+                            <div className="absolute top-0 left-0 z-[1] h-screen w-full bg-slate-950">
                                 <img
                                     src={currentActive.backgroundImage}
                                     className={cn(

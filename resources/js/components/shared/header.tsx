@@ -26,21 +26,23 @@ const navigations = [
 
 interface HeaderProps {
     autoHide?: boolean;
+    alwaysSeamless?: boolean;
+    className?: string;
 }
 
-export default function Header({ autoHide }: HeaderProps) {
+export default function Header({ autoHide, alwaysSeamless, className }: HeaderProps) {
     const isMobile = useIsMobile();
     const [{ y: scrollY }] = useWindowScroll();
-    const [isHide, setHideStatus] = useState<boolean>(false);
+    const [isHide, setHideStatus] = useState<boolean>(alwaysSeamless !== undefined ? alwaysSeamless : false);
 
     useEffect(() => {
         if (!autoHide) return;
-        setHideStatus(scrollY !== null && scrollY > 30);
-    }, [scrollY, autoHide]);
+        !alwaysSeamless && setHideStatus(scrollY !== null && scrollY > 30);
+    }, [scrollY, autoHide, alwaysSeamless]);
 
     if (isMobile) {
         return (
-            <header className={cn('fixed w-full backdrop-blur-lg')}>
+            <header className={cn('fixed z-10 w-full backdrop-blur-lg', className)}>
                 <section className={cn('py-4 transition-all')}>
                     <SafeWidth className={cn('flex justify-between')}>
                         <h1 className={cn('font-luckiest text-2xl')}>NITISARA</h1>
@@ -58,7 +60,7 @@ export default function Header({ autoHide }: HeaderProps) {
     }
 
     return (
-        <header className={cn('fixed w-full backdrop-blur-lg', !isHide && 'border-b')}>
+        <header className={cn('fixed z-10 w-full backdrop-blur-lg', !isHide && 'border-b', className)}>
             {!isHide && <section className="font-luckiest py-6 text-center text-4xl">NITISARA</section>}
             <section className={cn('py-4 transition-all', isHide && 'py-6')}>
                 <SafeWidth className={cn('flex justify-between', !isHide && '!justify-center')}>
