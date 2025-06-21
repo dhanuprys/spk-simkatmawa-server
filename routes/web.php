@@ -9,6 +9,10 @@ Route::get('/', function () {
 Route::get('/contact', function () {
     return Inertia::render('contact');
 });
+Route::get('/registration', function () {
+    return Inertia::render('registration');
+});
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {

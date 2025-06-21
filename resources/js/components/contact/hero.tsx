@@ -62,7 +62,7 @@ export default function Hero() {
             </div>
             <SafeWidth className="relative z-[1] space-y-4 text-white">
                 <h1 className="font-luckiest text-center text-6xl md:text-8xl">Terhubung Bersama Komunitas Sinema.</h1>
-                <p className="mx-auto max-w-[65rem] text-center">
+                <p className="mx-auto max-w-[65rem] text-center md:text-2xl">
                     Film Festival Nitisara membuka ruang dialog bagi sineas, penonton, partner, dan komunitas. Punya
                     ide, pertanyaan, atau ingin berkolaborasi? Tim kami siap mendengar.
                 </p>

@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { useWindowScroll } from '@uidotdev/usehooks';
+import { ArrowDownIcon } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import SafeWidth from '../safe-width';
 
@@ -76,7 +77,12 @@ export default function Winners() {
     return (
         <div className="bg-slate-950 pt-20 pb-20">
             <div ref={containerRef} style={{ height: winnerScrollHeight + 'px' }}>
-                <div className="font-luckiest text-center text-4xl text-white md:text-7xl">THE WINNERS</div>
+                <div>
+                    <div className="font-luckiest text-center text-4xl text-white md:text-7xl">THE WINNERS</div>
+                    <div className="mt-8 flex animate-bounce justify-center text-white">
+                        <ArrowDownIcon className="size-14 md:size-20" />
+                    </div>
+                </div>
                 <div
                     className={cn(
                         'opacity-0 transition-all duration-100',

@@ -21,7 +21,7 @@ const navigations = [
     },
     {
         label: 'Pendaftaran',
-        path: '/join',
+        path: '/registration',
     },
 ];
 
@@ -67,7 +67,7 @@ export default function Header({ autoHide, alwaysSeamless, className }: HeaderPr
     }
 
     return (
-        <header className={cn('fixed z-10 w-full backdrop-blur-lg', !isHide && 'border-b', className)}>
+        <header className={cn('fixed z-10 w-full backdrop-blur-lg', className)}>
             {!isHide && <section className="font-luckiest py-6 text-center text-4xl">NITISARA</section>}
             <section className={cn('py-4 transition-all', isHide && 'py-6')}>
                 <SafeWidth className={cn('flex justify-between', !isHide && '!justify-center')}>

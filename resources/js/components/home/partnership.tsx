@@ -7,7 +7,7 @@ export default function Partnership() {
                 <h2 className="font-luckiest text-center text-6xl md:text-8xl">
                     Partner with Purpose — Connect Through Cinema
                 </h2>
-                <p className="text-center">
+                <p className="text-center md:text-xl">
                     Kami berterima kasih kepada seluruh mitra yang telah mendukung perjalanan Film Festival Nitisara.
                     Bersama Anda, cerita ini bisa terus dinyalakan.
                 </p>
