@@ -94,7 +94,7 @@ export default function Hero({ activeEvent }: HeroProps) {
                 {activeEvent && (
                     <div
                         className={cn(
-                            'mx-auto flex w-full max-w-md flex-col items-center justify-center gap-x-0 gap-y-3 transition-all duration-700 sm:flex-row sm:gap-x-2 sm:gap-y-0 md:gap-x-4',
+                            'mx-auto flex w-full max-w-md flex-col items-end justify-center gap-x-0 gap-y-3 transition-all duration-700 sm:flex-row sm:gap-x-2 sm:gap-y-0 md:gap-x-4',
                             mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0 delay-200',
                         )}
                     >
