@@ -55,7 +55,7 @@ export default function StatusIndex() {
             </Head>
             <div>
                 <Header autoHide alwaysSeamless />
-                <SafeWidth className="py-16">
+                <SafeWidth className="py-24">
                     <div className="mx-auto max-w-2xl">
                         <div className="mb-8 text-center">
                             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">

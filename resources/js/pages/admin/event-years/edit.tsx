@@ -1,12 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AdminLayout from '@/layouts/admin-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, Calendar, Save } from 'lucide-react';
+import dayjs from 'dayjs';
+import { Save } from 'lucide-react';
 
 interface EventYear {
     id: number;
@@ -19,7 +19,8 @@ interface EventYear {
     registration_end: string;
     submission_start_date: string;
     submission_end_date: string;
-    is_active: boolean;
+    show_start: string;
+    show_end: string;
     created_at: string;
     updated_at: string;
 }
@@ -37,7 +38,8 @@ export default function EventYearEdit({ event_year }: Props) {
         registration_end: event_year.registration_end,
         submission_start_date: event_year.submission_start_date,
         submission_end_date: event_year.submission_end_date,
-        is_active: event_year.is_active,
+        show_start: event_year.show_start || '',
+        show_end: event_year.show_end || '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -48,30 +50,11 @@ export default function EventYearEdit({ event_year }: Props) {
     return (
         <AdminLayout title="Edit Tahun Event" description="Edit tahun event">
             <Head title={`Edit Tahun Event - ${event_year.title} - NITISARA Admin`} />
-
-            <div className="space-y-6">
-                {/* Header */}
-                <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="sm" asChild>
-                        <Link href={route('admin.event-years.index')}>
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Kembali
-                        </Link>
-                    </Button>
-                    <div>
-                        <h1 className="text-2xl font-bold">Edit Tahun Event</h1>
-                        <p className="text-muted-foreground">Edit informasi tahun event: {event_year.title}</p>
-                    </div>
-                </div>
-
-                {/* Form */}
+            <div className="mx-auto max-w-2xl py-8">
                 <Card>
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <Calendar className="h-5 w-5" />
-                            Form Edit Tahun Event
-                        </CardTitle>
-                        <CardDescription>Update informasi tahun event</CardDescription>
+                        <CardTitle>Edit Tahun Event</CardTitle>
+                        <CardDescription>Perbarui detail tahun event festival</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
@@ -122,7 +105,11 @@ export default function EventYearEdit({ event_year }: Props) {
                                     <Input
                                         id="registration_start"
                                         type="date"
-                                        value={data.registration_start}
+                                        value={
+                                            data.registration_start
+                                                ? dayjs(data.registration_start).format('YYYY-MM-DD')
+                                                : ''
+                                        }
                                         onChange={(e) => setData('registration_start', e.target.value)}
                                         className={errors.registration_start ? 'border-red-500' : ''}
                                     />
@@ -136,7 +123,11 @@ export default function EventYearEdit({ event_year }: Props) {
                                     <Input
                                         id="registration_end"
                                         type="date"
-                                        value={data.registration_end}
+                                        value={
+                                            data.registration_end
+                                                ? dayjs(data.registration_end).format('YYYY-MM-DD')
+                                                : ''
+                                        }
                                         onChange={(e) => setData('registration_end', e.target.value)}
                                         className={errors.registration_end ? 'border-red-500' : ''}
                                     />
@@ -152,7 +143,11 @@ export default function EventYearEdit({ event_year }: Props) {
                                     <Input
                                         id="submission_start_date"
                                         type="date"
-                                        value={data.submission_start_date}
+                                        value={
+                                            data.submission_start_date
+                                                ? dayjs(data.submission_start_date).format('YYYY-MM-DD')
+                                                : ''
+                                        }
                                         onChange={(e) => setData('submission_start_date', e.target.value)}
                                         className={errors.submission_start_date ? 'border-red-500' : ''}
                                     />
@@ -166,7 +161,11 @@ export default function EventYearEdit({ event_year }: Props) {
                                     <Input
                                         id="submission_end_date"
                                         type="date"
-                                        value={data.submission_end_date}
+                                        value={
+                                            data.submission_end_date
+                                                ? dayjs(data.submission_end_date).format('YYYY-MM-DD')
+                                                : ''
+                                        }
                                         onChange={(e) => setData('submission_end_date', e.target.value)}
                                         className={errors.submission_end_date ? 'border-red-500' : ''}
                                     />
@@ -176,19 +175,30 @@ export default function EventYearEdit({ event_year }: Props) {
                                 </div>
                             </div>
 
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="is_active"
-                                    checked={data.is_active}
-                                    onCheckedChange={(checked) => setData('is_active', checked as boolean)}
-                                />
-                                <Label htmlFor="is_active">Event Aktif</Label>
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                    <Label htmlFor="show_start">Tampilkan Mulai</Label>
+                                    <Input
+                                        id="show_start"
+                                        type="datetime-local"
+                                        value={data.show_start ? dayjs(data.show_start).format('YYYY-MM-DDTHH:mm') : ''}
+                                        onChange={(e) => setData('show_start', e.target.value)}
+                                        className={errors.show_start ? 'border-red-500' : ''}
+                                    />
+                                    {errors.show_start && <p className="text-sm text-red-500">{errors.show_start}</p>}
+                                </div>
+                                <div>
+                                    <Label htmlFor="show_end">Tampilkan Sampai</Label>
+                                    <Input
+                                        id="show_end"
+                                        type="datetime-local"
+                                        value={data.show_end ? dayjs(data.show_end).format('YYYY-MM-DDTHH:mm') : ''}
+                                        onChange={(e) => setData('show_end', e.target.value)}
+                                        className={errors.show_end ? 'border-red-500' : ''}
+                                    />
+                                    {errors.show_end && <p className="text-sm text-red-500">{errors.show_end}</p>}
+                                </div>
                             </div>
-                            {data.is_active && (
-                                <p className="rounded-md bg-amber-50 p-2 text-sm text-amber-600">
-                                    ⚠️ Menandai event ini sebagai aktif akan menonaktifkan event tahun lainnya.
-                                </p>
-                            )}
 
                             <div className="flex gap-2">
                                 <Button type="submit" disabled={processing}>

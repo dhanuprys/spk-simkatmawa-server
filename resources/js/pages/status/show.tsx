@@ -4,6 +4,14 @@ import Header from '@/components/shared/header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { Head, Link, router } from '@inertiajs/react';
 import {
@@ -63,6 +71,7 @@ interface StatusShowProps {
 export default function StatusShow({ participant, session }: StatusShowProps) {
     const [timeLeft, setTimeLeft] = useState<string>('');
     const [isExtending, setIsExtending] = useState(false);
+    const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
     // Calculate time left for session
     useEffect(() => {
@@ -96,9 +105,12 @@ export default function StatusShow({ participant, session }: StatusShowProps) {
     }, [session.expires_at]);
 
     const handleLogout = () => {
-        if (confirm('Apakah Anda yakin ingin keluar dari sesi ini?')) {
-            router.post(route('status.logout', session.token));
-        }
+        setShowLogoutDialog(true);
+    };
+
+    const confirmLogout = () => {
+        setShowLogoutDialog(false);
+        router.post(route('status.logout', session.token));
     };
 
     const handleExtendSession = async () => {
@@ -167,7 +179,7 @@ export default function StatusShow({ participant, session }: StatusShowProps) {
             </Head>
             <div>
                 <Header autoHide alwaysSeamless />
-                <SafeWidth className="py-16">
+                <SafeWidth className="py-24">
                     <div className="mx-auto max-w-4xl">
                         {/* Header */}
                         <div className="mb-8 flex items-center justify-between">
@@ -470,6 +482,31 @@ export default function StatusShow({ participant, session }: StatusShowProps) {
                     </div>
                 </SafeWidth>
                 <Footer />
+
+                {/* Logout Confirmation Dialog */}
+                <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                                <LogOut className="h-5 w-5" />
+                                Konfirmasi Keluar
+                            </DialogTitle>
+                            <DialogDescription>
+                                Apakah Anda yakin ingin keluar dari sesi ini? Anda perlu memasukkan PIN lagi untuk
+                                mengakses status tim.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setShowLogoutDialog(false)}>
+                                Batal
+                            </Button>
+                            <Button variant="destructive" onClick={confirmLogout}>
+                                <LogOut className="mr-2 h-4 w-4" />
+                                Keluar
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
         </>
     );

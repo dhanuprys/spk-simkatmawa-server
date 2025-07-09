@@ -15,13 +15,14 @@ const navigations = [
         label: 'Jelajahi Film',
         path: '/film',
     },
-    {
-        label: 'Cek Status',
-        path: '/status',
-    },
+
     {
         label: 'Kontak',
         path: '/contact',
+    },
+    {
+        label: 'Cek Status',
+        path: '/status',
     },
     {
         label: 'Pendaftaran',
@@ -40,6 +41,7 @@ export default function Header({ autoHide, alwaysSeamless, className }: HeaderPr
     const [{ y: scrollY }] = useWindowScroll();
     const [isHide, setHideStatus] = useState<boolean>(alwaysSeamless !== undefined ? alwaysSeamless : false);
     const [isNavHide, setNavHide] = useState<boolean>(true);
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
 
     useEffect(() => {
         if (!autoHide) return;
@@ -60,7 +62,14 @@ export default function Header({ autoHide, alwaysSeamless, className }: HeaderPr
                     </SafeWidth>
                     <nav className={cn('flex flex-col bg-white shadow-2xl', isNavHide && 'hidden')}>
                         {navigations.map((nav) => (
-                            <Link prefetch className="px-4 py-2 text-black hover:font-semibold" href={nav.path}>
+                            <Link
+                                prefetch
+                                className={cn(
+                                    'px-4 py-2 text-black hover:font-semibold',
+                                    nav.path === currentPath && 'font-bold',
+                                )}
+                                href={nav.path}
+                            >
                                 {nav.label}
                             </Link>
                         ))}
@@ -78,7 +87,11 @@ export default function Header({ autoHide, alwaysSeamless, className }: HeaderPr
                     <h1 className={cn('font-luckiest text-2xl', !isHide && '!hidden')}>NITISARA</h1>
                     <nav className="flex gap-x-8">
                         {navigations.map((nav) => (
-                            <Link prefetch className="hover:font-semibold" href={nav.path}>
+                            <Link
+                                prefetch
+                                className={cn('hover:font-semibold', nav.path === currentPath && 'font-bold')}
+                                href={nav.path}
+                            >
                                 {nav.label}
                             </Link>
                         ))}

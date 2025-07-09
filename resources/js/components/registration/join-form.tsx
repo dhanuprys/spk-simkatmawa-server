@@ -11,6 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from '@inertiajs/react';
 import {
     AlertCircle,
+    ArrowRight,
     Building,
     Camera,
     CheckCircle,
@@ -22,7 +23,6 @@ import {
     MapPin,
     Phone,
     RefreshCw,
-    Sparkles,
     Trophy,
     Upload,
     User,
@@ -64,6 +64,8 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
     const [activeStep, setActiveStep] = useState(1);
     const [dragOver, setDragOver] = useState<string | null>(null);
     const [showResetTooltip, setShowResetTooltip] = useState(false);
+    // 1. Add state for the confirmation checkbox
+    const [isReadyChecked, setIsReadyChecked] = useState(false);
 
     // Load cached form data from localStorage - memoized to prevent unnecessary calls
     const loadCachedFormData = useCallback((): Partial<RegistrationFormData> => {
@@ -277,40 +279,57 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
             { id: 1, title: 'Tim', icon: Users },
             { id: 2, title: 'Ketua Tim', icon: User },
             { id: 3, title: 'Dokumen', icon: Upload },
+            { id: 4, title: 'Konfirmasi', icon: CheckCircle },
         ],
         [],
     );
 
-    // Memoize step completion logic
+    // Helper: get fields for each step
+    const stepFields: Record<number, (keyof RegistrationFormData)[]> = {
+        1: ['team_name', 'city', 'company', 'category_id'],
+        2: ['leader_name', 'leader_email', 'leader_whatsapp'],
+        3: [], // files handled separately
+        4: [], // confirmation handled separately
+    };
+
+    // Refactor isStepComplete to only check relevant fields for each step
     const isStepComplete = useCallback(
         (step: number) => {
             const values = form.getValues();
             switch (step) {
                 case 1:
-                    return values.team_name && values.city && values.company && values.category_id;
+                    return stepFields[1].every((field) => values[field]);
                 case 2:
-                    return values.leader_name && values.leader_email && values.leader_whatsapp;
+                    return stepFields[2].every((field) => values[field]);
                 case 3:
                     return studentCardFile && paymentEvidenceFile;
+                case 4:
+                    return isReadyChecked;
                 default:
                     return false;
             }
         },
-        [form, studentCardFile, paymentEvidenceFile],
+        [form, studentCardFile, paymentEvidenceFile, isReadyChecked],
     );
 
+    // Helper: get errors for a step
+    const getStepErrors = (step: number) => {
+        const errors = form.formState.errors;
+        if (step === 1) return stepFields[1].some((field) => errors[field]);
+        if (step === 2) return stepFields[2].some((field) => errors[field]);
+        if (step === 3) return false; // files handled separately
+        if (step === 4) return false;
+        return false;
+    };
+
+    // Refactor canProceedToStep to only check errors for the previous step
     const canProceedToStep = useCallback(
         (step: number) => {
             if (step === 1) return true;
-
-            // Check if previous step is complete and has no validation errors
             const previousStep = step - 1;
             const isPreviousStepComplete = isStepComplete(previousStep);
-
-            // Also check for validation errors in the current form state
-            const hasErrors = Object.keys(form.formState.errors).length > 0;
-
-            return isPreviousStepComplete && !hasErrors;
+            const hasStepErrors = getStepErrors(previousStep);
+            return isPreviousStepComplete && !hasStepErrors;
         },
         [isStepComplete, form.formState.errors],
     );
@@ -336,19 +355,18 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
         setActiveStep(Math.max(1, activeStep - 1));
     }, [activeStep]);
 
+    // Update handleNextStep to only validate current step fields
     const handleNextStep = useCallback(() => {
-        // Validate current step before proceeding
-        const currentStepErrors = form.formState.errors;
-        const hasCurrentStepErrors = Object.keys(currentStepErrors).length > 0;
-
-        if (hasCurrentStepErrors) {
-            // Trigger validation for current step
-            form.trigger();
+        const currentStep = activeStep;
+        const fieldsToValidate = stepFields[currentStep] || [];
+        if (fieldsToValidate.length > 0) {
+            form.trigger(fieldsToValidate as any);
+        }
+        if (getStepErrors(currentStep) || !isStepComplete(currentStep)) {
             return;
         }
-
         setActiveStep(activeStep + 1);
-    }, [activeStep, form]);
+    }, [activeStep, form, isStepComplete]);
 
     return (
         <SafeWidth className="py-16">
@@ -372,20 +390,6 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
 
                 {/* Progress Steps */}
                 <div className="mb-8">
-                    <div className="mb-4 flex items-center justify-center">
-                        <div className="w-full max-w-md">
-                            <div className="text-muted-foreground mb-2 flex justify-between text-sm">
-                                <span>Progress</span>
-                                <span>{Math.round(stepProgress)}%</span>
-                            </div>
-                            <div className="bg-muted h-2 w-full rounded-full">
-                                <div
-                                    className="from-primary to-primary/70 h-full rounded-full bg-gradient-to-r transition-all duration-500"
-                                    style={{ width: `${stepProgress}%` }}
-                                />
-                            </div>
-                        </div>
-                    </div>
                     <div className="flex items-center justify-center gap-4">
                         {steps.map((step, index) => {
                             const Icon = step.icon;
@@ -413,7 +417,7 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                                     } ${hasErrors && !isActive ? 'ring-2 ring-red-500' : ''}`}
                                                 >
                                                     {isComplete ? (
-                                                        <CheckCircle className="h-4 w-4 animate-bounce" />
+                                                        <CheckCircle className="h-4 w-4" />
                                                     ) : (
                                                         <Icon className="h-4 w-4" />
                                                     )}
@@ -448,21 +452,23 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
 
                 <Card className="border-0 bg-gradient-to-br from-white to-gray-50/50 shadow-xl dark:from-gray-900 dark:to-gray-800/50">
                     <CardHeader className="from-primary/5 to-secondary/5 border-b bg-gradient-to-r px-8 py-8 text-center">
-                        <div className="flex items-center justify-between">
-                            <div className="flex-1" />
-                            <div className="flex-1">
-                                <CardTitle className="mb-2 text-xl">
+                        <div className="grid grid-cols-5 items-center justify-between">
+                            <div className="col-span-1" />
+                            <div className="col-span-3">
+                                <CardTitle className="mb-2 shrink-0 text-xl">
                                     {activeStep === 1 && 'Informasi Tim'}
                                     {activeStep === 2 && 'Informasi Ketua Tim'}
                                     {activeStep === 3 && 'Upload Dokumen'}
+                                    {activeStep === 4 && 'Konfirmasi'}
                                 </CardTitle>
                                 <CardDescription className="text-base">
                                     {activeStep === 1 && 'Isi informasi tim Anda'}
                                     {activeStep === 2 && 'Isi data ketua tim untuk komunikasi'}
                                     {activeStep === 3 && 'Upload dokumen yang diperlukan'}
+                                    {activeStep === 4 && 'Konfirmasi pendaftaran'}
                                 </CardDescription>
                             </div>
-                            <div className="flex flex-1 justify-end">
+                            <div className="col-span-1 flex justify-end">
                                 <TooltipProvider>
                                     <Tooltip open={showResetTooltip}>
                                         <TooltipTrigger asChild>
@@ -852,6 +858,27 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                     </div>
                                 )}
 
+                                {/* Step 4: Confirmation */}
+                                {activeStep === 4 && (
+                                    <div className="flex flex-col items-center justify-center py-8">
+                                        <label className="flex cursor-pointer items-center space-x-2 select-none">
+                                            <input
+                                                type="checkbox"
+                                                checked={isReadyChecked}
+                                                onChange={(e) => setIsReadyChecked(e.target.checked)}
+                                                className="form-checkbox text-primary focus:ring-primary h-5 w-5 rounded border-gray-300"
+                                            />
+                                            <span className="text-base font-medium">
+                                                Saya sudah siap dan data yang saya masukkan sudah benar.
+                                            </span>
+                                        </label>
+                                        <p className="mt-4 max-w-md text-center text-sm text-gray-500">
+                                            Pastikan semua data sudah benar sebelum mengirim pendaftaran. Setelah
+                                            mengirim, data tidak dapat diubah kecuali oleh admin.
+                                        </p>
+                                    </div>
+                                )}
+
                                 {/* Navigation Buttons */}
                                 <div className="flex items-center justify-between border-t pt-6">
                                     <Button
@@ -865,7 +892,7 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                     </Button>
 
                                     <div className="flex items-center gap-3">
-                                        {activeStep < 3 && (
+                                        {activeStep < 4 && (
                                             <Button
                                                 type="button"
                                                 onClick={handleNextStep}
@@ -873,14 +900,14 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                                 className="flex items-center gap-2"
                                             >
                                                 Selanjutnya
-                                                <Sparkles className="h-4 w-4" />
+                                                <ArrowRight className="h-4 w-4" />
                                             </Button>
                                         )}
 
-                                        {activeStep === 3 && (
+                                        {activeStep === 4 && (
                                             <Button
                                                 type="submit"
-                                                disabled={isSubmitting || !studentCardFile || !paymentEvidenceFile}
+                                                disabled={isSubmitting || (activeStep === 4 && !isReadyChecked)}
                                                 className="flex items-center gap-2 px-8"
                                             >
                                                 {isSubmitting ? (

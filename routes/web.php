@@ -2,9 +2,18 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Models\EventYear;
 
 Route::get('/', function () {
-    return Inertia::render('home');
+    $activeEvent = EventYear::withCount('participants')
+        ->select(['id', 'year', 'title', 'registration_start', 'registration_end'])
+        ->where('show_start', '<=', now())
+        ->where('show_end', '>=', now())
+        ->orderBy('registration_start')
+        ->first();
+    return Inertia::render('home', [
+        'activeEvent' => $activeEvent,
+    ]);
 })->name('home');
 Route::get('/contact', function () {
     return Inertia::render('contact');

@@ -1,16 +1,20 @@
 import { Link } from '@inertiajs/react';
 import { ArrowRight, ChevronDown, Search } from 'lucide-react';
 
-export default function Hero() {
+interface HeroProps {
+    eventYear?: number;
+}
+
+export default function Hero({ eventYear }: HeroProps) {
     return (
         <section className="relative flex min-h-[80vh] items-center overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-16">
             <div className="container mx-auto px-4">
                 <div className="mx-auto max-w-3xl text-center">
                     {/* Main Heading */}
                     <h1 className="font-luckiest mb-6 text-4xl text-gray-900 md:text-6xl">
-                        Bergabung dengan{' '}
-                        <span className="from-primary bg-gradient-to-r to-purple-600 bg-clip-text text-transparent">
-                            NITISARA
+                        Saatnya tampil di layar{' '}
+                        <span className="from-primary bg-gradient-to-r to-blue-600 bg-clip-text text-transparent">
+                            NITISARA{eventYear ? ` ${eventYear}` : ''}
                         </span>
                     </h1>
 

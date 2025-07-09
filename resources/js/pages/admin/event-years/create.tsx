@@ -1,12 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AdminLayout from '@/layouts/admin-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, Calendar, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 
 export default function EventYearCreate() {
     const { data, setData, post, processing, errors } = useForm({
@@ -17,7 +16,8 @@ export default function EventYearCreate() {
         registration_end: '',
         submission_start_date: '',
         submission_end_date: '',
-        is_active: true as boolean,
+        show_start: '',
+        show_end: '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -28,30 +28,11 @@ export default function EventYearCreate() {
     return (
         <AdminLayout title="Tambah Tahun Event" description="Buat tahun event baru">
             <Head title="Tambah Tahun Event - NITISARA Admin" />
-
-            <div className="space-y-6">
-                {/* Header */}
-                <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="sm" asChild>
-                        <Link href={route('admin.event-years.index')}>
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Kembali
-                        </Link>
-                    </Button>
-                    <div>
-                        <h1 className="text-2xl font-bold">Tambah Tahun Event</h1>
-                        <p className="text-muted-foreground">Buat tahun event baru untuk festival</p>
-                    </div>
-                </div>
-
-                {/* Form */}
+            <div className="mx-auto max-w-2xl py-8">
                 <Card>
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <Calendar className="h-5 w-5" />
-                            Form Tahun Event
-                        </CardTitle>
-                        <CardDescription>Isi informasi tahun event yang akan dibuat</CardDescription>
+                        <CardTitle>Tambah Tahun Event</CardTitle>
+                        <CardDescription>Isi detail tahun event festival</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
@@ -156,19 +137,30 @@ export default function EventYearCreate() {
                                 </div>
                             </div>
 
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="is_active"
-                                    checked={data.is_active}
-                                    onCheckedChange={(checked) => setData('is_active', checked as boolean)}
-                                />
-                                <Label htmlFor="is_active">Event Aktif</Label>
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                    <Label htmlFor="show_start">Tampilkan Mulai</Label>
+                                    <Input
+                                        id="show_start"
+                                        type="datetime-local"
+                                        value={data.show_start}
+                                        onChange={(e) => setData('show_start', e.target.value)}
+                                        className={errors.show_start ? 'border-red-500' : ''}
+                                    />
+                                    {errors.show_start && <p className="text-sm text-red-500">{errors.show_start}</p>}
+                                </div>
+                                <div>
+                                    <Label htmlFor="show_end">Tampilkan Sampai</Label>
+                                    <Input
+                                        id="show_end"
+                                        type="datetime-local"
+                                        value={data.show_end}
+                                        onChange={(e) => setData('show_end', e.target.value)}
+                                        className={errors.show_end ? 'border-red-500' : ''}
+                                    />
+                                    {errors.show_end && <p className="text-sm text-red-500">{errors.show_end}</p>}
+                                </div>
                             </div>
-                            {data.is_active && (
-                                <p className="rounded-md bg-amber-50 p-2 text-sm text-amber-600">
-                                    ⚠️ Menandai event ini sebagai aktif akan menonaktifkan event tahun lainnya.
-                                </p>
-                            )}
 
                             <div className="flex gap-2">
                                 <Button type="submit" disabled={processing}>

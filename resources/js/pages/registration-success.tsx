@@ -44,7 +44,7 @@ export default function RegistrationSuccess() {
             </Head>
             <div ref={containerRef}>
                 <Header autoHide alwaysSeamless />
-                <SafeWidth className="py-16">
+                <SafeWidth className="py-24">
                     <div className="mx-auto max-w-2xl text-center">
                         <div className="space-y-6">
                             <div className="text-center">

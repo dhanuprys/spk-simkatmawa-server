@@ -33,13 +33,9 @@ class EventYearController extends Controller
             'registration_end' => 'required|date|after:registration_start',
             'submission_start_date' => 'required|date',
             'submission_end_date' => 'required|date|after:submission_start_date',
-            'is_active' => 'boolean',
+            'show_start' => 'required|date',
+            'show_end' => 'required|date|after:show_start',
         ]);
-
-        // If this event year is being set as active, deactivate all others
-        if ($validated['is_active']) {
-            EventYear::where('is_active', true)->update(['is_active' => false]);
-        }
 
         EventYear::create($validated);
 
@@ -77,13 +73,9 @@ class EventYearController extends Controller
             'registration_end' => 'required|date|after:registration_start',
             'submission_start_date' => 'required|date',
             'submission_end_date' => 'required|date|after:submission_start_date',
-            'is_active' => 'boolean',
+            'show_start' => 'required|date',
+            'show_end' => 'required|date|after:show_start',
         ]);
-
-        // If this event year is being set as active, deactivate all others
-        if ($validated['is_active']) {
-            EventYear::where('is_active', true)->where('id', '!=', $eventYear->id)->update(['is_active' => false]);
-        }
 
         $eventYear->update($validated);
 

@@ -8,7 +8,7 @@ import { Head, usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 
 export default function Home() {
-    const { auth } = usePage<SharedData>().props;
+    const { auth, activeEvent } = usePage<SharedData & { activeEvent?: any }>().props;
     const containerRef = useRef<HTMLDivElement>(null);
 
     return (
@@ -19,7 +19,7 @@ export default function Home() {
             </Head>
             <div ref={containerRef}>
                 <Header autoHide className="[&>*]:text-white" />
-                <Hero />
+                <Hero activeEvent={activeEvent} />
                 <Winners />
                 <Partnership />
                 <Footer />

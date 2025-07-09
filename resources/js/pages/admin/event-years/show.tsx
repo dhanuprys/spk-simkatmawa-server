@@ -24,7 +24,8 @@ interface EventYear {
     registration_end: string;
     submission_start_date: string;
     submission_end_date: string;
-    is_active: boolean;
+    show_start: string;
+    show_end: string;
     participants_count: number;
     participants: Participant[];
     created_at: string;
@@ -104,10 +105,32 @@ export default function EventYearShow({ event_year }: Props) {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div>
-                                <Badge variant={event_year.is_active ? 'default' : 'secondary'}>
-                                    {event_year.is_active ? 'Aktif' : 'Nonaktif'}
-                                </Badge>
+                            <div className="grid gap-4">
+                                <div className="flex items-center gap-2">
+                                    <CalendarDays className="text-muted-foreground h-4 w-4" />
+                                    <div>
+                                        <p className="text-sm font-medium">Tahun Event</p>
+                                        <p className="text-muted-foreground text-sm">{event_year.year}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Calendar className="text-muted-foreground h-4 w-4" />
+                                    <div>
+                                        <p className="text-sm font-medium">Tampilkan Mulai</p>
+                                        <p className="text-muted-foreground text-sm">
+                                            {formatDate(event_year.show_start)}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Calendar className="text-muted-foreground h-4 w-4" />
+                                    <div>
+                                        <p className="text-sm font-medium">Tampilkan Sampai</p>
+                                        <p className="text-muted-foreground text-sm">
+                                            {formatDate(event_year.show_end)}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
 
                             {event_year.description && (
@@ -117,14 +140,6 @@ export default function EventYearShow({ event_year }: Props) {
                             )}
 
                             <div className="grid gap-4">
-                                <div className="flex items-center gap-2">
-                                    <CalendarDays className="text-muted-foreground h-4 w-4" />
-                                    <div>
-                                        <p className="text-sm font-medium">Tahun Event</p>
-                                        <p className="text-muted-foreground text-sm">{event_year.year}</p>
-                                    </div>
-                                </div>
-
                                 <div className="flex items-center gap-2">
                                     <Users className="text-muted-foreground h-4 w-4" />
                                     <div>

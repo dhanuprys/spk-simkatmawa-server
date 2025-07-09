@@ -13,8 +13,9 @@ class RegistrationController extends Controller
 {
     public function index()
     {
-        $eventYears = EventYear::where('registration_start', '<=', now())
-            ->where('registration_end', '>=', now())
+        $eventYears = EventYear::where('show_start', '<=', now())
+            ->where('show_end', '>=', now())
+            ->orderBy('registration_start')
             ->get();
 
         $categories = Category::where('is_active', true)->get();
@@ -40,8 +41,11 @@ class RegistrationController extends Controller
         ]);
 
         // Get the active event year
-        $activeEventYear = EventYear::where('registration_start', '<=', now())
+        $activeEventYear = EventYear::where('show_start', '<=', now())
+            ->where('show_end', '>=', now())
+            ->where('registration_start', '<=', now())
             ->where('registration_end', '>=', now())
+            ->orderBy('registration_start')
             ->first();
 
         if (!$activeEventYear) {

@@ -1,4 +1,3 @@
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AdminLayout from '@/layouts/admin-layout';
@@ -64,14 +63,14 @@ export default function EventYearsIndex({ event_years }: EventYearsIndexProps) {
                                                     {new Date(eventYear.registration_start).toLocaleDateString('id-ID')}{' '}
                                                     - {new Date(eventYear.registration_end).toLocaleDateString('id-ID')}
                                                 </span>
+                                                <span className="text-muted-foreground text-xs">
+                                                    Tampilkan:{' '}
+                                                    {new Date(eventYear.show_start).toLocaleDateString('id-ID')} -{' '}
+                                                    {new Date(eventYear.show_end).toLocaleDateString('id-ID')}
+                                                </span>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            {eventYear.is_active && (
-                                                <Badge variant="default" className="bg-green-100 text-green-800">
-                                                    Aktif
-                                                </Badge>
-                                            )}
                                             <Button variant="ghost" size="sm" asChild>
                                                 <Link href={route('admin.event-years.show', eventYear.id)}>
                                                     <Eye className="h-4 w-4" />
