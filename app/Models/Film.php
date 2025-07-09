@@ -11,6 +11,17 @@ class Film extends Model
 
     protected $guarded = [];
 
+    protected $fillable = [
+        'participant_id',
+        'title',
+        'description',
+        'direct_video_url',
+        'film_url',
+        'originality_file',
+        'poster_file',
+        'backdrop_file',
+        'verified_by_user_id',
+    ];
 
     public function participant()
     {
@@ -25,6 +36,11 @@ class Film extends Model
     public function votings()
     {
         return $this->hasMany(FilmVoting::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 
 }

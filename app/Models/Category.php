@@ -17,4 +17,9 @@ class Category extends Model
         return $this->hasMany(Participant::class);
     }
 
+    public function films()
+    {
+        return $this->hasMany(Film::class);
+    }
+
 }

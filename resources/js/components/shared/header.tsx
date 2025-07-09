@@ -16,6 +16,10 @@ const navigations = [
         path: '/film',
     },
     {
+        label: 'Cek Status',
+        path: '/status',
+    },
+    {
         label: 'Kontak',
         path: '/contact',
     },

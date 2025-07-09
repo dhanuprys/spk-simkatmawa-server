@@ -8,24 +8,24 @@
 @custom-variant dark (&:is(.dark *));
 
 @font-face {
-  font-family: 'LuckiestGuy';
-  src: url('/assets/fonts/LuckiestGuy-Regular.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
+    font-family: 'LuckiestGuy';
+    src: url('/assets/fonts/LuckiestGuy-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
 }
 
 @font-face {
-  font-family: 'Poppins';
-  src: url('/assets/fonts/Poppins-Regular.woff2') format('woff2');
-  font-weight: 400; /* Regular */
-  font-style: normal;
+    font-family: 'Poppins';
+    src: url('/assets/fonts/Poppins-Regular.woff2') format('woff2');
+    font-weight: 400; /* Regular */
+    font-style: normal;
 }
 
 @font-face {
-  font-family: 'Poppins';
-  src: url('/assets/fonts/Poppins-Thin.woff2') format('woff2');
-  font-weight: 100; /* Thin */
-  font-style: normal;
+    font-family: 'Poppins';
+    src: url('/assets/fonts/Poppins-Thin.woff2') format('woff2');
+    font-weight: 100; /* Thin */
+    font-style: normal;
 }
 
 .font-poppins {
@@ -38,7 +38,8 @@
 
 @theme {
     --font-sans:
-        'Poppins', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+        'Poppins', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
@@ -185,4 +186,34 @@
     body {
         @apply bg-background text-foreground;
     }
+}
+
+/* Floating animations for hero section */
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes float-delayed {
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-30px);
+    }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+    animation: float-delayed 8s ease-in-out infinite;
+    animation-delay: 2s;
 }

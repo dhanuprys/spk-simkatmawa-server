@@ -22,12 +22,32 @@ export interface NavItem {
     isActive?: boolean;
 }
 
+export interface EventYear {
+    id: number;
+    year: number;
+    registration_start: string;
+    registration_end: string;
+    submission_start_date: string;
+    submission_end_date: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Category {
+    id: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    eventYears?: EventYear[];
+    categories?: Category[];
     [key: string]: unknown;
 }
 
