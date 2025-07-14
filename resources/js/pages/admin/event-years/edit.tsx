@@ -61,9 +61,8 @@ export default function EventYearEdit({ event_year }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('admin.event-years.update', event_year.id), {
-            ...data,
-            _method: 'put',
+        setData('_method', 'put');
+        post(route('admin.event-years.update-post', event_year.id), {
             preserveScroll: true,
             onSuccess: () => {
                 setData('event_guide_document', null);

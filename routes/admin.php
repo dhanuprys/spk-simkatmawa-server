@@ -70,7 +70,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // Event Years Management
     Route::resource('event-years', EventYearController::class);
     // Support POST for update (for file uploads with method spoofing)
-    Route::post('event-years/{eventYear}', [EventYearController::class, 'update'])->name('event-years.update');
+    Route::post('event-years/{eventYear}', [EventYearController::class, 'update'])->name('event-years.update-post');
     Route::get('event-years/{eventYear}/download-guide', [EventYearController::class, 'downloadEventGuide'])->name('event-years.download-guide');
 
     // Users Management
