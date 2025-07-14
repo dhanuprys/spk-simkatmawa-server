@@ -12,7 +12,7 @@ export default function Footer() {
                     {/* Brand Section */}
                     <div className="lg:col-span-2">
                         <div className="mb-6 text-center md:text-left">
-                            <h3 className="font-luckiest bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-3xl text-transparent md:text-4xl lg:text-5xl">
+                            <h3 className="font-luckiest bg-gradient-to-r from-blue-400 to-blue-700 bg-clip-text text-3xl text-transparent md:text-4xl lg:text-5xl">
                                 NITISARA
                             </h3>
                             <p className="mt-3 text-base text-slate-300 md:mt-4 md:text-lg">

@@ -18,7 +18,13 @@ class RegistrationController extends Controller
             ->orderBy('registration_start')
             ->get();
 
-        $categories = Category::where('is_active', true)->get();
+        $activeEventYear = $eventYears->first();
+        $categories = collect();
+        if ($activeEventYear) {
+            $categories = Category::where('is_active', true)
+                ->where('event_year_id', $activeEventYear->id)
+                ->get();
+        }
 
         return Inertia::render('registration', [
             'eventYears' => $eventYears,

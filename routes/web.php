@@ -6,7 +6,7 @@ use App\Models\EventYear;
 
 Route::get('/', function () {
     $activeEvent = EventYear::withCount('participants')
-        ->select(['id', 'year', 'title', 'registration_start', 'registration_end'])
+        ->select(['id', 'year', 'title', 'registration_start', 'registration_end', 'event_guide_document'])
         ->where('show_start', '<=', now())
         ->where('show_end', '>=', now())
         ->orderBy('registration_start')
@@ -35,6 +35,14 @@ Route::post('/submission', [App\Http\Controllers\SubmissionController::class, 's
 Route::put('/submission/{film}', [App\Http\Controllers\SubmissionController::class, 'update'])->name('submission.update');
 Route::post('/submission/logout', [App\Http\Controllers\SubmissionController::class, 'logout'])->name('submission.logout');
 
+// Voting routes
+Route::get('/voting', [App\Http\Controllers\VotingController::class, 'index'])->name('voting.index');
+Route::get('/voting/closed', [App\Http\Controllers\VotingController::class, 'closed'])->name('voting.closed');
+Route::post('/voting/verify', [App\Http\Controllers\VotingController::class, 'verifyPin'])->name('voting.verify');
+Route::post('/voting/logout', [App\Http\Controllers\VotingController::class, 'logout'])->name('voting.logout');
+Route::post('/voting/start-session', [App\Http\Controllers\VotingController::class, 'startVotingSession'])->name('voting.start-session');
+Route::post('/voting/vote', [App\Http\Controllers\VotingController::class, 'vote'])->name('voting.vote');
+Route::get('/voting/check-session', [App\Http\Controllers\VotingController::class, 'checkSession'])->name('voting.check-session');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {

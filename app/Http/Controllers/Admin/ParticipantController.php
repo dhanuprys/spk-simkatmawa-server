@@ -38,8 +38,11 @@ class ParticipantController extends Controller
             ->latest()
             ->paginate(20);
 
-        $categories = Category::all();
         $event_years = EventYear::all();
+        $categories = collect();
+        if ($request->event_year_id) {
+            $categories = Category::where('event_year_id', $request->event_year_id)->get();
+        }
 
         return Inertia::render('admin/participants/index', [
             'participants' => $participants,
@@ -61,8 +64,11 @@ class ParticipantController extends Controller
     public function edit(Participant $participant)
     {
         $participant->load(['eventYear', 'category', 'verifiedBy']);
-        $categories = Category::all();
         $event_years = EventYear::all();
+        $categories = collect();
+        if ($participant->event_year_id) {
+            $categories = Category::where('event_year_id', $participant->event_year_id)->get();
+        }
 
         return Inertia::render('admin/participants/edit', [
             'participant' => $participant,

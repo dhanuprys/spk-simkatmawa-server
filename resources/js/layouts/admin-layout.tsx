@@ -4,11 +4,11 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { Head, Link, usePage } from '@inertiajs/react';
 import {
-    Award,
     BarChart3,
     Calendar,
     FileVideo,
     Home,
+    Key,
     LogOut,
     Menu,
     Settings,
@@ -24,15 +24,16 @@ interface AdminLayoutProps {
     description?: string;
 }
 
-const navigation = [
+const navigationMain = [
     { name: 'Dashboard', href: route('admin.dashboard'), icon: Home },
+    { name: 'Statistik', href: route('admin.statistics'), icon: BarChart3 },
     { name: 'Peserta', href: route('admin.participants.index'), icon: Users },
     { name: 'Film', href: route('admin.films.index'), icon: FileVideo },
-    { name: 'Kategori', href: route('admin.categories.index'), icon: Award },
     { name: 'Tahun Event', href: route('admin.event-years.index'), icon: Calendar },
-    { name: 'Statistik', href: route('admin.statistics'), icon: BarChart3 },
-    { name: 'Pengaturan', href: route('admin.settings.index'), icon: Settings },
+    { name: 'PIN Page Login', href: route('admin.voting-pins.index'), icon: Key },
+    { name: 'Users', href: route('admin.users.index'), icon: User },
 ];
+const navigationSecondary = [{ name: 'Pengaturan', href: route('admin.settings.index'), icon: Settings }];
 
 export default function AdminLayout({ children, title, description }: PropsWithChildren<AdminLayoutProps>) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -61,22 +62,49 @@ export default function AdminLayout({ children, title, description }: PropsWithC
                         </Button>
                     </div>
                     <nav className="space-y-2 p-4">
-                        {navigation.map((item) => (
-                            <Link
-                                key={item.name}
-                                href={item.href}
-                                className={cn(
-                                    'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                                    isActive(item.href)
-                                        ? 'bg-primary text-primary-foreground'
-                                        : 'hover:bg-accent hover:text-accent-foreground',
-                                )}
-                                onClick={() => setSidebarOpen(false)}
-                            >
-                                <item.icon className="h-4 w-4" />
-                                {item.name}
-                            </Link>
-                        ))}
+                        <div className="mb-2">
+                            <div className="text-muted-foreground px-3 py-1 text-xs font-semibold tracking-wider uppercase">
+                                Manajemen
+                            </div>
+                            {navigationMain.map((item) => (
+                                <Link
+                                    key={item.name}
+                                    href={item.href}
+                                    className={cn(
+                                        'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                                        isActive(item.href)
+                                            ? 'bg-primary text-primary-foreground'
+                                            : 'hover:bg-accent hover:text-accent-foreground',
+                                    )}
+                                    onClick={() => setSidebarOpen(false)}
+                                >
+                                    <item.icon className="h-4 w-4" />
+                                    {item.name}
+                                </Link>
+                            ))}
+                        </div>
+                        <Separator className="my-2" />
+                        <div>
+                            <div className="text-muted-foreground px-3 py-1 text-xs font-semibold tracking-wider uppercase">
+                                Lainnya
+                            </div>
+                            {navigationSecondary.map((item) => (
+                                <Link
+                                    key={item.name}
+                                    href={item.href}
+                                    className={cn(
+                                        'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                                        isActive(item.href)
+                                            ? 'bg-primary text-primary-foreground'
+                                            : 'hover:bg-accent hover:text-accent-foreground',
+                                    )}
+                                    onClick={() => setSidebarOpen(false)}
+                                >
+                                    <item.icon className="h-4 w-4" />
+                                    {item.name}
+                                </Link>
+                            ))}
+                        </div>
                     </nav>
                 </div>
             </div>
@@ -92,22 +120,49 @@ export default function AdminLayout({ children, title, description }: PropsWithC
                         <ul role="list" className="flex flex-1 flex-col gap-y-7">
                             <li>
                                 <ul role="list" className="-mx-2 space-y-1">
-                                    {navigation.map((item) => (
-                                        <li key={item.name}>
-                                            <Link
-                                                href={item.href}
-                                                className={cn(
-                                                    'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                                                    isActive(item.href)
-                                                        ? 'bg-primary text-primary-foreground'
-                                                        : 'hover:bg-accent hover:text-accent-foreground',
-                                                )}
-                                            >
-                                                <item.icon className="h-4 w-4" />
-                                                {item.name}
-                                            </Link>
-                                        </li>
-                                    ))}
+                                    <div className="mb-2">
+                                        <div className="text-muted-foreground px-3 py-1 text-xs font-semibold tracking-wider uppercase">
+                                            Manajemen
+                                        </div>
+                                        {navigationMain.map((item) => (
+                                            <li key={item.name}>
+                                                <Link
+                                                    href={item.href}
+                                                    className={cn(
+                                                        'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                                                        isActive(item.href)
+                                                            ? 'bg-primary text-primary-foreground'
+                                                            : 'hover:bg-accent hover:text-accent-foreground',
+                                                    )}
+                                                >
+                                                    <item.icon className="h-4 w-4" />
+                                                    {item.name}
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </div>
+                                    <Separator className="my-2" />
+                                    <div>
+                                        <div className="text-muted-foreground px-3 py-1 text-xs font-semibold tracking-wider uppercase">
+                                            Lainnya
+                                        </div>
+                                        {navigationSecondary.map((item) => (
+                                            <li key={item.name}>
+                                                <Link
+                                                    href={item.href}
+                                                    className={cn(
+                                                        'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                                                        isActive(item.href)
+                                                            ? 'bg-primary text-primary-foreground'
+                                                            : 'hover:bg-accent hover:text-accent-foreground',
+                                                    )}
+                                                >
+                                                    <item.icon className="h-4 w-4" />
+                                                    {item.name}
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </div>
                                 </ul>
                             </li>
                         </ul>

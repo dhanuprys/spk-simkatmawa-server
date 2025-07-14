@@ -4,10 +4,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AdminLayout from '@/layouts/admin-layout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Award, Save } from 'lucide-react';
 
-export default function CategoryCreate() {
+export default function CategoryCreate(props: any) {
+    // Try to get eventYearId from props, fallback to route params
+    const page = usePage();
+    const eventYearId = props.eventYearId || page.props.eventYearId || page.url.split('/').filter(Boolean).reverse()[2];
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         is_active: true as boolean,
@@ -15,7 +18,7 @@ export default function CategoryCreate() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('admin.categories.store'));
+        post(route('admin.event-years.categories.store', eventYearId));
     };
 
     return (
@@ -26,7 +29,7 @@ export default function CategoryCreate() {
                 {/* Header */}
                 <div className="flex items-center gap-4">
                     <Button variant="ghost" size="sm" asChild>
-                        <Link href={route('admin.categories.index')}>
+                        <Link href={route('admin.event-years.show', eventYearId)}>
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Kembali
                         </Link>
@@ -75,7 +78,7 @@ export default function CategoryCreate() {
                                     {processing ? 'Menyimpan...' : 'Simpan Kategori'}
                                 </Button>
                                 <Button type="button" variant="outline" asChild>
-                                    <Link href={route('admin.categories.index')}>Batal</Link>
+                                    <Link href={route('admin.event-years.show', eventYearId)}>Batal</Link>
                                 </Button>
                             </div>
                         </form>

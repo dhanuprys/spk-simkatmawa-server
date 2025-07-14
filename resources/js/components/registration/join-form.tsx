@@ -315,11 +315,11 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
     // Helper: get errors for a step
     const getStepErrors = (step: number) => {
         const errors = form.formState.errors;
-        if (step === 1) return stepFields[1].some((field) => errors[field]);
-        if (step === 2) return stepFields[2].some((field) => errors[field]);
-        if (step === 3) return false; // files handled separately
-        if (step === 4) return false;
-        return false;
+        if (step === 1) return stepFields[1].filter((field) => errors[field]);
+        if (step === 2) return stepFields[2].filter((field) => errors[field]);
+        if (step === 3) return []; // files handled separately
+        if (step === 4) return [];
+        return [];
     };
 
     // Refactor canProceedToStep to only check errors for the previous step
@@ -328,7 +328,7 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
             if (step === 1) return true;
             const previousStep = step - 1;
             const isPreviousStepComplete = isStepComplete(previousStep);
-            const hasStepErrors = getStepErrors(previousStep);
+            const hasStepErrors = getStepErrors(previousStep).length > 0;
             return isPreviousStepComplete && !hasStepErrors;
         },
         [isStepComplete, form.formState.errors],
@@ -362,7 +362,7 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
         if (fieldsToValidate.length > 0) {
             form.trigger(fieldsToValidate as any);
         }
-        if (getStepErrors(currentStep) || !isStepComplete(currentStep)) {
+        if (getStepErrors(currentStep).length > 0 || !isStepComplete(currentStep)) {
             return;
         }
         setActiveStep(activeStep + 1);
@@ -389,14 +389,14 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                 </div>
 
                 {/* Progress Steps */}
-                <div className="mb-8">
-                    <div className="flex items-center justify-center gap-4">
+                <div className="mb-6">
+                    <div className="flex flex-wrap items-center justify-center gap-2">
                         {steps.map((step, index) => {
                             const Icon = step.icon;
-                            const isComplete = isStepComplete(step.id);
                             const isActive = activeStep === step.id;
-                            const canAccess = canProceedToStep(step.id);
-                            const hasErrors = Object.keys(form.formState.errors).length > 0;
+                            const isComplete = isStepComplete(step.id);
+                            const hasErrors = getStepErrors(step.id).length > 0;
+                            const canAccess = step.id <= activeStep || isComplete;
 
                             return (
                                 <div key={step.id} className="flex items-center">
@@ -406,7 +406,7 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                                 <button
                                                     onClick={() => handleStepChange(step.id)}
                                                     disabled={!canAccess}
-                                                    className={`flex items-center gap-2 rounded-lg px-4 py-2 transition-all duration-200 hover:scale-105 ${
+                                                    className={`flex items-center gap-2 rounded-lg px-3 py-2 transition-all duration-200 hover:scale-105 sm:px-4 ${
                                                         isActive
                                                             ? 'bg-primary text-primary-foreground shadow-lg'
                                                             : isComplete
@@ -417,13 +417,15 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                                     } ${hasErrors && !isActive ? 'ring-2 ring-red-500' : ''}`}
                                                 >
                                                     {isComplete ? (
-                                                        <CheckCircle className="h-4 w-4" />
+                                                        <CheckCircle className="h-4 w-4 flex-shrink-0" />
                                                     ) : (
-                                                        <Icon className="h-4 w-4" />
+                                                        <Icon className="h-4 w-4 flex-shrink-0" />
                                                     )}
-                                                    <span className="hidden sm:inline">{step.title}</span>
+                                                    <span className="hidden whitespace-nowrap sm:inline">
+                                                        {step.title}
+                                                    </span>
                                                     {hasErrors && !isActive && (
-                                                        <div className="h-2 w-2 rounded-full bg-red-500" />
+                                                        <div className="h-2 w-2 flex-shrink-0 rounded-full bg-red-500" />
                                                     )}
                                                 </button>
                                             </TooltipTrigger>
@@ -439,7 +441,7 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                     </TooltipProvider>
                                     {index < steps.length - 1 && (
                                         <div
-                                            className={`mx-2 h-0.5 w-8 transition-all duration-300 ${
+                                            className={`mx-1 h-0.5 w-4 transition-all duration-300 sm:mx-2 sm:w-8 ${
                                                 isStepComplete(step.id) ? 'bg-green-300' : 'bg-muted'
                                             }`}
                                         />
@@ -451,24 +453,24 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                 </div>
 
                 <Card className="border-0 bg-gradient-to-br from-white to-gray-50/50 shadow-xl dark:from-gray-900 dark:to-gray-800/50">
-                    <CardHeader className="from-primary/5 to-secondary/5 border-b bg-gradient-to-r px-8 py-8 text-center">
-                        <div className="grid grid-cols-5 items-center justify-between">
-                            <div className="col-span-1" />
-                            <div className="col-span-3">
-                                <CardTitle className="mb-2 shrink-0 text-xl">
+                    <CardHeader className="from-primary/5 to-secondary/5 border-b bg-gradient-to-r px-4 py-6 text-center sm:px-8 sm:py-8">
+                        <div className="grid grid-cols-1 items-center justify-between gap-4 sm:grid-cols-5">
+                            <div className="order-2 sm:order-1 sm:col-span-1" />
+                            <div className="order-1 sm:order-2 sm:col-span-3">
+                                <CardTitle className="mb-2 shrink-0 text-lg sm:text-xl">
                                     {activeStep === 1 && 'Informasi Tim'}
                                     {activeStep === 2 && 'Informasi Ketua Tim'}
                                     {activeStep === 3 && 'Upload Dokumen'}
                                     {activeStep === 4 && 'Konfirmasi'}
                                 </CardTitle>
-                                <CardDescription className="text-base">
+                                <CardDescription className="text-sm sm:text-base">
                                     {activeStep === 1 && 'Isi informasi tim Anda'}
                                     {activeStep === 2 && 'Isi data ketua tim untuk komunikasi'}
                                     {activeStep === 3 && 'Upload dokumen yang diperlukan'}
                                     {activeStep === 4 && 'Konfirmasi pendaftaran'}
                                 </CardDescription>
                             </div>
-                            <div className="col-span-1 flex justify-end">
+                            <div className="order-3 flex justify-center sm:col-span-1 sm:justify-end">
                                 <TooltipProvider>
                                     <Tooltip open={showResetTooltip}>
                                         <TooltipTrigger asChild>
@@ -490,7 +492,7 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                             </div>
                         </div>
                     </CardHeader>
-                    <CardContent className="p-6">
+                    <CardContent className="p-4 sm:p-6">
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                                 {/* Error Summary */}
@@ -583,7 +585,7 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel className="flex items-center gap-2">
-                                                                <MapPin className="h-4 w-4" />
+                                                                <MapPin className="h-4 w-4 flex-shrink-0" />
                                                                 Kota
                                                             </FormLabel>
                                                             <FormControl>
@@ -604,7 +606,7 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel className="flex items-center gap-2">
-                                                                <Building className="h-4 w-4" />
+                                                                <Building className="h-4 w-4 flex-shrink-0" />
                                                                 Perusahaan/Institusi
                                                             </FormLabel>
                                                             <FormControl>
@@ -656,7 +658,7 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel className="flex items-center gap-2">
-                                                            <Mail className="h-4 w-4" />
+                                                            <Mail className="h-4 w-4 flex-shrink-0" />
                                                             Email
                                                         </FormLabel>
                                                         <FormControl>
@@ -678,7 +680,7 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel className="flex items-center gap-2">
-                                                            <Phone className="h-4 w-4" />
+                                                            <Phone className="h-4 w-4 flex-shrink-0" />
                                                             WhatsApp
                                                         </FormLabel>
                                                         <FormControl>
@@ -715,7 +717,7 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                             <div className="space-y-4">
                                                 <div
-                                                    className={`rounded-lg border-2 border-dashed p-6 transition-all duration-200 ${
+                                                    className={`rounded-lg border-2 border-dashed p-4 transition-all duration-200 sm:p-6 ${
                                                         dragOver === 'student_card_file'
                                                             ? 'border-primary bg-primary/5 scale-105'
                                                             : studentCardFile
@@ -727,18 +729,20 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                                     onDrop={(e) => handleDrop(e, 'student_card_file')}
                                                 >
                                                     <div className="text-center">
-                                                        <GraduationCap className="text-primary mx-auto mb-4 h-12 w-12" />
-                                                        <h4 className="mb-2 font-semibold">Kartu Mahasiswa</h4>
-                                                        <p className="text-muted-foreground mb-4 text-sm">
+                                                        <GraduationCap className="text-primary mx-auto mb-4 h-10 w-10 sm:h-12 sm:w-12" />
+                                                        <h4 className="mb-2 text-sm font-semibold sm:text-base">
+                                                            Kartu Mahasiswa
+                                                        </h4>
+                                                        <p className="text-muted-foreground mb-4 text-xs sm:text-sm">
                                                             Upload kartu mahasiswa ketua tim
                                                         </p>
                                                         {studentCardFile ? (
                                                             <div className="space-y-2">
-                                                                <div className="flex items-center justify-between rounded-lg bg-white p-3 dark:bg-gray-800">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <FileText className="text-primary h-4 w-4" />
-                                                                        <div className="text-left">
-                                                                            <p className="truncate text-sm font-medium">
+                                                                <div className="flex items-center justify-between rounded-lg bg-white p-2 sm:p-3 dark:bg-gray-800">
+                                                                    <div className="flex min-w-0 flex-1 items-center gap-2">
+                                                                        <FileText className="text-primary h-4 w-4 flex-shrink-0" />
+                                                                        <div className="min-w-0 text-left">
+                                                                            <p className="truncate text-xs font-medium sm:text-sm">
                                                                                 {studentCardFile.name}
                                                                             </p>
                                                                             <p className="text-muted-foreground text-xs">
@@ -751,12 +755,12 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                                                         variant="ghost"
                                                                         size="icon"
                                                                         onClick={() => removeFile('student_card_file')}
-                                                                        className="h-6 w-6"
+                                                                        className="h-6 w-6 flex-shrink-0"
                                                                     >
                                                                         <X className="h-3 w-3" />
                                                                     </Button>
                                                                 </div>
-                                                                <div className="flex items-center gap-2 text-sm text-green-600">
+                                                                <div className="flex items-center justify-center gap-2 text-xs text-green-600 sm:text-sm">
                                                                     <CheckCircle className="h-4 w-4" />
                                                                     File terupload
                                                                 </div>
@@ -780,7 +784,7 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
 
                                             <div className="space-y-4">
                                                 <div
-                                                    className={`rounded-lg border-2 border-dashed p-6 transition-all duration-200 ${
+                                                    className={`rounded-lg border-2 border-dashed p-4 transition-all duration-200 sm:p-6 ${
                                                         dragOver === 'payment_evidence_file'
                                                             ? 'border-primary bg-primary/5 scale-105'
                                                             : paymentEvidenceFile
@@ -792,18 +796,20 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                                     onDrop={(e) => handleDrop(e, 'payment_evidence_file')}
                                                 >
                                                     <div className="text-center">
-                                                        <CreditCard className="text-primary mx-auto mb-4 h-12 w-12" />
-                                                        <h4 className="mb-2 font-semibold">Bukti Pembayaran</h4>
-                                                        <p className="text-muted-foreground mb-4 text-sm">
+                                                        <CreditCard className="text-primary mx-auto mb-4 h-10 w-10 sm:h-12 sm:w-12" />
+                                                        <h4 className="mb-2 text-sm font-semibold sm:text-base">
+                                                            Bukti Pembayaran
+                                                        </h4>
+                                                        <p className="text-muted-foreground mb-4 text-xs sm:text-sm">
                                                             Upload bukti pembayaran biaya pendaftaran
                                                         </p>
                                                         {paymentEvidenceFile ? (
                                                             <div className="space-y-2">
-                                                                <div className="flex items-center justify-between rounded-lg bg-white p-3 dark:bg-gray-800">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <FileText className="text-primary h-4 w-4" />
-                                                                        <div className="text-left">
-                                                                            <p className="truncate text-sm font-medium">
+                                                                <div className="flex items-center justify-between rounded-lg bg-white p-2 sm:p-3 dark:bg-gray-800">
+                                                                    <div className="flex min-w-0 flex-1 items-center gap-2">
+                                                                        <FileText className="text-primary h-4 w-4 flex-shrink-0" />
+                                                                        <div className="min-w-0 text-left">
+                                                                            <p className="truncate text-xs font-medium sm:text-sm">
                                                                                 {paymentEvidenceFile.name}
                                                                             </p>
                                                                             <p className="text-muted-foreground text-xs">
@@ -820,12 +826,12 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                                                         onClick={() =>
                                                                             removeFile('payment_evidence_file')
                                                                         }
-                                                                        className="h-6 w-6"
+                                                                        className="h-6 w-6 flex-shrink-0"
                                                                     >
                                                                         <X className="h-3 w-3" />
                                                                     </Button>
                                                                 </div>
-                                                                <div className="flex items-center gap-2 text-sm text-green-600">
+                                                                <div className="flex items-center justify-center gap-2 text-xs text-green-600 sm:text-sm">
                                                                     <CheckCircle className="h-4 w-4" />
                                                                     File terupload
                                                                 </div>
@@ -860,44 +866,161 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
 
                                 {/* Step 4: Confirmation */}
                                 {activeStep === 4 && (
-                                    <div className="flex flex-col items-center justify-center py-8">
-                                        <label className="flex cursor-pointer items-center space-x-2 select-none">
-                                            <input
-                                                type="checkbox"
-                                                checked={isReadyChecked}
-                                                onChange={(e) => setIsReadyChecked(e.target.checked)}
-                                                className="form-checkbox text-primary focus:ring-primary h-5 w-5 rounded border-gray-300"
-                                            />
-                                            <span className="text-base font-medium">
-                                                Saya sudah siap dan data yang saya masukkan sudah benar.
-                                            </span>
-                                        </label>
-                                        <p className="mt-4 max-w-md text-center text-sm text-gray-500">
-                                            Pastikan semua data sudah benar sebelum mengirim pendaftaran. Setelah
-                                            mengirim, data tidak dapat diubah kecuali oleh admin.
-                                        </p>
-                                    </div>
+                                    <>
+                                        {/* Input Summary */}
+                                        <div className="mx-auto mb-8 w-full max-w-2xl rounded-xl bg-white/60 p-4 sm:p-6">
+                                            <h3 className="mb-4 flex items-center gap-2 text-base font-semibold text-gray-900">
+                                                <FileText className="h-5 w-5 flex-shrink-0 text-blue-500" /> Ringkasan
+                                                Data Pendaftaran
+                                            </h3>
+                                            <div className="grid grid-cols-1 gap-x-4 gap-y-4 text-sm sm:gap-x-8 md:grid-cols-2">
+                                                <div className="min-w-0">
+                                                    <div className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                                        Informasi Tim
+                                                    </div>
+                                                    <div className="flex justify-between border-b border-dashed border-gray-100 py-1">
+                                                        <span className="truncate pr-2 text-gray-500">Nama Tim</span>
+                                                        <span className="truncate text-right font-medium text-gray-900">
+                                                            {form.getValues('team_name')}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between border-b border-dashed border-gray-100 py-1">
+                                                        <span className="truncate pr-2 text-gray-500">Kota</span>
+                                                        <span className="truncate text-right font-medium text-gray-900">
+                                                            {form.getValues('city')}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between border-b border-dashed border-gray-100 py-1">
+                                                        <span className="truncate pr-2 text-gray-500">
+                                                            Perusahaan/Institusi
+                                                        </span>
+                                                        <span className="truncate text-right font-medium text-gray-900">
+                                                            {form.getValues('company')}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between py-1">
+                                                        <span className="truncate pr-2 text-gray-500">Kategori</span>
+                                                        <span className="truncate text-right font-medium text-gray-900">
+                                                            {categories.find(
+                                                                (c) =>
+                                                                    c.id.toString() === form.getValues('category_id'),
+                                                            )?.name || '-'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <div className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                                        Ketua Tim
+                                                    </div>
+                                                    <div className="flex justify-between border-b border-dashed border-gray-100 py-1">
+                                                        <span className="truncate pr-2 text-gray-500">Nama</span>
+                                                        <span className="truncate text-right font-medium text-gray-900">
+                                                            {form.getValues('leader_name')}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between border-b border-dashed border-gray-100 py-1">
+                                                        <span className="truncate pr-2 text-gray-500">Email</span>
+                                                        <span className="truncate text-right font-medium text-gray-900">
+                                                            {form.getValues('leader_email')}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between py-1">
+                                                        <span className="truncate pr-2 text-gray-500">WhatsApp</span>
+                                                        <span className="truncate text-right font-medium text-gray-900">
+                                                            {form.getValues('leader_whatsapp')}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-4 md:col-span-2">
+                                                    <div className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                                        Dokumen
+                                                    </div>
+                                                    <div className="flex flex-col gap-3 sm:flex-row sm:gap-6">
+                                                        <div className="flex min-w-0 items-start gap-2">
+                                                            <GraduationCap className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-400" />
+                                                            <div className="min-w-0 flex-1">
+                                                                <span className="block text-gray-500">
+                                                                    Kartu Mahasiswa:
+                                                                </span>
+                                                                {studentCardFile ? (
+                                                                    <span className="block truncate font-medium text-gray-900">
+                                                                        {studentCardFile.name}{' '}
+                                                                        <span className="text-xs text-gray-400">
+                                                                            ({formatFileSize(studentCardFile.size)})
+                                                                        </span>
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="block text-gray-400">
+                                                                        Belum diupload
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex min-w-0 items-start gap-2">
+                                                            <CreditCard className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-400" />
+                                                            <div className="min-w-0 flex-1">
+                                                                <span className="block text-gray-500">
+                                                                    Bukti Pembayaran:
+                                                                </span>
+                                                                {paymentEvidenceFile ? (
+                                                                    <span className="block truncate font-medium text-gray-900">
+                                                                        {paymentEvidenceFile.name}{' '}
+                                                                        <span className="text-xs text-gray-400">
+                                                                            ({formatFileSize(paymentEvidenceFile.size)})
+                                                                        </span>
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="block text-gray-400">
+                                                                        Belum diupload
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Confirmation Checkbox */}
+                                        <div className="flex flex-col items-center justify-center py-6 sm:py-8">
+                                            <label className="flex cursor-pointer items-start space-x-3 text-center select-none sm:text-left">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isReadyChecked}
+                                                    onChange={(e) => setIsReadyChecked(e.target.checked)}
+                                                    className="form-checkbox text-primary focus:ring-primary mt-1 h-5 w-5 flex-shrink-0 rounded border-gray-300"
+                                                />
+                                                <span className="text-sm font-medium sm:text-base">
+                                                    Saya sudah siap dan data yang saya masukkan sudah benar.
+                                                </span>
+                                            </label>
+                                            <p className="mt-4 max-w-md text-center text-xs text-gray-500 sm:text-sm">
+                                                Pastikan semua data sudah benar sebelum mengirim pendaftaran. Setelah
+                                                mengirim, data tidak dapat diubah kecuali oleh admin.
+                                            </p>
+                                        </div>
+                                    </>
                                 )}
 
                                 {/* Navigation Buttons */}
-                                <div className="flex items-center justify-between border-t pt-6">
+                                <div className="flex flex-col gap-4 border-t pt-6 sm:flex-row sm:items-center sm:justify-between">
                                     <Button
                                         type="button"
                                         variant="outline"
                                         onClick={handlePreviousStep}
                                         disabled={activeStep === 1}
-                                        className="flex items-center gap-2"
+                                        className="flex w-full items-center justify-center gap-2 sm:w-auto"
                                     >
                                         Sebelumnya
                                     </Button>
 
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex w-full items-center justify-center gap-3 sm:w-auto">
                                         {activeStep < 4 && (
                                             <Button
                                                 type="button"
                                                 onClick={handleNextStep}
                                                 disabled={!isStepComplete(activeStep)}
-                                                className="flex items-center gap-2"
+                                                className="flex w-full items-center justify-center gap-2 sm:w-auto"
                                             >
                                                 Selanjutnya
                                                 <ArrowRight className="h-4 w-4" />
@@ -908,7 +1031,7 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                             <Button
                                                 type="submit"
                                                 disabled={isSubmitting || (activeStep === 4 && !isReadyChecked)}
-                                                className="flex items-center gap-2 px-8"
+                                                className="flex w-full items-center justify-center gap-2 px-8 sm:w-auto"
                                             >
                                                 {isSubmitting ? (
                                                     <>

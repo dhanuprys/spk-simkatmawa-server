@@ -86,3 +86,7 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
         </AdminLayout>
     );
 }
+
+// This file is no longer used since categories are now managed through event years
+// The standalone category management has been replaced with event-year scoped categories
+// See resources/js/pages/admin/event-years/show.tsx for the new implementation

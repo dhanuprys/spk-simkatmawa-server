@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AdminLayout from '@/layouts/admin-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Save } from 'lucide-react';
+import { FileText, Save } from 'lucide-react';
 
 export default function EventYearCreate() {
     const { data, setData, post, processing, errors } = useForm({
@@ -18,11 +18,23 @@ export default function EventYearCreate() {
         submission_end_date: '',
         show_start: '',
         show_end: '',
+        event_guide_document: null as File | null,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('admin.event-years.store'));
+        post(route('admin.event-years.store'), {
+            preserveScroll: true,
+            onSuccess: () => {
+                // Reset file input after successful submission
+                setData('event_guide_document', null);
+            },
+        });
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+        setData('event_guide_document', file);
     };
 
     return (
@@ -75,6 +87,31 @@ export default function EventYearCreate() {
                                     rows={3}
                                 />
                                 {errors.description && <p className="text-sm text-red-600">{errors.description}</p>}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="event_guide_document">Dokumen Panduan Event</Label>
+                                <div className="space-y-2">
+                                    <Input
+                                        id="event_guide_document"
+                                        type="file"
+                                        accept=".pdf,.doc,.docx"
+                                        onChange={handleFileChange}
+                                        className={errors.event_guide_document ? 'border-red-500' : ''}
+                                    />
+                                    <p className="text-muted-foreground text-xs">
+                                        Format yang didukung: PDF, DOC, DOCX (Maksimal 10MB)
+                                    </p>
+                                    {data.event_guide_document && (
+                                        <div className="flex items-center gap-2 text-sm text-green-600">
+                                            <FileText className="h-4 w-4" />
+                                            {data.event_guide_document.name}
+                                        </div>
+                                    )}
+                                    {errors.event_guide_document && (
+                                        <p className="text-sm text-red-600">{errors.event_guide_document}</p>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="grid gap-4 md:grid-cols-2">

@@ -182,47 +182,55 @@ export default function StatusShow({ participant, session }: StatusShowProps) {
                 <SafeWidth className="py-24">
                     <div className="mx-auto max-w-4xl">
                         {/* Header */}
-                        <div className="mb-8 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <Button variant="ghost" size="sm" asChild>
-                                    <Link href={route('status.index')}>
-                                        <ArrowLeft className="mr-2 h-4 w-4" />
-                                        Kembali
-                                    </Link>
-                                </Button>
-                                <div>
-                                    <h1 className="text-2xl font-bold">{participant.team_name}</h1>
-                                    <p className="text-muted-foreground">PIN: {participant.pin}</p>
+                        <div className="mb-6 sm:mb-8">
+                            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                                    <Button variant="ghost" size="sm" asChild className="w-fit">
+                                        <Link href={route('status.index')}>
+                                            <ArrowLeft className="mr-2 h-4 w-4" />
+                                            Kembali
+                                        </Link>
+                                    </Button>
+                                    <div className="space-y-1">
+                                        <h1 className="text-xl font-bold sm:text-2xl">{participant.team_name}</h1>
+                                        <p className="text-muted-foreground text-sm">PIN: {participant.pin}</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={handleExtendSession}
-                                    disabled={isExtending}
-                                >
-                                    <RefreshCw className={`mr-2 h-4 w-4 ${isExtending ? 'animate-spin' : ''}`} />
-                                    Perpanjang Sesi
-                                </Button>
-                                <Button variant="outline" size="sm" onClick={handleLogout}>
-                                    <LogOut className="mr-2 h-4 w-4" />
-                                    Keluar
-                                </Button>
+                                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={handleExtendSession}
+                                        disabled={isExtending}
+                                        className="w-full sm:w-auto"
+                                    >
+                                        <RefreshCw className={`mr-2 h-4 w-4 ${isExtending ? 'animate-spin' : ''}`} />
+                                        Perpanjang Sesi
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={handleLogout}
+                                        className="w-full sm:w-auto"
+                                    >
+                                        <LogOut className="mr-2 h-4 w-4" />
+                                        Keluar
+                                    </Button>
+                                </div>
                             </div>
                         </div>
 
                         {/* Session Info */}
                         <Card className="mb-6">
                             <CardContent className="pt-6">
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-muted-foreground">Sesi aktif hingga:</span>
-                                    <span className="font-medium">{timeLeft}</span>
+                                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                    <span className="text-muted-foreground text-sm">Sesi aktif hingga:</span>
+                                    <span className="text-sm font-medium text-green-600">{timeLeft}</span>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <div className="grid gap-6 md:grid-cols-2">
+                        <div className="grid gap-6 lg:grid-cols-2">
                             {/* Status Information */}
                             <Card>
                                 <CardHeader>
@@ -363,30 +371,30 @@ export default function StatusShow({ participant, session }: StatusShowProps) {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <div className="grid gap-4 md:grid-cols-3">
+                                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                     <div className="flex items-center gap-3">
-                                        <Users className="text-muted-foreground h-4 w-4" />
-                                        <div>
+                                        <Users className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+                                        <div className="min-w-0 flex-1">
                                             <div className="font-medium">Nama Ketua</div>
-                                            <div className="text-muted-foreground text-sm">
+                                            <div className="text-muted-foreground truncate text-sm">
                                                 {participant.leader_name}
                                             </div>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <Mail className="text-muted-foreground h-4 w-4" />
-                                        <div>
+                                        <Mail className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+                                        <div className="min-w-0 flex-1">
                                             <div className="font-medium">Email</div>
-                                            <div className="text-muted-foreground text-sm">
+                                            <div className="text-muted-foreground truncate text-sm">
                                                 {participant.leader_email}
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <Phone className="text-muted-foreground h-4 w-4" />
-                                        <div>
+                                    <div className="flex items-center gap-3 sm:col-span-2 lg:col-span-1">
+                                        <Phone className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+                                        <div className="min-w-0 flex-1">
                                             <div className="font-medium">WhatsApp</div>
-                                            <div className="text-muted-foreground text-sm">
+                                            <div className="text-muted-foreground truncate text-sm">
                                                 {participant.leader_whatsapp}
                                             </div>
                                         </div>
@@ -398,7 +406,7 @@ export default function StatusShow({ participant, session }: StatusShowProps) {
                                 {/* Document Downloads */}
                                 <div className="space-y-3">
                                     <div className="font-medium">Dokumen</div>
-                                    <div className="grid gap-3 md:grid-cols-2">
+                                    <div className="grid gap-3 sm:grid-cols-2">
                                         <Button variant="outline" size="sm" asChild className="w-full justify-start">
                                             <a
                                                 href={`/registration/${participant.pin}/download/student-card`}
@@ -437,14 +445,26 @@ export default function StatusShow({ participant, session }: StatusShowProps) {
                                         {participant.films.map((film) => (
                                             <div
                                                 key={film.id}
-                                                className="flex items-center justify-between rounded-lg border p-3"
+                                                className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between"
                                             >
-                                                <div>
-                                                    <div className="font-medium">
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="font-medium text-gray-900">
                                                         {film.title || `Film #${film.id}`}
                                                     </div>
-                                                    <div className="text-muted-foreground text-sm">
-                                                        Durasi: {film.duration} menit
+                                                    {film.synopsis && (
+                                                        <div className="text-muted-foreground mt-1 line-clamp-2 text-sm">
+                                                            {film.synopsis}
+                                                        </div>
+                                                    )}
+                                                    <div className="text-muted-foreground mt-2 text-xs">
+                                                        Dikirim:{' '}
+                                                        {new Date(film.created_at).toLocaleDateString('id-ID', {
+                                                            day: '2-digit',
+                                                            month: 'short',
+                                                            year: 'numeric',
+                                                            hour: '2-digit',
+                                                            minute: '2-digit',
+                                                        })}
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2">
@@ -467,11 +487,13 @@ export default function StatusShow({ participant, session }: StatusShowProps) {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="py-6 text-center">
-                                        <FileVideo className="text-muted-foreground mx-auto mb-2 h-8 w-8" />
-                                        <p className="text-muted-foreground text-sm">Belum ada film yang diunggah</p>
+                                    <div className="py-8 text-center">
+                                        <FileVideo className="text-muted-foreground mx-auto mb-3 h-12 w-12" />
+                                        <p className="text-muted-foreground mb-4 text-sm">
+                                            Belum ada film yang diunggah
+                                        </p>
                                         {participant.verification_status === 'approved' && (
-                                            <Button asChild className="mt-3">
+                                            <Button asChild>
                                                 <Link href="/submission">Upload Film Sekarang</Link>
                                             </Button>
                                         )}

@@ -16,6 +16,8 @@ class SubmissionController extends Controller
         $existingFilm = null;
         $eventYear = null;
         $isSubmissionOpen = false;
+        $submissionStatus = 'closed'; // 'closed', 'coming_soon', 'open', 'ended'
+        $countdownInfo = null;
 
         // Check if participant is in session
         if ($request->session()->has('participant_id')) {
@@ -24,12 +26,38 @@ class SubmissionController extends Controller
             if ($participant) {
                 $eventYear = $participant->eventYear;
                 $existingFilm = Film::where('participant_id', $participant->id)->first();
+            }
+        }
 
-                // Check if submission period is open
-                $now = now();
-                $isSubmissionOpen = $eventYear &&
-                    $now >= $eventYear->submission_start_date &&
-                    $now <= $eventYear->submission_end_date;
+        // If no participant or no event year from participant, check for active event year
+        if (!$eventYear) {
+            $eventYear = EventYear::where('show_start', '<=', now())
+                ->where('show_end', '>=', now())
+                ->orderBy('submission_start_date')
+                ->first();
+        }
+
+        // Check submission period status
+        $now = now();
+        if ($eventYear) {
+            $submissionStart = $eventYear->submission_start_date;
+            $submissionEnd = $eventYear->submission_end_date;
+
+            if ($now < $submissionStart) {
+                $submissionStatus = 'coming_soon';
+                $countdownInfo = [
+                    'target_date' => $submissionStart,
+                    'message' => 'Submit film akan dibuka dalam:'
+                ];
+            } elseif ($now >= $submissionStart && $now <= $submissionEnd) {
+                $submissionStatus = 'open';
+                $isSubmissionOpen = true;
+            } else {
+                $submissionStatus = 'ended';
+                $countdownInfo = [
+                    'target_date' => $submissionEnd,
+                    'message' => 'Submit film telah ditutup sejak:'
+                ];
             }
         }
 
@@ -38,6 +66,12 @@ class SubmissionController extends Controller
             'existingFilm' => $existingFilm,
             'eventYear' => $eventYear,
             'isSubmissionOpen' => $isSubmissionOpen,
+            'submissionStatus' => $submissionStatus,
+            'countdownInfo' => $countdownInfo,
+            'flash' => [
+                'success' => session('success'),
+                'error' => session('error'),
+            ],
         ]);
     }
 
@@ -102,8 +136,9 @@ class SubmissionController extends Controller
         }
 
         $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'synopsis' => 'required|string|max:1000',
             'film_url' => 'required|url',
-            'direct_video_url' => 'nullable|url',
             'originality_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:4096',
             'poster_file' => 'required|file|mimes:jpg,jpeg,png|max:4096',
             'backdrop_file' => 'nullable|file|mimes:jpg,jpeg,png|max:4096',
@@ -120,8 +155,9 @@ class SubmissionController extends Controller
 
         $film = Film::create([
             'participant_id' => $participant->id,
+            'title' => $validated['title'],
+            'synopsis' => $validated['synopsis'],
             'film_url' => $validated['film_url'],
-            'direct_video_url' => $validated['direct_video_url'],
             'originality_file' => $originalityPath,
             'poster_file' => $posterPath,
             'backdrop_file' => $backdropPath,
@@ -157,7 +193,6 @@ class SubmissionController extends Controller
 
         $validated = $request->validate([
             'film_url' => 'required|url',
-            'direct_video_url' => 'nullable|url',
             'originality_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:4096',
             'poster_file' => 'nullable|file|mimes:jpg,jpeg,png|max:4096',
             'backdrop_file' => 'nullable|file|mimes:jpg,jpeg,png|max:4096',
@@ -165,7 +200,6 @@ class SubmissionController extends Controller
 
         $updateData = [
             'film_url' => $validated['film_url'],
-            'direct_video_url' => $validated['direct_video_url'],
         ];
 
         // Handle file uploads if provided

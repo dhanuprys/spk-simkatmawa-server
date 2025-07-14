@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AdminLayout from '@/layouts/admin-layout';
 import { Head, Link } from '@inertiajs/react';
-import { Award, Calendar, CheckCircle, Clock, Eye, FileVideo, Star, TrendingUp, Users, X } from 'lucide-react';
+import { Calendar, CheckCircle, Clock, Eye, FileVideo, Star, TrendingUp, Users, X } from 'lucide-react';
 
 interface DashboardProps {
     stats: {
@@ -50,15 +50,15 @@ export default function Dashboard({
             bgColor: 'bg-green-50',
             href: route('admin.films.index'),
         },
-        {
-            title: 'Kategori',
-            value: stats.total_categories,
-            icon: Award,
-            description: 'Kategori film',
-            color: 'text-purple-600',
-            bgColor: 'bg-purple-50',
-            href: route('admin.categories.index'),
-        },
+        // {
+        //     title: 'Kategori',
+        //     value: stats.total_categories,
+        //     icon: Award,
+        //     description: 'Kategori film',
+        //     color: 'text-purple-600',
+        //     bgColor: 'bg-purple-50',
+        //     href: route('admin.categories.index'),
+        // },
         {
             title: 'Tahun Event',
             value: stats.total_event_years,

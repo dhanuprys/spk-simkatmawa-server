@@ -25,10 +25,15 @@ export interface NavItem {
 export interface EventYear {
     id: number;
     year: number;
+    title: string;
+    description: string | null;
     registration_start: string;
     registration_end: string;
     submission_start_date: string;
     submission_end_date: string;
+    show_start: string | null;
+    show_end: string | null;
+    event_guide_document: string | null;
     created_at: string;
     updated_at: string;
 }

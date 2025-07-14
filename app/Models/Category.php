@@ -9,7 +9,11 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'name',
+        'is_active',
+        'event_year_id',
+    ];
 
 
     public function participants()
@@ -22,4 +26,8 @@ class Category extends Model
         return $this->hasMany(Film::class);
     }
 
+    public function eventYear()
+    {
+        return $this->belongsTo(EventYear::class);
+    }
 }

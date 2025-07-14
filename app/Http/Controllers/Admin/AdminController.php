@@ -75,87 +75,117 @@ class AdminController extends Controller
 
     public function statistics()
     {
+        // Get current year for filtering
+        $currentYear = date('Y');
+
+        // Participants by month for current year
         $participants_by_month = Participant::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
-            ->whereYear('created_at', date('Y'))
+            ->whereYear('created_at', $currentYear)
             ->groupBy('month')
             ->orderBy('month')
             ->get();
 
-        $films_by_category = Category::withCount('participants')
+        // Films by category: count films where participant.category_id matches category
+        $films_by_category = Category::withCount(['participants as total_participants'])
+            ->get()
+            ->map(function ($category) {
+                $total_films = \App\Models\Film::whereHas('participant', function ($q) use ($category) {
+                    $q->where('category_id', $category->id);
+                })->count();
+                return [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'total_participants' => $category->total_participants,
+                    'total_films' => $total_films,
+                ];
+            });
+
+        // Films by month for current year
+        $films_by_month = Film::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+            ->whereYear('created_at', $currentYear)
+            ->groupBy('month')
+            ->orderBy('month')
             ->get();
 
+        // Verification statistics
         $verification_stats = [
             'participants' => [
                 'pending' => Participant::whereNull('verified_by_user_id')->count(),
                 'verified' => Participant::whereNotNull('verified_by_user_id')->count(),
+                'total' => Participant::count(),
             ],
             'films' => [
                 'pending' => Film::whereNull('verified_by_user_id')->count(),
                 'verified' => Film::whereNotNull('verified_by_user_id')->count(),
+                'total' => Film::count(),
             ],
+        ];
+
+        // Event year statistics
+        $event_years_stats = EventYear::withCount(['participants', 'films'])
+            ->orderBy('show_start', 'desc')
+            ->get()
+            ->map(function ($eventYear) {
+                return [
+                    'id' => $eventYear->id,
+                    'title' => $eventYear->title,
+                    'show_start' => $eventYear->show_start,
+                    'show_end' => $eventYear->show_end,
+                    'submission_start_date' => $eventYear->submission_start_date,
+                    'submission_end_date' => $eventYear->submission_end_date,
+                    'participants_count' => $eventYear->participants_count,
+                    'films_count' => $eventYear->films_count,
+                    'is_active' => ($eventYear->show_start && $eventYear->show_end)
+                        ? now()->between($eventYear->show_start, $eventYear->show_end)
+                        : false,
+                    'submission_status' => $this->getSubmissionStatus($eventYear),
+                ];
+            });
+
+        // Recent activity (last 30 days)
+        $recent_activity = [
+            'new_participants' => Participant::where('created_at', '>=', now()->subDays(30))->count(),
+            'new_films' => Film::where('created_at', '>=', now()->subDays(30))->count(),
+            'verified_participants' => Participant::where('verified_at', '>=', now()->subDays(30))->count(),
+            'verified_films' => Film::where('verified_at', '>=', now()->subDays(30))->count(),
+        ];
+
+        // Overall statistics
+        $overall_stats = [
+            'total_participants' => Participant::count(),
+            'total_films' => Film::count(),
+            'total_categories' => Category::count(),
+            'total_event_years' => EventYear::count(),
+            'total_users' => User::count(),
+            'avg_films_per_participant' => Participant::count() > 0 ? round(Film::count() / Participant::count(), 2) : 0,
         ];
 
         return Inertia::render('admin/statistics', [
             'participants_by_month' => $participants_by_month,
+            'films_by_month' => $films_by_month,
             'films_by_category' => $films_by_category,
             'verification_stats' => $verification_stats,
+            'event_years_stats' => $event_years_stats,
+            'recent_activity' => $recent_activity,
+            'overall_stats' => $overall_stats,
+            'current_year' => $currentYear,
         ]);
     }
 
-    public function participantsReport(Request $request)
+    private function getSubmissionStatus($eventYear)
     {
-        $participants = Participant::with(['eventYear', 'category', 'verifiedBy', 'films'])
-            ->when($request->search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
-            })
-            ->when($request->category_id, function ($query, $categoryId) {
-                $query->where('category_id', $categoryId);
-            })
-            ->when($request->event_year_id, function ($query, $eventYearId) {
-                $query->where('event_year_id', $eventYearId);
-            })
-            ->when($request->status, function ($query, $status) {
-                if ($status === 'verified') {
-                    $query->whereNotNull('verified_by_user_id');
-                } elseif ($status === 'pending') {
-                    $query->whereNull('verified_by_user_id');
-                }
-            })
-            ->latest()
-            ->paginate(20);
+        $now = now();
+        $submissionStart = $eventYear->submission_start_date;
+        $submissionEnd = $eventYear->submission_end_date;
 
-        $categories = Category::all();
-        $event_years = EventYear::all();
-
-        return Inertia::render('admin/reports/participants', [
-            'participants' => $participants,
-            'categories' => $categories,
-            'event_years' => $event_years,
-            'filters' => $request->only(['search', 'category_id', 'event_year_id', 'status']),
-        ]);
+        if ($now < $submissionStart) {
+            return 'coming_soon';
+        } elseif ($now >= $submissionStart && $now <= $submissionEnd) {
+            return 'open';
+        } else {
+            return 'ended';
+        }
     }
 
-    public function filmsReport(Request $request)
-    {
-        $films = Film::with(['participant', 'verifiedBy'])
-            ->when($request->search, function ($query, $search) {
-                $query->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
-            })
-            ->when($request->status, function ($query, $status) {
-                if ($status === 'verified') {
-                    $query->whereNotNull('verified_by_user_id');
-                } elseif ($status === 'pending') {
-                    $query->whereNull('verified_by_user_id');
-                }
-            })
-            ->latest()
-            ->paginate(20);
 
-        return Inertia::render('admin/reports/films', [
-            'films' => $films,
-            'filters' => $request->only(['search', 'status']),
-        ]);
-    }
 }

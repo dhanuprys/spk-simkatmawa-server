@@ -14,11 +14,16 @@ class FilmController extends Controller
     {
         $films = Film::with(['participant', 'verifiedBy'])
             ->when($request->search, function ($query, $search) {
-                $query->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhereHas('participant', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%");
-                    });
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('synopsis', 'like', "%{$search}%")
+                        ->orWhereHas('participant', function ($participantQuery) use ($search) {
+                            $participantQuery->where('team_name', 'like', "%{$search}%")
+                                ->orWhere('leader_name', 'like', "%{$search}%")
+                                ->orWhere('city', 'like', "%{$search}%")
+                                ->orWhere('company', 'like', "%{$search}%");
+                        });
+                });
             })
             ->when($request->status, function ($query, $status) {
                 if ($status === 'verified') {
@@ -45,43 +50,19 @@ class FilmController extends Controller
         ]);
     }
 
-    public function edit(Film $film)
-    {
-        $film->load(['participant']);
-
-        return Inertia::render('admin/films/edit', [
-            'film' => $film,
-        ]);
-    }
-
-    public function update(Request $request, Film $film)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'duration' => 'required|integer|min:1',
-            'director' => 'required|string|max:255',
-            'producer' => 'required|string|max:255',
-            'year_produced' => 'required|integer|min:1900|max:' . (date('Y') + 1),
-            'language' => 'required|string|max:100',
-            'subtitle_language' => 'nullable|string|max:100',
-            'synopsis' => 'required|string',
-            'crew' => 'nullable|string',
-            'cast' => 'nullable|string',
-            'technical_specs' => 'nullable|string',
-        ]);
-
-        $film->update($validated);
-
-        return redirect()->route('admin.films.show', $film)
-            ->with('success', 'Data film berhasil diperbarui');
-    }
-
     public function destroy(Film $film)
     {
-        // Delete film file if exists
-        if ($film->file_path && Storage::exists($film->file_path)) {
-            Storage::delete($film->file_path);
+        // Delete uploaded files if they exist
+        if ($film->originality_file && Storage::disk('public')->exists($film->originality_file)) {
+            Storage::disk('public')->delete($film->originality_file);
+        }
+
+        if ($film->poster_file && Storage::disk('public')->exists($film->poster_file)) {
+            Storage::disk('public')->delete($film->poster_file);
+        }
+
+        if ($film->backdrop_file && Storage::disk('public')->exists($film->backdrop_file)) {
+            Storage::disk('public')->delete($film->backdrop_file);
         }
 
         $film->delete();
@@ -112,10 +93,37 @@ class FilmController extends Controller
 
     public function download(Film $film)
     {
-        if (!$film->file_path || !Storage::exists($film->file_path)) {
-            abort(404, 'File film tidak ditemukan');
+        if (!$film->originality_file || !Storage::disk('public')->exists($film->originality_file)) {
+            abort(404, 'File tidak ditemukan');
         }
 
-        return Storage::download($film->file_path, $film->title . '.mp4');
+        return Storage::disk('public')->download($film->originality_file, 'surat_orisinalitas_' . $film->title . '.pdf');
+    }
+
+    public function downloadPoster(Film $film)
+    {
+        if (!$film->poster_file || !Storage::disk('public')->exists($film->poster_file)) {
+            abort(404, 'File poster tidak ditemukan');
+        }
+
+        return Storage::disk('public')->download($film->poster_file, 'poster_' . $film->title . '.jpg');
+    }
+
+    public function downloadBackdrop(Film $film)
+    {
+        if (!$film->backdrop_file || !Storage::disk('public')->exists($film->backdrop_file)) {
+            abort(404, 'File backdrop tidak ditemukan');
+        }
+
+        return Storage::disk('public')->download($film->backdrop_file, 'backdrop_' . $film->title . '.jpg');
+    }
+
+    public function update(Request $request, Film $film)
+    {
+        $validated = $request->validate([
+            'ranking' => 'nullable|integer',
+        ]);
+        $film->update($validated);
+        return back()->with('success', 'Peringkat film berhasil diperbarui.');
     }
 }

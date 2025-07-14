@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import AdminLayout from '@/layouts/admin-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import dayjs from 'dayjs';
-import { Save } from 'lucide-react';
+import { Download, FileText, Save } from 'lucide-react';
 
 interface EventYear {
     id: number;
@@ -21,6 +21,7 @@ interface EventYear {
     submission_end_date: string;
     show_start: string;
     show_end: string;
+    event_guide_document: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -29,8 +30,23 @@ interface Props {
     event_year: EventYear;
 }
 
+interface EventYearFormData {
+    year: string;
+    title: string;
+    description: string;
+    registration_start: string;
+    registration_end: string;
+    submission_start_date: string;
+    submission_end_date: string;
+    show_start: string;
+    show_end: string;
+    event_guide_document: File | null;
+    _method?: string;
+    [key: string]: any;
+}
+
 export default function EventYearEdit({ event_year }: Props) {
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, post, processing, errors } = useForm<EventYearFormData>({
         year: event_year.year.toString(),
         title: event_year.title,
         description: event_year.description || '',
@@ -40,11 +56,28 @@ export default function EventYearEdit({ event_year }: Props) {
         submission_end_date: event_year.submission_end_date,
         show_start: event_year.show_start || '',
         show_end: event_year.show_end || '',
+        event_guide_document: null,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(route('admin.event-years.update', event_year.id));
+        post(route('admin.event-years.update', event_year.id), {
+            ...data,
+            _method: 'put',
+            preserveScroll: true,
+            onSuccess: () => {
+                setData('event_guide_document', null);
+            },
+        });
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+        setData('event_guide_document', file);
+    };
+
+    const getFileName = (filePath: string) => {
+        return filePath.split('/').pop() || filePath;
     };
 
     return (
@@ -97,6 +130,59 @@ export default function EventYearEdit({ event_year }: Props) {
                                     rows={3}
                                 />
                                 {errors.description && <p className="text-sm text-red-600">{errors.description}</p>}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="event_guide_document">Dokumen Panduan Event</Label>
+                                <div className="space-y-2">
+                                    <Input
+                                        id="event_guide_document"
+                                        type="file"
+                                        accept=".pdf,.doc,.docx"
+                                        onChange={handleFileChange}
+                                        className={errors.event_guide_document ? 'border-red-500' : ''}
+                                    />
+                                    <p className="text-muted-foreground text-xs">
+                                        Format yang didukung: PDF, DOC, DOCX (Maksimal 10MB)
+                                    </p>
+
+                                    {/* Show existing file */}
+                                    {event_year.event_guide_document && !data.event_guide_document && (
+                                        <div className="flex items-center justify-between rounded-md border p-3">
+                                            <div className="flex items-center gap-2">
+                                                <FileText className="h-4 w-4 text-blue-600" />
+                                                <span className="text-sm">
+                                                    {getFileName(event_year.event_guide_document)}
+                                                </span>
+                                            </div>
+                                            <Button type="button" variant="outline" size="sm" asChild>
+                                                <a
+                                                    href={route('admin.event-years.download-guide', event_year.id)}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    <Download className="mr-1 h-3 w-3" />
+                                                    Download
+                                                </a>
+                                            </Button>
+                                        </div>
+                                    )}
+
+                                    {/* Show new selected file */}
+                                    {data.event_guide_document && (
+                                        <div className="flex items-center gap-2 text-sm text-green-600">
+                                            <FileText className="h-4 w-4" />
+                                            {data.event_guide_document.name}
+                                            <span className="text-muted-foreground text-xs">
+                                                (akan mengganti file yang ada)
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    {errors.event_guide_document && (
+                                        <p className="text-sm text-red-600">{errors.event_guide_document}</p>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="grid gap-4 md:grid-cols-2">

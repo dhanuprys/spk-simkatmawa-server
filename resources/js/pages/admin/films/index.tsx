@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AdminLayout from '@/layouts/admin-layout';
 import { Head, Link, router } from '@inertiajs/react';
-import { CheckCircle, Clock, Download, Eye, FileVideo, Filter, Search, X } from 'lucide-react';
+import { Calendar, CheckCircle, Clock, Download, Eye, FileVideo, Filter, Search, User, X } from 'lucide-react';
 import { useState } from 'react';
 
 interface FilmsIndexProps {
@@ -54,6 +54,16 @@ export default function FilmsIndex({ films, filters }: FilmsIndexProps) {
         );
     };
 
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    };
+
     return (
         <AdminLayout title="Film" description="Kelola data film festival">
             <Head title="Film - NITISARA Admin" />
@@ -64,6 +74,11 @@ export default function FilmsIndex({ films, filters }: FilmsIndexProps) {
                     <div>
                         <h1 className="text-2xl font-bold">Film</h1>
                         <p className="text-muted-foreground">Kelola data film festival NITISARA</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-sm">
+                            Total: {films.total} film
+                        </Badge>
                     </div>
                 </div>
 
@@ -82,7 +97,7 @@ export default function FilmsIndex({ films, filters }: FilmsIndexProps) {
                                 <div className="relative">
                                     <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                                     <Input
-                                        placeholder="Cari judul film atau nama peserta..."
+                                        placeholder="Cari judul film, deskripsi, atau nama tim..."
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
                                         className="pl-10"
@@ -91,7 +106,7 @@ export default function FilmsIndex({ films, filters }: FilmsIndexProps) {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Status</label>
+                                <label className="text-sm font-medium">Status Verifikasi</label>
                                 <Select value={status} onValueChange={setStatus}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Semua status" />
@@ -130,56 +145,80 @@ export default function FilmsIndex({ films, filters }: FilmsIndexProps) {
                                 {films.data.map((film) => (
                                     <div
                                         key={film.id}
-                                        className="flex items-center justify-between rounded-lg border p-4"
+                                        className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-gray-50"
                                     >
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex flex-col">
-                                                <span className="font-medium">{film.title}</span>
-                                                <span className="text-muted-foreground text-sm">
-                                                    {film.participant?.name} • {film.duration} menit
-                                                </span>
-                                                <span className="text-muted-foreground text-sm">
-                                                    {film.director} • {film.year_produced}
-                                                </span>
+                                        <div className="flex flex-1 items-center gap-4">
+                                            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
+                                                <FileVideo className="h-6 w-6 text-blue-600" />
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <div className="mb-1 flex items-center gap-2">
+                                                    <h3 className="truncate font-semibold text-gray-900">
+                                                        {film.title}
+                                                    </h3>
+                                                    {film.verified_by_user_id ? (
+                                                        <Badge
+                                                            variant="default"
+                                                            className="bg-green-100 text-xs text-green-800"
+                                                        >
+                                                            <CheckCircle className="mr-1 h-3 w-3" />
+                                                            Terverifikasi
+                                                        </Badge>
+                                                    ) : (
+                                                        <Badge variant="secondary" className="text-xs">
+                                                            <Clock className="mr-1 h-3 w-3" />
+                                                            Menunggu
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                                <p className="mb-2 line-clamp-2 text-sm text-gray-600">
+                                                    {film.synopsis}
+                                                </p>
+                                                <div className="flex items-center gap-4 text-xs text-gray-500">
+                                                    <div className="flex items-center gap-1">
+                                                        <User className="h-3 w-3" />
+                                                        <span>{film.participant?.team_name || 'N/A'}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <Calendar className="h-3 w-3" />
+                                                        <span>{formatDate(film.created_at)}</span>
+                                                    </div>
+                                                    {film.verified_by_user_id && (
+                                                        <div className="flex items-center gap-1">
+                                                            <CheckCircle className="h-3 w-3" />
+                                                            <span>Diverifikasi oleh {film.verified_by?.name}</span>
+                                                        </div>
+                                                    )}
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="font-semibold">Peringkat:</span>
+                                                        <span>{film.ranking ?? '-'}</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <div className="text-right">
-                                                <div className="text-muted-foreground text-sm">{film.language}</div>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                {film.verified_by_user_id ? (
-                                                    <Badge variant="default" className="bg-green-100 text-green-800">
-                                                        <CheckCircle className="mr-1 h-3 w-3" />
-                                                        Terverifikasi
-                                                    </Badge>
-                                                ) : (
-                                                    <Badge variant="secondary">
-                                                        <Clock className="mr-1 h-3 w-3" />
-                                                        Menunggu
-                                                    </Badge>
-                                                )}
-                                                <Button variant="ghost" size="sm" asChild>
-                                                    <Link href={route('admin.films.show', film.id)}>
-                                                        <Eye className="h-4 w-4" />
-                                                    </Link>
-                                                </Button>
+                                            <Button variant="ghost" size="sm" asChild>
+                                                <Link href={route('admin.films.show', film.id)}>
+                                                    <Eye className="h-4 w-4" />
+                                                </Link>
+                                            </Button>
+                                            {film.originality_file && (
                                                 <Button variant="ghost" size="sm" asChild>
                                                     <Link href={route('admin.films.download', film.id)}>
                                                         <Download className="h-4 w-4" />
                                                     </Link>
                                                 </Button>
-                                            </div>
+                                            )}
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <div className="py-8 text-center">
-                                <FileVideo className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
+                            <div className="py-12 text-center">
+                                <FileVideo className="text-muted-foreground mx-auto mb-4 h-16 w-16" />
                                 <h3 className="mb-2 text-lg font-medium">Tidak ada film</h3>
-                                <p className="text-muted-foreground">
-                                    Belum ada film yang diunggah atau tidak ada yang sesuai dengan filter.
+                                <p className="text-muted-foreground mx-auto max-w-md">
+                                    Belum ada film yang diunggah atau tidak ada yang sesuai dengan filter yang dipilih.
                                 </p>
                             </div>
                         )}

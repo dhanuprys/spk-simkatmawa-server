@@ -21,6 +21,7 @@ class EventYear extends Model
         'submission_end_date',
         'show_start',
         'show_end',
+        'event_guide_document',
     ];
 
     protected $casts = [
@@ -35,5 +36,22 @@ class EventYear extends Model
     public function participants()
     {
         return $this->hasMany(Participant::class);
+    }
+
+    public function films()
+    {
+        return $this->hasManyThrough(
+            \App\Models\Film::class,
+            \App\Models\Participant::class,
+            'event_year_id', // Foreign key on participants table
+            'participant_id', // Foreign key on films table
+            'id', // Local key on event_years table
+            'id'  // Local key on participants table
+        );
+    }
+
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
     }
 }

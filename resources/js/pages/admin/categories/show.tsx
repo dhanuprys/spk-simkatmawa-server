@@ -33,6 +33,7 @@ interface Category {
     is_active: boolean;
     participants_count: number;
     participants: Participant[];
+    event_year_id: number;
     created_at: string;
     updated_at: string;
 }
@@ -62,9 +63,9 @@ export default function CategoryShow({ category }: Props) {
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Button variant="ghost" size="sm" asChild>
-                            <Link href={route('admin.categories.index')}>
+                            <Link href={route('admin.event-years.index')}>
                                 <ArrowLeft className="mr-2 h-4 w-4" />
-                                Kembali
+                                Kembali ke Tahun Event
                             </Link>
                         </Button>
                         <div>
@@ -74,7 +75,9 @@ export default function CategoryShow({ category }: Props) {
                     </div>
                     <div className="flex gap-2">
                         <Button asChild>
-                            <Link href={route('admin.categories.edit', category.id)}>
+                            <Link
+                                href={route('admin.event-years.categories.edit', [category.event_year_id, category.id])}
+                            >
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit
                             </Link>

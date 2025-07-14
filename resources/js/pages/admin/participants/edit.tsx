@@ -39,6 +39,9 @@ export default function ParticipantEdit({ participant, categories, event_years }
         pin: participant.pin,
     });
 
+    // Filter categories by selected event year
+    const filteredCategories = categories.filter((category: any) => category.event_year_id === data.event_year_id);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         put(route('admin.participants.update', participant.id));
@@ -142,11 +145,17 @@ export default function ParticipantEdit({ participant, categories, event_years }
                                                 <SelectValue placeholder="Pilih kategori" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {categories.map((category) => (
-                                                    <SelectItem key={category.id} value={category.id.toString()}>
-                                                        {category.name}
-                                                    </SelectItem>
-                                                ))}
+                                                {filteredCategories.length > 0 ? (
+                                                    filteredCategories.map((category) => (
+                                                        <SelectItem key={category.id} value={category.id.toString()}>
+                                                            {category.name}
+                                                        </SelectItem>
+                                                    ))
+                                                ) : (
+                                                    <div className="text-muted-foreground px-4 py-2">
+                                                        Tidak ada kategori untuk tahun event ini
+                                                    </div>
+                                                )}
                                             </SelectContent>
                                         </Select>
                                         {errors.category_id && (

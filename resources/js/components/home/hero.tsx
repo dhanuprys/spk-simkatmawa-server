@@ -1,7 +1,6 @@
 import { cn } from '@/lib/utils';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { Clock, Rocket, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import SafeWidth from '../safe-width';
 import { Button } from '../ui/button';
@@ -17,6 +16,9 @@ interface HeroProps {
         participants_count: number;
         registration_start?: string;
         registration_end?: string;
+        event_guide_document?: string;
+        show_start?: string;
+        show_end?: string;
     } | null;
 }
 
@@ -98,31 +100,42 @@ export default function Hero({ activeEvent }: HeroProps) {
                             mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0 delay-200',
                         )}
                     >
-                        <div className="flex w-full flex-col items-center sm:w-auto">
+                        <div className="flex w-full flex-col items-center gap-3 sm:w-auto">
                             {registrationNotOpened && (
                                 <span className="mb-1 text-xs font-medium tracking-wide text-blue-300 uppercase">
                                     Pendaftaran dibuka dalam:
                                 </span>
                             )}
-                            <Button
-                                className="flex w-full items-center gap-2 rounded-full bg-white py-4 text-lg font-semibold text-black shadow-md sm:w-auto md:p-8 md:text-xl"
-                                disabled={registrationNotOpened}
-                                aria-label={registrationNotOpened ? 'Countdown menuju pendaftaran' : 'Jumlah peserta'}
-                            >
-                                {registrationNotOpened ? (
-                                    <>
-                                        <Clock className="h-5 w-5 text-blue-600" />
-                                        <span className="font-mono text-base tracking-widest tabular-nums md:text-xl">
-                                            {countdownText}
-                                        </span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <User className="h-5 w-5 text-blue-600" />
-                                        <span>{activeEvent.participants_count} Peserta</span>
-                                    </>
-                                )}
-                            </Button>
+                            {registrationNotOpened ? (
+                                <Button
+                                    className="flex w-full items-center gap-2 rounded-full bg-white py-4 text-lg font-semibold text-black shadow-md sm:w-auto md:p-8 md:text-xl"
+                                    disabled
+                                    aria-label="Countdown menuju pendaftaran"
+                                >
+                                    <span className="font-mono text-base tracking-widest tabular-nums md:text-xl">
+                                        {countdownText}
+                                    </span>
+                                </Button>
+                            ) : null}
+                            {/* Improved download button for guide document */}
+                            {activeEvent && activeEvent.event_guide_document && (
+                                <Button
+                                    className="flex w-full items-center gap-2 rounded-full bg-gray-300/20 px-8 py-4 text-white shadow-md backdrop-blur-2xl transition-transform hover:scale-105 active:scale-95 sm:w-auto md:p-8 md:text-xl"
+                                    size="default"
+                                    asChild
+                                    aria-label="Download Panduan Event"
+                                >
+                                    <a
+                                        href={route('admin.event-years.download-guide', activeEvent.id)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-2"
+                                        style={{ boxShadow: '0 1px 6px 0 rgba(30,64,175,0.04)' }}
+                                    >
+                                        <span>Unduh Buku Panduan</span>
+                                    </a>
+                                </Button>
+                            )}
                         </div>
                         <div className="w-full sm:w-auto">
                             {registrationNotOpened ? (
@@ -131,7 +144,6 @@ export default function Hero({ activeEvent }: HeroProps) {
                                     disabled
                                     aria-label="Pendaftaran segera dibuka"
                                 >
-                                    <Rocket className="h-5 w-5" />
                                     Segera Dibuka
                                 </Button>
                             ) : (
@@ -140,10 +152,7 @@ export default function Hero({ activeEvent }: HeroProps) {
                                     asChild
                                     aria-label="Daftar sekarang"
                                 >
-                                    <a href="/registration">
-                                        <Rocket className="h-5 w-5" />
-                                        Daftar Sekarang!
-                                    </a>
+                                    <a href="/registration">Daftar Sekarang!</a>
                                 </Button>
                             )}
                         </div>

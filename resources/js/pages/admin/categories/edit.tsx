@@ -22,7 +22,7 @@ interface Props {
     category: Category;
 }
 
-export default function CategoryEdit({ category }: Props) {
+export default function CategoryEdit({ category, eventYearId }: { category: Category; eventYearId: number }) {
     const { data, setData, put, processing, errors } = useForm({
         name: category.name,
         is_active: category.is_active,
@@ -30,7 +30,7 @@ export default function CategoryEdit({ category }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(route('admin.categories.update', category.id));
+        put(route('admin.event-years.categories.update', [eventYearId, category.id]));
     };
 
     return (
@@ -41,7 +41,7 @@ export default function CategoryEdit({ category }: Props) {
                 {/* Header */}
                 <div className="flex items-center gap-4">
                     <Button variant="ghost" size="sm" asChild>
-                        <Link href={route('admin.categories.index')}>
+                        <Link href={route('admin.event-years.show', eventYearId)}>
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Kembali
                         </Link>
@@ -90,7 +90,7 @@ export default function CategoryEdit({ category }: Props) {
                                     {processing ? 'Menyimpan...' : 'Update Kategori'}
                                 </Button>
                                 <Button type="button" variant="outline" asChild>
-                                    <Link href={route('admin.categories.index')}>Batal</Link>
+                                    <Link href={route('admin.event-years.show', eventYearId)}>Batal</Link>
                                 </Button>
                             </div>
                         </form>

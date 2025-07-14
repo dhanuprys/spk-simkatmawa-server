@@ -1,8 +1,9 @@
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AdminLayout from '@/layouts/admin-layout';
 import { Head, Link } from '@inertiajs/react';
-import { Calendar, Edit, Eye, Plus } from 'lucide-react';
+import { Award, Calendar, Edit, Plus, Ticket, Users } from 'lucide-react';
 
 interface EventYearsIndexProps {
     event_years: {
@@ -41,49 +42,89 @@ export default function EventYearsIndex({ event_years }: EventYearsIndexProps) {
                     </CardHeader>
                     <CardContent>
                         {event_years.data.length > 0 ? (
-                            <div className="space-y-4">
-                                {event_years.data.map((eventYear) => (
-                                    <div
-                                        key={eventYear.id}
-                                        className="flex items-center justify-between rounded-lg border p-4"
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex flex-col">
-                                                <span className="font-medium">
-                                                    {eventYear.title} ({eventYear.year})
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                {event_years.data.map((eventYear) => {
+                                    const now = new Date();
+                                    const showStart = new Date(eventYear.show_start);
+                                    const showEnd = new Date(eventYear.show_end);
+                                    const isOngoing = now >= showStart && now <= showEnd;
+                                    return (
+                                        <div
+                                            key={eventYear.id}
+                                            className={`group flex flex-col justify-between rounded-xl border bg-white p-5 shadow-sm transition hover:shadow-md ${isOngoing ? 'border-green-400 ring-2 ring-green-100' : 'border-gray-200'}`}
+                                        >
+                                            <div className="mb-2 flex items-center gap-3">
+                                                <span className="flex items-center gap-2 text-lg font-bold">
+                                                    {eventYear.title}{' '}
+                                                    <span className="text-base font-normal text-gray-500">
+                                                        ({eventYear.year})
+                                                    </span>
+                                                    {isOngoing && (
+                                                        <Badge className="animate-pulse border-green-200 bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
+                                                            Sedang Berlangsung
+                                                        </Badge>
+                                                    )}
                                                 </span>
-                                                <span className="text-muted-foreground text-sm">
-                                                    {eventYear.description || 'Tidak ada deskripsi'}
+                                            </div>
+                                            <div className="mb-2 text-sm text-gray-700">
+                                                {eventYear.description || (
+                                                    <span className="text-gray-400 italic">Tidak ada deskripsi</span>
+                                                )}
+                                            </div>
+                                            <div className="mb-2 flex flex-wrap gap-3 text-sm">
+                                                <span className="flex items-center gap-1 font-medium text-blue-700">
+                                                    <Award className="h-4 w-4" />
+                                                    {eventYear.categories_count ?? 0} Kategori
                                                 </span>
-                                                <span className="text-muted-foreground text-sm">
-                                                    {eventYear.participants_count} peserta
+                                                <span className="flex items-center gap-1 font-medium text-purple-700">
+                                                    <Users className="h-4 w-4" />
+                                                    {eventYear.participants_count} Peserta
                                                 </span>
-                                                <span className="text-muted-foreground text-sm">
+                                                <span className="flex items-center gap-1 font-medium text-orange-600">
+                                                    <Ticket className="h-4 w-4" />
+                                                    {eventYear.ticket_stats?.unused ?? 0} Tiket Tersedia
+                                                </span>
+                                            </div>
+                                            <div className="mb-3 flex flex-col gap-1 text-xs text-gray-500">
+                                                <span>
                                                     Pendaftaran:{' '}
                                                     {new Date(eventYear.registration_start).toLocaleDateString('id-ID')}{' '}
                                                     - {new Date(eventYear.registration_end).toLocaleDateString('id-ID')}
                                                 </span>
-                                                <span className="text-muted-foreground text-xs">
+                                                <span>
                                                     Tampilkan:{' '}
                                                     {new Date(eventYear.show_start).toLocaleDateString('id-ID')} -{' '}
                                                     {new Date(eventYear.show_end).toLocaleDateString('id-ID')}
                                                 </span>
                                             </div>
+                                            <div className="mt-auto flex gap-2">
+                                                <Button
+                                                    asChild
+                                                    size="sm"
+                                                    className="w-full font-semibold"
+                                                    variant="secondary"
+                                                >
+                                                    <Link href={route('admin.event-years.show', eventYear.id)}>
+                                                        Kelola
+                                                    </Link>
+                                                </Button>
+                                                <Button
+                                                    asChild
+                                                    size="icon"
+                                                    variant="ghost"
+                                                    className="border border-gray-200"
+                                                >
+                                                    <Link
+                                                        href={route('admin.event-years.edit', eventYear.id)}
+                                                        title="Edit Tahun Event"
+                                                    >
+                                                        <Edit className="h-4 w-4" />
+                                                    </Link>
+                                                </Button>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <Button variant="ghost" size="sm" asChild>
-                                                <Link href={route('admin.event-years.show', eventYear.id)}>
-                                                    <Eye className="h-4 w-4" />
-                                                </Link>
-                                            </Button>
-                                            <Button variant="ghost" size="sm" asChild>
-                                                <Link href={route('admin.event-years.edit', eventYear.id)}>
-                                                    <Edit className="h-4 w-4" />
-                                                </Link>
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         ) : (
                             <div className="py-8 text-center">

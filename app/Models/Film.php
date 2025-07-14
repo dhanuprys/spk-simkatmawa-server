@@ -14,13 +14,14 @@ class Film extends Model
     protected $fillable = [
         'participant_id',
         'title',
-        'description',
+        'synopsis',
         'direct_video_url',
         'film_url',
         'originality_file',
         'poster_file',
         'backdrop_file',
         'verified_by_user_id',
+        'ranking',
     ];
 
     public function participant()
@@ -38,9 +39,10 @@ class Film extends Model
         return $this->hasMany(FilmVoting::class);
     }
 
-    public function category()
+    public function getVoteCountAttribute()
     {
-        return $this->belongsTo(Category::class);
+        return $this->votings()->count();
     }
+
 
 }
