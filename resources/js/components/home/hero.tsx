@@ -76,7 +76,7 @@ export default function Hero({ activeEvent }: HeroProps) {
             <SafeWidth className="relative z-[1] max-w-[65rem] space-y-6 pt-8 pb-8">
                 <h1
                     className={cn(
-                        'font-luckiest bg-gradient-to-b from-blue-800 to-blue-500 bg-clip-text text-center text-8xl text-transparent drop-shadow-[0_0_1px_#1D4ED8] transition-all duration-700 sm:text-6xl md:text-8xl md:text-9xl',
+                        'font-luckiest bg-gradient-to-b from-blue-800 to-blue-500 bg-clip-text text-center text-8xl text-transparent drop-shadow-[0_0_1px_#1D4ED8] transition-all duration-700 sm:text-6xl md:text-7xl',
                         mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0',
                     )}
                 >
