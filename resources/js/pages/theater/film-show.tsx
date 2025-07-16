@@ -1,6 +1,6 @@
 import { FilmCard, RecommendedFilms, TheaterHeader, type Film } from '@/components/theater';
 import { Button } from '@/components/ui/button';
-import { usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 function ShareButton({ url, title }: { url: string; title: string }) {
@@ -250,6 +250,7 @@ function FilmShow() {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-black via-zinc-900 to-black pt-24 text-white">
+            <Head title={`${film.title} | NITISARA Theater`} />
             <TheaterHeader onSearch={handleSearch} isSearching={!!searchQuery} homeUrl="/theater" />
             <main className="mx-auto max-w-6xl px-4 pb-16">
                 <div className="pt-6 md:pt-8">

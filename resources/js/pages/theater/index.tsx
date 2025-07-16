@@ -1,5 +1,5 @@
 import { FilmCard, FilmRow, TheaterHeader, TheaterHero, type Film } from '@/components/theater';
-import { usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 // Types for props (adjust as needed for your backend data)
@@ -290,6 +290,7 @@ export default function TheaterIndex() {
 
     return (
         <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-b from-black via-zinc-900 to-black text-white">
+            <Head title="NITISARA Theater" />
             <TheaterHeader onSearch={handleSearch} isSearching={!!searchQuery} homeUrl="/" />
             <main className="pb-16">
                 <TheaterHero films={allFilms} />
