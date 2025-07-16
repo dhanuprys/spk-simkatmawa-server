@@ -39,11 +39,12 @@ export default function FilmCreateForParticipant({ participant }: FilmCreateForP
         direct_video_url: '',
         ranking: '',
         originality_file: null as File | null,
-        poster_file: null as File | null,
+        poster_landscape_file: null as File | null,
+        poster_portrait_file: null as File | null,
         backdrop_file: null as File | null,
         director: '',
         teaser_url: '',
-        castings: [],
+        castings: [] as Array<{ real_name: string; film_name: string }>,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -301,7 +302,7 @@ export default function FilmCreateForParticipant({ participant }: FilmCreateForP
 
                                 {/* Originality File */}
                                 <div>
-                                    <Label htmlFor="originality_file">Surat Pernyataan Orisinalitas</Label>
+                                    <Label htmlFor="originality_file">Surat Pernyataan Orisinalitas (Opsional)</Label>
                                     <div
                                         className={`mt-2 cursor-pointer rounded-lg border-2 border-dashed p-4 transition-all duration-200 ${
                                             dragOver === 'originality_file'
@@ -342,47 +343,99 @@ export default function FilmCreateForParticipant({ participant }: FilmCreateForP
                                     )}
                                 </div>
 
-                                {/* Poster File */}
-                                <div>
-                                    <Label htmlFor="poster_file">Poster Film</Label>
-                                    <div
-                                        className={`mt-2 cursor-pointer rounded-lg border-2 border-dashed p-4 transition-all duration-200 ${
-                                            dragOver === 'poster_file'
-                                                ? 'border-primary bg-primary/5 scale-105'
-                                                : form.data.poster_file
-                                                  ? 'border-green-300 bg-green-50'
-                                                  : 'border-primary/30 hover:border-primary/50'
-                                        }`}
-                                        onDragOver={(e) => handleDragOver(e, 'poster_file')}
-                                        onDragLeave={handleDragLeave}
-                                        onDrop={(e) => handleDrop(e, 'poster_file')}
-                                        onClick={() => document.getElementById('poster_file')?.click()}
-                                    >
-                                        <div className="flex items-center justify-center">
-                                            <div className="text-center">
-                                                <Upload className="mx-auto mb-2 h-8 w-8 text-gray-400" />
-                                                <p className="text-sm text-gray-600">
-                                                    {form.data.poster_file
-                                                        ? form.data.poster_file.name
-                                                        : 'Drag & drop file atau klik untuk memilih'}
-                                                </p>
-                                                <p className="text-xs text-gray-500">JPG, JPEG, PNG (max 4MB)</p>
+                                {/* Poster Files */}
+                                <div className="grid gap-6 md:grid-cols-2">
+                                    {/* Poster Landscape File */}
+                                    <div>
+                                        <Label htmlFor="poster_landscape_file">
+                                            Poster Landscape (16:9) (Opsional)
+                                        </Label>
+                                        <div
+                                            className={`mt-2 cursor-pointer rounded-lg border-2 border-dashed p-4 transition-all duration-200 ${
+                                                dragOver === 'poster_landscape_file'
+                                                    ? 'border-primary bg-primary/5 scale-105'
+                                                    : form.data.poster_landscape_file
+                                                      ? 'border-green-300 bg-green-50'
+                                                      : 'border-primary/30 hover:border-primary/50'
+                                            }`}
+                                            onDragOver={(e) => handleDragOver(e, 'poster_landscape_file')}
+                                            onDragLeave={handleDragLeave}
+                                            onDrop={(e) => handleDrop(e, 'poster_landscape_file')}
+                                            onClick={() => document.getElementById('poster_landscape_file')?.click()}
+                                        >
+                                            <div className="flex items-center justify-center">
+                                                <div className="text-center">
+                                                    <Upload className="mx-auto mb-2 h-8 w-8 text-gray-400" />
+                                                    <p className="text-sm text-gray-600">
+                                                        {form.data.poster_landscape_file
+                                                            ? form.data.poster_landscape_file.name
+                                                            : 'Drag & drop file atau klik untuk memilih'}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">
+                                                        JPG, JPEG, PNG (16:9, max 3MB)
+                                                    </p>
+                                                </div>
                                             </div>
+                                            <input
+                                                id="poster_landscape_file"
+                                                type="file"
+                                                className="hidden"
+                                                accept=".jpg,.jpeg,.png"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) form.setData('poster_landscape_file', file);
+                                                }}
+                                            />
                                         </div>
-                                        <input
-                                            id="poster_file"
-                                            type="file"
-                                            className="hidden"
-                                            accept=".jpg,.jpeg,.png"
-                                            onChange={(e) => {
-                                                const file = e.target.files?.[0];
-                                                if (file) form.setData('poster_file', file);
-                                            }}
-                                        />
+                                        {form.errors.poster_landscape_file && (
+                                            <p className="text-sm text-red-600">{form.errors.poster_landscape_file}</p>
+                                        )}
                                     </div>
-                                    {form.errors.poster_file && (
-                                        <p className="text-sm text-red-600">{form.errors.poster_file}</p>
-                                    )}
+
+                                    {/* Poster Portrait File */}
+                                    <div>
+                                        <Label htmlFor="poster_portrait_file">Poster Portrait (2:3) (Opsional)</Label>
+                                        <div
+                                            className={`mt-2 cursor-pointer rounded-lg border-2 border-dashed p-4 transition-all duration-200 ${
+                                                dragOver === 'poster_portrait_file'
+                                                    ? 'border-primary bg-primary/5 scale-105'
+                                                    : form.data.poster_portrait_file
+                                                      ? 'border-green-300 bg-green-50'
+                                                      : 'border-primary/30 hover:border-primary/50'
+                                            }`}
+                                            onDragOver={(e) => handleDragOver(e, 'poster_portrait_file')}
+                                            onDragLeave={handleDragLeave}
+                                            onDrop={(e) => handleDrop(e, 'poster_portrait_file')}
+                                            onClick={() => document.getElementById('poster_portrait_file')?.click()}
+                                        >
+                                            <div className="flex items-center justify-center">
+                                                <div className="text-center">
+                                                    <Upload className="mx-auto mb-2 h-8 w-8 text-gray-400" />
+                                                    <p className="text-sm text-gray-600">
+                                                        {form.data.poster_portrait_file
+                                                            ? form.data.poster_portrait_file.name
+                                                            : 'Drag & drop file atau klik untuk memilih'}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">
+                                                        JPG, JPEG, PNG (2:3, max 3MB)
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <input
+                                                id="poster_portrait_file"
+                                                type="file"
+                                                className="hidden"
+                                                accept=".jpg,.jpeg,.png"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) form.setData('poster_portrait_file', file);
+                                                }}
+                                            />
+                                        </div>
+                                        {form.errors.poster_portrait_file && (
+                                            <p className="text-sm text-red-600">{form.errors.poster_portrait_file}</p>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* Backdrop File */}

@@ -29,9 +29,9 @@ class FilmRequest extends FormRequest
             'poster_portrait_file' => 'nullable|file|mimes:jpg,jpeg,png|max:3072',
             'backdrop_file' => 'nullable|file|mimes:jpg,jpeg,png|max:3072',
             'ranking' => 'nullable|integer',
-            'director' => 'nullable|string|max:255', // NEW: Director
-            'teaser_url' => 'nullable|url', // NEW: Teaser URL
-            'castings' => 'nullable|array', // NEW: Castings array
+            'director' => 'nullable|string|max:255',
+            'teaser_url' => 'nullable|url',
+            'castings' => 'nullable|array',
             'castings.*.real_name' => 'required_with:castings|string|max:255',
             'castings.*.film_name' => 'required_with:castings|string|max:255',
         ];
@@ -47,13 +47,9 @@ class FilmRequest extends FormRequest
         }
         if ($this->hasFile('poster_landscape_file')) {
             $rules['poster_landscape_file'] = 'file|mimes:jpg,jpeg,png|max:3072';
-        } elseif ($this->isMethod('POST')) {
-            $rules['poster_landscape_file'] = 'required|file|mimes:jpg,jpeg,png|max:3072';
         }
         if ($this->hasFile('poster_portrait_file')) {
             $rules['poster_portrait_file'] = 'file|mimes:jpg,jpeg,png|max:3072';
-        } elseif ($this->isMethod('POST')) {
-            $rules['poster_portrait_file'] = 'required|file|mimes:jpg,jpeg,png|max:3072';
         }
         if ($this->hasFile('backdrop_file')) {
             $rules['backdrop_file'] = 'file|mimes:jpg,jpeg,png|max:3072';
@@ -82,10 +78,10 @@ class FilmRequest extends FormRequest
             'originality_file.file' => 'File surat pernyataan orisinalitas harus berupa file.',
             'originality_file.mimes' => 'File surat pernyataan orisinalitas harus berformat PDF, JPG, JPEG, atau PNG.',
             'originality_file.max' => 'File surat pernyataan orisinalitas maksimal 4MB.',
-            'poster_landscape_file.required' => 'Poster landscape wajib diupload. Rekomendasi rasio 16:9.',
+            'poster_landscape_file.file' => 'Poster landscape harus berupa file.',
             'poster_landscape_file.mimes' => 'Poster landscape harus berupa file JPG atau PNG.',
             'poster_landscape_file.max' => 'Ukuran poster landscape maksimal 3MB.',
-            'poster_portrait_file.required' => 'Poster portrait wajib diupload. Rekomendasi rasio 2:3.',
+            'poster_portrait_file.file' => 'Poster portrait harus berupa file.',
             'poster_portrait_file.mimes' => 'Poster portrait harus berupa file JPG atau PNG.',
             'poster_portrait_file.max' => 'Ukuran poster portrait maksimal 3MB.',
             'backdrop_file.file' => 'File backdrop harus berupa file.',

@@ -326,7 +326,7 @@ export default function FilmEdit({ film }: FilmEditProps) {
 
                                 {/* Originality File */}
                                 <div>
-                                    <Label>Surat Pernyataan Orisinalitas</Label>
+                                    <Label>Surat Pernyataan Orisinalitas (Opsional)</Label>
                                     <div
                                         className={`rounded-lg border-2 border-dashed p-4 transition-all duration-200 ${
                                             dragOver === 'originality_file'
@@ -367,7 +367,7 @@ export default function FilmEdit({ film }: FilmEditProps) {
                                 <div className="grid gap-6 md:grid-cols-2">
                                     {/* Poster Landscape File */}
                                     <div>
-                                        <Label>Poster Landscape (16:9) *</Label>
+                                        <Label>Poster Landscape (16:9) (Opsional)</Label>
                                         <div
                                             className={`rounded-lg border-2 border-dashed p-4 transition-all duration-200 ${
                                                 dragOver === 'poster_landscape_file'
@@ -418,7 +418,7 @@ export default function FilmEdit({ film }: FilmEditProps) {
 
                                     {/* Poster Portrait File */}
                                     <div>
-                                        <Label>Poster Portrait (2:3) *</Label>
+                                        <Label>Poster Portrait (2:3) (Opsional)</Label>
                                         <div
                                             className={`rounded-lg border-2 border-dashed p-4 transition-all duration-200 ${
                                                 dragOver === 'poster_portrait_file'
