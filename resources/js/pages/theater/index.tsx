@@ -9,7 +9,7 @@ type EventYear = { id: number; year: number; show_end?: string };
 // Empty state component
 function EmptyState() {
     return (
-        <div className="flex min-h-[400px] items-center justify-center">
+        <div className="flex min-h-[90vh] items-center justify-center">
             <div className="text-center text-gray-400">
                 <svg className="mx-auto mb-4 h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
