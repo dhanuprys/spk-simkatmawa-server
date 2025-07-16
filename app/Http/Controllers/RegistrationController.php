@@ -26,7 +26,7 @@ class RegistrationController extends Controller
                 ->get();
         }
 
-        return Inertia::render('registration', [
+        return Inertia::render('registration/registration', [
             'eventYears' => $eventYears,
             'categories' => $categories,
         ]);
@@ -115,7 +115,7 @@ class RegistrationController extends Controller
 
         $participant = $session->participant->load(['eventYear', 'category', 'verifiedBy', 'films']);
 
-        return Inertia::render('registration-success', [
+        return Inertia::render('registration/registration-success', [
             'participant' => $participant,
             'session' => [
                 'token' => $session->token,
