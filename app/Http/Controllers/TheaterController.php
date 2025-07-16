@@ -45,7 +45,7 @@ class TheaterController extends Controller
 
     public function show($filmId)
     {
-        $film = \App\Models\Film::with(['participant', 'participant.eventYear', 'participant.category'])
+        $film = \App\Models\Film::with(['participant', 'participant.eventYear', 'participant.category', 'castings'])
             ->where('id', $filmId)
             ->whereNotNull('verified_by_user_id')
             ->firstOrFail();

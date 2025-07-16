@@ -14,6 +14,8 @@ export interface Film {
         category?: { id: number; name: string };
     };
     vote_count?: number;
+    director?: string;
+    castings?: Array<{ real_name: string; film_name: string }>;
 }
 
 interface FilmCardProps {

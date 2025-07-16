@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import AdminLayout from '@/layouts/admin-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, FileVideo, Upload, Users } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface FilmCreateForParticipantProps {
     participant: {
@@ -25,6 +25,12 @@ interface FilmCreateForParticipantProps {
 
 export default function FilmCreateForParticipant({ participant }: FilmCreateForParticipantProps) {
     const [dragOver, setDragOver] = useState<string | null>(null);
+    const [castings, setCastings] = useState<Array<{ real_name: string; film_name: string }>>([]);
+
+    // Always sync form.data.castings with castings state
+    useEffect(() => {
+        form.setData('castings', castings);
+    }, [castings]);
 
     const form = useForm({
         title: '',
@@ -35,6 +41,9 @@ export default function FilmCreateForParticipant({ participant }: FilmCreateForP
         originality_file: null as File | null,
         poster_file: null as File | null,
         backdrop_file: null as File | null,
+        director: '',
+        teaser_url: '',
+        castings: [],
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -59,6 +68,12 @@ export default function FilmCreateForParticipant({ participant }: FilmCreateForP
         if (files.length > 0) {
             form.setData(field as any, files[0]);
         }
+    };
+
+    const handleAddCasting = () => setCastings([...castings, { real_name: '', film_name: '' }]);
+    const handleRemoveCasting = (idx: number) => setCastings(castings.filter((_, i) => i !== idx));
+    const handleCastingChange = (idx: number, field: 'real_name' | 'film_name', value: string) => {
+        setCastings(castings.map((c, i) => (i === idx ? { ...c, [field]: value } : c)));
     };
 
     return (
@@ -197,6 +212,85 @@ export default function FilmCreateForParticipant({ participant }: FilmCreateForP
                                     />
                                     {form.errors.ranking && (
                                         <p className="text-sm text-red-600">{form.errors.ranking}</p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="director">Sutradara (Opsional)</Label>
+                                    <Input
+                                        id="director"
+                                        type="text"
+                                        value={form.data.director}
+                                        onChange={(e) => form.setData('director', e.target.value)}
+                                        placeholder="Nama sutradara"
+                                        className={form.errors.director ? 'border-red-500' : ''}
+                                    />
+                                    {form.errors.director && (
+                                        <p className="text-sm text-red-600">{form.errors.director}</p>
+                                    )}
+                                </div>
+                                <div>
+                                    <Label htmlFor="teaser_url">Teaser URL (Opsional)</Label>
+                                    <Input
+                                        id="teaser_url"
+                                        type="url"
+                                        value={form.data.teaser_url}
+                                        onChange={(e) => form.setData('teaser_url', e.target.value)}
+                                        placeholder="https://youtube.com/teaser"
+                                        className={form.errors.teaser_url ? 'border-red-500' : ''}
+                                    />
+                                    {form.errors.teaser_url && (
+                                        <p className="text-sm text-red-600">{form.errors.teaser_url}</p>
+                                    )}
+                                </div>
+                                <div>
+                                    <Label>
+                                        Pemeran (Castings) <span className="text-xs text-gray-400">(Opsional)</span>
+                                    </Label>
+                                    <div className="space-y-2">
+                                        {castings.length === 0 && (
+                                            <div className="text-gray-500">Belum ada data pemeran</div>
+                                        )}
+                                        {castings.map((c, idx) => (
+                                            <div
+                                                key={idx}
+                                                className="flex flex-col gap-2 rounded border bg-gray-50 p-2 md:flex-row md:items-center"
+                                            >
+                                                <Input
+                                                    type="text"
+                                                    placeholder="Nama asli"
+                                                    value={c.real_name}
+                                                    onChange={(e) =>
+                                                        handleCastingChange(idx, 'real_name', e.target.value)
+                                                    }
+                                                    className="md:w-1/3"
+                                                />
+                                                <span className="text-gray-500">sebagai</span>
+                                                <Input
+                                                    type="text"
+                                                    placeholder="Nama di film"
+                                                    value={c.film_name}
+                                                    onChange={(e) =>
+                                                        handleCastingChange(idx, 'film_name', e.target.value)
+                                                    }
+                                                    className="md:w-1/3"
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    variant="destructive"
+                                                    size="icon"
+                                                    onClick={() => handleRemoveCasting(idx)}
+                                                >
+                                                    &times;
+                                                </Button>
+                                            </div>
+                                        ))}
+                                        <Button type="button" variant="outline" onClick={handleAddCasting}>
+                                            Tambah Pemeran
+                                        </Button>
+                                    </div>
+                                    {form.errors.castings && (
+                                        <p className="text-sm text-red-600">{form.errors.castings}</p>
                                     )}
                                 </div>
                             </div>

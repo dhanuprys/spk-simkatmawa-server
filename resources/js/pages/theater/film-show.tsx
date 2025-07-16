@@ -151,6 +151,28 @@ function FilmMeta({ film }: { film: Film }) {
                 <span className="hidden text-lg md:inline">Festival Film</span>
             </div>
             <p className="mb-6 max-w-3xl text-sm leading-relaxed text-gray-200 md:mb-6 md:text-lg">{film.synopsis}</p>
+            {/* Director */}
+            {film.director && (
+                <div className="mb-4 flex items-center gap-2 text-sm text-gray-300">
+                    <span className="font-medium text-gray-400">Sutradara:</span>
+                    <span className="text-white">{film.director}</span>
+                </div>
+            )}
+            {/* Castings */}
+            {Array.isArray(film.castings) && film.castings.length > 0 && (
+                <div className="mb-4">
+                    <span className="mb-1 block font-medium text-gray-400">Pemeran:</span>
+                    <ul className="space-y-1">
+                        {film.castings.map((c: any, idx: number) => (
+                            <li key={idx} className="flex items-center gap-2 text-sm text-gray-200">
+                                <span className="font-semibold text-white">{c.real_name}</span>
+                                <span className="text-gray-400">sebagai</span>
+                                <span className="text-gray-300 italic">{c.film_name}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
             <div className="flex flex-col gap-3 text-sm text-gray-400 md:flex-row md:gap-6 md:text-sm">
                 <div className="flex items-center gap-2">
                     <span className="font-medium text-gray-500">Tim:</span>

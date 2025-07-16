@@ -46,6 +46,9 @@ interface FilmShowProps {
         participant: any;
         verified_by: any;
         ranking: number | null;
+        director?: string;
+        teaser_url?: string;
+        castings?: any[];
     };
 }
 
@@ -197,6 +200,53 @@ export default function FilmShow({ film }: FilmShowProps) {
                                             </div>
                                         </div>
                                     </div>
+                                )}
+                            </div>
+                            <div>
+                                <div className="font-medium text-gray-900">Sutradara</div>
+                                <div className="text-gray-700">
+                                    {film.director?.trim() ? film.director : 'tidak dikenal'}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="font-medium text-gray-900">Teaser</div>
+                                {film.teaser_url ? (
+                                    <div className="flex items-center gap-2">
+                                        <a
+                                            href={film.teaser_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="truncate text-blue-600 hover:text-blue-800"
+                                        >
+                                            {film.teaser_url}
+                                        </a>
+                                        <Button variant="ghost" size="sm" asChild>
+                                            <a href={film.teaser_url} target="_blank" rel="noopener noreferrer">
+                                                <ExternalLink className="h-4 w-4" />
+                                            </a>
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <span className="text-gray-500">Tidak ada</span>
+                                )}
+                            </div>
+                            <div>
+                                <div className="font-medium text-gray-900">Pemeran (Castings)</div>
+                                {film.castings && film.castings.length > 0 ? (
+                                    <ul className="grid gap-2 md:grid-cols-2">
+                                        {film.castings.map((c: any, idx: number) => (
+                                            <li
+                                                key={idx}
+                                                className="flex flex-col rounded border bg-gray-50 p-2 md:flex-row md:items-center md:gap-2"
+                                            >
+                                                <span className="font-semibold">{c.real_name}</span>
+                                                <span className="text-gray-500">sebagai</span>
+                                                <span className="italic">{c.film_name}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <span className="text-gray-500">Belum ada data</span>
                                 )}
                             </div>
                         </CardContent>

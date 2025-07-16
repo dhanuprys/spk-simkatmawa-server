@@ -30,7 +30,7 @@ class FilmController extends Controller
 
     public function show(Film $film)
     {
-        $film->load(['participant', 'verifiedBy']);
+        $film->load(['participant', 'verifiedBy', 'castings']);
 
         return Inertia::render('admin/films/show', [
             'film' => $film,
@@ -39,7 +39,7 @@ class FilmController extends Controller
 
     public function edit(Film $film)
     {
-        $film->load(['participant', 'verifiedBy']);
+        $film->load(['participant', 'verifiedBy', 'castings']);
 
         return Inertia::render('admin/films/edit', [
             'film' => $film,
@@ -103,6 +103,8 @@ class FilmController extends Controller
             'film_url' => $validated['film_url'],
             'direct_video_url' => $validated['direct_video_url'] ?: null,
             'ranking' => $validated['ranking'] ? (int) $validated['ranking'] : null,
+            'director' => $validated['director'] ?? null,
+            'teaser_url' => $validated['teaser_url'] ?? null,
         ];
 
         // Handle file uploads if provided
@@ -120,6 +122,17 @@ class FilmController extends Controller
         }
 
         $film->update($updateData);
+
+        // Handle castings (optional, replace all)
+        if (isset($validated['castings'])) {
+            $film->castings()->delete();
+            foreach ($validated['castings'] as $casting) {
+                $film->castings()->create([
+                    'real_name' => $casting['real_name'],
+                    'film_name' => $casting['film_name'],
+                ]);
+            }
+        }
 
         return redirect()->route('admin.films.show', $film)
             ->with('success', 'Film berhasil diperbarui.');
@@ -158,6 +171,16 @@ class FilmController extends Controller
         $validated['verified_at'] = now();
 
         $film = Film::create($validated);
+
+        // Handle castings (optional)
+        if (isset($validated['castings'])) {
+            foreach ($validated['castings'] as $casting) {
+                $film->castings()->create([
+                    'real_name' => $casting['real_name'],
+                    'film_name' => $casting['film_name'],
+                ]);
+            }
+        }
 
         return redirect()->route('admin.participants.show', $participant)
             ->with('success', 'Film berhasil ditambahkan untuk peserta ini');

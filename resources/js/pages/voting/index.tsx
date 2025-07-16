@@ -614,7 +614,7 @@ export default function VotingIndex({ filmsByCategory, categories, session, acti
                                 {/* Left: Form */}
                                 <div className="md:w-1/2">
                                     <Card className="border-0 bg-white shadow-lg">
-                                        <CardContent className="p-8">
+                                        <CardContent className="px-8">
                                             <div className="space-y-6">
                                                 <div className="space-y-3">
                                                     <Label htmlFor="ticket" className="text-base font-medium">

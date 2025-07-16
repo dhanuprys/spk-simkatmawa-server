@@ -43,6 +43,8 @@ class Film extends Model
         'verified_by_user_id',
         'verified_at',
         'ranking',
+        'director', // NEW: Director name
+        'teaser_url', // NEW: Teaser URL
     ];
 
     protected $casts = [
@@ -77,6 +79,14 @@ class Film extends Model
     public function votings()
     {
         return $this->hasMany(FilmVoting::class);
+    }
+
+    /**
+     * Get the castings for the film.
+     */
+    public function castings()
+    {
+        return $this->hasMany(Casting::class);
     }
 
     /**

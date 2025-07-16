@@ -61,7 +61,7 @@ class SubmissionController extends Controller
             }
         }
 
-        return Inertia::render('submission', [
+        return Inertia::render('submission/index', [
             'participant' => $participant,
             'existingFilm' => $existingFilm,
             'eventYear' => $eventYear,
@@ -85,6 +85,13 @@ class SubmissionController extends Controller
 
         if (!$participant) {
             return back()->withErrors(['pin' => 'PIN tidak valid']);
+        }
+
+        // Check if participant is verified
+        if ($participant->verification_status !== 'approved') {
+            return Inertia::render('submission/submission-unverified', [
+                'message' => 'Akun Anda belum diverifikasi oleh admin. Silakan menunggu verifikasi sebelum dapat mengupload film.'
+            ]);
         }
 
         // Check if submission period is open
@@ -143,6 +150,11 @@ class SubmissionController extends Controller
             'poster_landscape_file' => 'required|file|mimes:jpg,jpeg,png|max:3072',
             'poster_portrait_file' => 'required|file|mimes:jpg,jpeg,png|max:3072',
             'backdrop_file' => 'nullable|file|mimes:jpg,jpeg,png|max:3072',
+            'director' => 'nullable|string|max:255',
+            'teaser_url' => 'required|url', // now required
+            'castings' => 'nullable|array',
+            'castings.*.real_name' => 'required_with:castings|string|max:255',
+            'castings.*.film_name' => 'required_with:castings|string|max:255',
         ]);
 
         // Handle file uploads
@@ -164,7 +176,18 @@ class SubmissionController extends Controller
             'poster_landscape_file' => $posterLandscapePath,
             'poster_portrait_file' => $posterPortraitPath,
             'backdrop_file' => $backdropPath,
+            'director' => $validated['director'] ?? null,
+            'teaser_url' => $validated['teaser_url'] ?? null,
         ]);
+        // Handle castings (optional)
+        if (isset($validated['castings'])) {
+            foreach ($validated['castings'] as $casting) {
+                $film->castings()->create([
+                    'real_name' => $casting['real_name'],
+                    'film_name' => $casting['film_name'],
+                ]);
+            }
+        }
 
         return redirect()->route('submission')
             ->with('success', 'Film berhasil dikirim');
@@ -200,10 +223,17 @@ class SubmissionController extends Controller
             'poster_landscape_file' => 'nullable|file|mimes:jpg,jpeg,png|max:3072',
             'poster_portrait_file' => 'nullable|file|mimes:jpg,jpeg,png|max:3072',
             'backdrop_file' => 'nullable|file|mimes:jpg,jpeg,png|max:3072',
+            'director' => 'nullable|string|max:255',
+            'teaser_url' => 'nullable|url',
+            'castings' => 'nullable|array',
+            'castings.*.real_name' => 'required_with:castings|string|max:255',
+            'castings.*.film_name' => 'required_with:castings|string|max:255',
         ]);
 
         $updateData = [
             'film_url' => $validated['film_url'],
+            'director' => $validated['director'] ?? null,
+            'teaser_url' => $validated['teaser_url'] ?? null,
         ];
 
         // Handle file uploads if provided
@@ -221,6 +251,16 @@ class SubmissionController extends Controller
         }
 
         $film->update($updateData);
+        // Handle castings (optional, replace all)
+        if (isset($validated['castings'])) {
+            $film->castings()->delete();
+            foreach ($validated['castings'] as $casting) {
+                $film->castings()->create([
+                    'real_name' => $casting['real_name'],
+                    'film_name' => $casting['film_name'],
+                ]);
+            }
+        }
 
         return redirect()->route('submission')
             ->with('success', 'Film berhasil diperbarui');

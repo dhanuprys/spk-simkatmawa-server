@@ -23,8 +23,17 @@ class FilmRequest extends FormRequest
             'title' => 'required|string|max:255',
             'synopsis' => 'required|string|max:1000',
             'film_url' => 'required|url',
-            'direct_video_url' => 'nullable|string|url',
-            'ranking' => 'nullable|string|integer|min:1',
+            'direct_video_url' => 'nullable|url',
+            'originality_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:3072',
+            'poster_landscape_file' => 'nullable|file|mimes:jpg,jpeg,png|max:3072',
+            'poster_portrait_file' => 'nullable|file|mimes:jpg,jpeg,png|max:3072',
+            'backdrop_file' => 'nullable|file|mimes:jpg,jpeg,png|max:3072',
+            'ranking' => 'nullable|integer',
+            'director' => 'nullable|string|max:255', // NEW: Director
+            'teaser_url' => 'nullable|url', // NEW: Teaser URL
+            'castings' => 'nullable|array', // NEW: Castings array
+            'castings.*.real_name' => 'required_with:castings|string|max:255',
+            'castings.*.film_name' => 'required_with:castings|string|max:255',
         ];
 
         // Participant ID validation (only for new films, and only if provided)
