@@ -584,6 +584,7 @@ export default function Submission({
                                 handlePinDigitChange={handlePinDigitChange}
                                 handlePinKeyDown={handlePinKeyDown}
                                 handlePinSubmit={handlePinSubmit}
+                                setPinDigits={setPinDigits}
                             />
                         </div>
                     </SafeWidth>
