@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { registrationSchema, type RegistrationFormData } from '@/lib/schemas/registration';
+import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from '@inertiajs/react';
 import {
@@ -606,11 +607,16 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                                                 Nama tim sudah terdaftar untuk event tahun ini.
                                                             </p>
                                                         )}
-                                                        {checkingTeamName && (
-                                                            <p className="mt-1 text-xs text-gray-500">
-                                                                Memeriksa ketersediaan nama tim...
-                                                            </p>
-                                                        )}
+
+                                                        <p
+                                                            className={cn(
+                                                                'mt-1 text-xs text-gray-500 opacity-0',
+                                                                checkingTeamName && 'opacity-100',
+                                                            )}
+                                                        >
+                                                            Memeriksa ketersediaan nama tim...
+                                                        </p>
+
                                                         <FormMessage />
                                                     </FormItem>
                                                 )}

@@ -189,6 +189,15 @@ class SubmissionController extends Controller
             }
         }
 
+        // Send Telegram notification (silent on error)
+        try {
+            app(\App\Services\TelegramService::class)->sendMessage(
+                "<b>Film Baru Dikirim</b>\nTim: {$participant->team_name}\nJudul: {$film->title}\nKetua: {$participant->leader_name}\nEmail: {$participant->leader_email}\nWhatsApp: {$participant->leader_whatsapp}"
+            );
+        } catch (\Throwable $e) {
+            // Silently ignore
+        }
+
         return redirect()->route('submission')
             ->with('success', 'Film berhasil dikirim');
     }

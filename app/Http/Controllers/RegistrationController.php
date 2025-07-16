@@ -81,6 +81,15 @@ class RegistrationController extends Controller
             'payment_evidence_file' => $paymentEvidencePath,
         ]);
 
+        // Send Telegram notification (silent on error)
+        try {
+            app(\App\Services\TelegramService::class)->sendMessage(
+                "<b>Registrasi Baru</b>\nTim: {$participant->team_name}\nKetua: {$participant->leader_name}\nEmail: {$participant->leader_email}\nWhatsApp: {$participant->leader_whatsapp}"
+            );
+        } catch (\Throwable $e) {
+            // Silently ignore
+        }
+
         // Create session for the new participant
         $session = ParticipantSession::createSession(
             $participant,
