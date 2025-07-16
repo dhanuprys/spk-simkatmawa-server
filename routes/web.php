@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\EventYear;
+use Illuminate\Http\Request;
+use App\Models\Participant;
 
 Route::get('/', function () {
     $activeEvent = EventYear::withCount('participants')
@@ -22,6 +24,22 @@ Route::get('/registration', [App\Http\Controllers\RegistrationController::class,
 Route::post('/registration', [App\Http\Controllers\RegistrationController::class, 'store'])->name('registration.store');
 Route::get('/registration/success', [App\Http\Controllers\RegistrationController::class, 'success'])->name('registration.success');
 Route::get('/registration/{pin}/download/{type}', [App\Http\Controllers\RegistrationController::class, 'download'])->name('registration.download');
+
+// AJAX endpoint for checking unique team name for the current event year
+Route::get('/registration/check-team-name', function (Request $request) {
+    $teamName = $request->query('team_name');
+    $eventYearId = $request->query('event_year_id');
+
+    if (!$teamName || !$eventYearId) {
+        return response()->json(['unique' => false, 'message' => 'Missing parameters'], 400);
+    }
+
+    $exists = Participant::where('event_year_id', $eventYearId)
+        ->where('team_name', $teamName)
+        ->exists();
+
+    return response()->json(['unique' => !$exists]);
+});
 
 // Status tracking routes
 Route::get('/status', [App\Http\Controllers\StatusController::class, 'index'])->name('status.index');
@@ -43,6 +61,9 @@ Route::post('/voting/logout', [App\Http\Controllers\VotingController::class, 'lo
 Route::post('/voting/start-session', [App\Http\Controllers\VotingController::class, 'startVotingSession'])->name('voting.start-session');
 Route::post('/voting/vote', [App\Http\Controllers\VotingController::class, 'vote'])->name('voting.vote');
 Route::get('/voting/check-session', [App\Http\Controllers\VotingController::class, 'checkSession'])->name('voting.check-session');
+
+Route::get('/theater', [App\Http\Controllers\TheaterController::class, 'index'])->name('theater.index');
+Route::get('/theater/film/{film}', [App\Http\Controllers\TheaterController::class, 'show'])->name('theater.film.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {

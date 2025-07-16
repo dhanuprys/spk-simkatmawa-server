@@ -141,6 +141,14 @@ export default function ParticipantShow({ participant }: ParticipantShowProps) {
                                 Edit
                             </Link>
                         </Button>
+                        {participant.films.length === 0 && (
+                            <Button asChild>
+                                <Link href={route('admin.participants.films.create', participant.id)}>
+                                    <FileVideo className="mr-2 h-4 w-4" />
+                                    Tambah Film
+                                </Link>
+                            </Button>
+                        )}
                     </div>
                 </div>
 

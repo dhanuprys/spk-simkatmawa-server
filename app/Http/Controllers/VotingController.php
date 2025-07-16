@@ -43,6 +43,10 @@ class VotingController extends Controller
                     ->latest('year')
                     ->first();
 
+                if (!$activeEventYear) {
+                    return Inertia::render('voting/closed');
+                }
+
                 // Load verified films grouped by category
                 $films = Film::whereNotNull('verified_by_user_id')
                     ->with(['participant.category'])

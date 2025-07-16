@@ -447,6 +447,20 @@ export default function StatusShow({ participant, session }: StatusShowProps) {
                                                 key={film.id}
                                                 className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between"
                                             >
+                                                {/* Poster Portrait */}
+                                                <div className="mb-2 flex-shrink-0 sm:mr-4 sm:mb-0">
+                                                    {film.poster_portrait_file ? (
+                                                        <img
+                                                            src={`/storage/${film.poster_portrait_file}`}
+                                                            alt="Poster portrait"
+                                                            className="h-24 w-16 rounded bg-gray-100 object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="flex h-24 w-16 items-center justify-center rounded bg-gray-200 text-gray-400">
+                                                            <FileVideo className="h-8 w-8" />
+                                                        </div>
+                                                    )}
+                                                </div>
                                                 <div className="min-w-0 flex-1">
                                                     <div className="font-medium text-gray-900">
                                                         {film.title || `Film #${film.id}`}

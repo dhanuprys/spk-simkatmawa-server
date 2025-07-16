@@ -34,6 +34,7 @@ interface Participant {
     leader_name: string;
     city: string;
     company: string;
+    verification_status: string;
     status: string;
     created_at: string;
 }
@@ -45,25 +46,45 @@ interface Category {
     participants_count?: number;
 }
 
-interface TopFilm {
+interface Film {
     id: number;
     title: string;
     synopsis: string;
+    film_url: string;
+    direct_video_url?: string;
+    is_verified: boolean;
+    verified_at?: string;
+    ranking?: number;
+    created_at: string;
     participant: {
         id: number;
         team_name: string;
         leader_name: string;
+        city: string;
+        company: string;
+    };
+    verified_by?: {
+        id: number;
+        name: string;
     };
     vote_count: number;
 }
 
-interface FavoriteFilmsByCategory {
+interface TopFilm extends Film {}
+
+interface FilmsByCategory {
     id: number;
     name: string;
     is_active: boolean;
     participants_count: number;
-    top_films: TopFilm[];
+    films: Film[];
     total_films: number;
+    verified_films_count: number;
+    pending_films_count: number;
+}
+
+interface FavoriteFilmsByCategory extends FilmsByCategory {
+    top_films: TopFilm[];
 }
 
 interface EventYear {
@@ -130,6 +151,29 @@ export default function EventYearShow({ event_year }: Props) {
         if (count < 1000) return count.toString();
         if (count < 1000000) return `${(count / 1000).toFixed(1)}K`;
         return `${(count / 1000000).toFixed(1)}M`;
+    };
+
+    const formatShortDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('id-ID', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        });
+    };
+
+    const formatDateTime = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('id-ID', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    };
+
+    const getVerificationStatus = (isVerified: boolean, verifiedAt?: string) => {
+        if (!isVerified) return { text: 'Pending', variant: 'secondary' as const };
+        return { text: 'Terverifikasi', variant: 'default' as const };
     };
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -282,6 +326,20 @@ export default function EventYearShow({ event_year }: Props) {
                                     <p>Diupdate: {new Date(event_year.updated_at).toLocaleDateString('id-ID')}</p>
                                 </div>
                             </div>
+                            {event_year.event_guide_document && (
+                                <div className="mt-4">
+                                    <Button asChild variant="outline" size="sm" className="w-full">
+                                        <a
+                                            href={route('admin.event-years.download-guide', event_year.id)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            <Download className="mr-2 h-4 w-4" />
+                                            Unduh Panduan Event
+                                        </a>
+                                    </Button>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
 
@@ -346,36 +404,6 @@ export default function EventYearShow({ event_year }: Props) {
                     </Card>
                 </div>
 
-                {/* Event Guide Document */}
-                {event_year.event_guide_document && (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <FileText className="h-5 w-5" />
-                                Dokumen Panduan Event
-                            </CardTitle>
-                            <CardDescription>Dokumen yang dapat diunduh sebagai panduan untuk peserta</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex flex-col gap-2">
-                                <p className="text-muted-foreground text-sm">
-                                    Dokumen panduan tahun event ini dapat diunduh dengan klik tombol di bawah ini.
-                                </p>
-                                <Button asChild variant="outline">
-                                    <a
-                                        href={route('admin.event-years.download-guide', event_year.id)}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        <Download className="mr-2 h-4 w-4" />
-                                        Unduh Dokumen Panduan
-                                    </a>
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
-
                 {/* Category Management */}
                 <Card>
                     <CardHeader>
@@ -409,6 +437,17 @@ export default function EventYearShow({ event_year }: Props) {
                                             </div>
                                         </div>
                                         <div className="flex gap-2">
+                                            <Button size="sm" variant="outline" asChild>
+                                                <Link
+                                                    href={route('admin.event-years.categories.show', [
+                                                        event_year.id,
+                                                        category.id,
+                                                    ])}
+                                                >
+                                                    <FileText className="mr-1 h-4 w-4" />
+                                                    Lihat Film
+                                                </Link>
+                                            </Button>
                                             <Button size="sm" variant="outline" asChild>
                                                 <Link
                                                     href={route('admin.event-years.categories.edit', [
@@ -481,36 +520,44 @@ export default function EventYearShow({ event_year }: Props) {
                                                         key={film.id}
                                                         className="hover:bg-muted/50 relative rounded-lg border p-4 transition-colors"
                                                     >
-                                                        {index === 0 && (
+                                                        {film.ranking ? (
                                                             <div className="absolute -top-2 -right-2">
                                                                 <Badge className="bg-yellow-500 text-white">
-                                                                    <Star className="mr-1 h-3 w-3" />
-                                                                    Juara 1
+                                                                    <Star className="mr-1 h-3 w-3" />#{film.ranking}
                                                                 </Badge>
                                                             </div>
-                                                        )}
-                                                        {index === 1 && (
+                                                        ) : index < 3 ? (
                                                             <div className="absolute -top-2 -right-2">
-                                                                <Badge variant="secondary">
+                                                                <Badge
+                                                                    variant={
+                                                                        index === 0
+                                                                            ? 'default'
+                                                                            : index === 1
+                                                                              ? 'secondary'
+                                                                              : 'outline'
+                                                                    }
+                                                                >
                                                                     <Star className="mr-1 h-3 w-3" />
-                                                                    Juara 2
+                                                                    Top {index + 1}
                                                                 </Badge>
                                                             </div>
-                                                        )}
-                                                        {index === 2 && (
-                                                            <div className="absolute -top-2 -right-2">
-                                                                <Badge variant="outline">
-                                                                    <Star className="mr-1 h-3 w-3" />
-                                                                    Juara 3
-                                                                </Badge>
-                                                            </div>
-                                                        )}
+                                                        ) : null}
 
                                                         <div className="space-y-3">
                                                             <div>
-                                                                <h4 className="line-clamp-2 font-semibold">
-                                                                    {film.title}
-                                                                </h4>
+                                                                <div className="mb-2 flex items-center gap-2">
+                                                                    <h4 className="line-clamp-2 font-semibold">
+                                                                        {film.title}
+                                                                    </h4>
+                                                                    <Badge
+                                                                        variant={
+                                                                            getVerificationStatus(film.is_verified)
+                                                                                .variant
+                                                                        }
+                                                                    >
+                                                                        {getVerificationStatus(film.is_verified).text}
+                                                                    </Badge>
+                                                                </div>
                                                                 <p className="text-muted-foreground line-clamp-2 text-sm">
                                                                     {film.synopsis}
                                                                 </p>
@@ -522,6 +569,11 @@ export default function EventYearShow({ event_year }: Props) {
                                                                     <span className="text-muted-foreground text-sm">
                                                                         {film.participant.team_name}
                                                                     </span>
+                                                                    <span className="text-muted-foreground">•</span>
+                                                                    <span className="text-muted-foreground text-sm">
+                                                                        {film.participant.city},{' '}
+                                                                        {film.participant.company}
+                                                                    </span>
                                                                 </div>
                                                                 <div className="flex items-center gap-2">
                                                                     <span className="text-muted-foreground text-sm">
@@ -531,14 +583,24 @@ export default function EventYearShow({ event_year }: Props) {
                                                             </div>
 
                                                             <div className="flex items-center justify-between border-t pt-2">
-                                                                <div className="flex items-center gap-1">
-                                                                    <Heart className="h-4 w-4 text-red-500" />
-                                                                    <span className="text-lg font-semibold">
-                                                                        {formatVoteCount(film.vote_count)}
-                                                                    </span>
-                                                                    <span className="text-muted-foreground text-sm">
-                                                                        vote
-                                                                    </span>
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="flex items-center gap-1">
+                                                                        <Heart className="h-4 w-4 text-red-500" />
+                                                                        <span className="text-lg font-semibold">
+                                                                            {formatVoteCount(film.vote_count)}
+                                                                        </span>
+                                                                        <span className="text-muted-foreground text-sm">
+                                                                            vote
+                                                                        </span>
+                                                                    </div>
+                                                                    {film.ranking && (
+                                                                        <div className="flex items-center gap-1">
+                                                                            <Star className="h-4 w-4 text-yellow-500" />
+                                                                            <span className="font-semibold text-yellow-600">
+                                                                                #{film.ranking}
+                                                                            </span>
+                                                                        </div>
+                                                                    )}
                                                                 </div>
                                                                 <Button variant="ghost" size="sm" asChild>
                                                                     <Link href={route('admin.films.show', film.id)}>
@@ -571,13 +633,35 @@ export default function EventYearShow({ event_year }: Props) {
                 {/* Participants List */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>Peserta dalam Event</CardTitle>
-                        <CardDescription>Daftar peserta yang terdaftar dalam event ini</CardDescription>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Users className="h-5 w-5" />
+                                    Peserta dalam Event
+                                </CardTitle>
+                                <CardDescription>Daftar peserta yang terdaftar dalam event ini</CardDescription>
+                            </div>
+                            <div className="flex gap-2">
+                                <Button asChild>
+                                    <Link href={route('admin.event-years.participants.index', event_year.id)}>
+                                        <Users className="mr-2 h-4 w-4" />
+                                        Lihat Semua Peserta
+                                    </Link>
+                                </Button>
+                                <Button variant="outline" asChild>
+                                    <Link href={route('admin.event-years.participants.create', event_year.id)}>
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Tambah Peserta
+                                    </Link>
+                                </Button>
+                            </div>
+                        </div>
                     </CardHeader>
                     <CardContent>
                         {event_year.participants.length > 0 ? (
                             <div className="space-y-4">
-                                {event_year.participants.map((participant) => (
+                                {/* Show only first 5 participants with a "View All" link */}
+                                {event_year.participants.slice(0, 5).map((participant) => (
                                     <div
                                         key={participant.id}
                                         className="flex items-center justify-between rounded-lg border p-4"
@@ -594,16 +678,16 @@ export default function EventYearShow({ event_year }: Props) {
                                         <div className="flex items-center gap-2">
                                             <Badge
                                                 variant={
-                                                    participant.status === 'verified'
+                                                    participant.verification_status === 'approved'
                                                         ? 'default'
-                                                        : participant.status === 'pending'
+                                                        : participant.verification_status === 'pending'
                                                           ? 'secondary'
                                                           : 'destructive'
                                                 }
                                             >
-                                                {participant.status === 'verified'
+                                                {participant.verification_status === 'approved'
                                                     ? 'Terverifikasi'
-                                                    : participant.status === 'pending'
+                                                    : participant.verification_status === 'pending'
                                                       ? 'Menunggu'
                                                       : 'Ditolak'}
                                             </Badge>
@@ -615,11 +699,27 @@ export default function EventYearShow({ event_year }: Props) {
                                         </div>
                                     </div>
                                 ))}
+
+                                {event_year.participants.length > 5 && (
+                                    <div className="pt-4 text-center">
+                                        <Button variant="outline" asChild>
+                                            <Link href={route('admin.event-years.participants.index', event_year.id)}>
+                                                Lihat {event_year.participants.length - 5} peserta lainnya
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <div className="py-8 text-center">
                                 <Users className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
-                                <p className="text-muted-foreground">Belum ada peserta dalam event ini</p>
+                                <p className="text-muted-foreground mb-4">Belum ada peserta dalam event ini</p>
+                                <Button asChild>
+                                    <Link href={route('admin.event-years.participants.create', event_year.id)}>
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Tambah Peserta Pertama
+                                    </Link>
+                                </Button>
                             </div>
                         )}
                     </CardContent>

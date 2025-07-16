@@ -5,7 +5,19 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AdminLayout from '@/layouts/admin-layout';
 import { Head, Link, router } from '@inertiajs/react';
-import { CheckCircle, ChevronLeft, ChevronRight, Clock, Edit, Eye, Filter, Search, Users, X } from 'lucide-react';
+import {
+    Calendar,
+    CheckCircle,
+    ChevronLeft,
+    ChevronRight,
+    Clock,
+    Edit,
+    Eye,
+    Filter,
+    Search,
+    Users,
+    X,
+} from 'lucide-react';
 import { useState } from 'react';
 
 interface ParticipantsIndexProps {
@@ -83,7 +95,43 @@ export default function ParticipantsIndex({ participants, categories, event_year
                             Verifikasi dan kelola data peserta festival film NITISARA
                         </p>
                     </div>
+                    <Button asChild>
+                        <Link href={route('admin.participants.create')}>
+                            <Users className="mr-2 h-4 w-4" />
+                            Tambah Peserta
+                        </Link>
+                    </Button>
                 </div>
+
+                {/* Quick Access to Event Year Participants */}
+                {event_years.length > 0 && (
+                    <Card className="border-l-4 border-l-blue-500">
+                        <CardHeader className="pb-4">
+                            <CardTitle className="flex items-center gap-3 text-lg">
+                                <div className="rounded-lg bg-blue-100 p-2">
+                                    <Calendar className="h-5 w-5 text-blue-600" />
+                                </div>
+                                Akses Cepat per Tahun Event
+                            </CardTitle>
+                            <CardDescription>Lihat peserta berdasarkan tahun event tertentu</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex flex-wrap gap-3">
+                                {event_years.map((year) => (
+                                    <Button key={year.id} variant="outline" size="sm" asChild className="h-auto p-3">
+                                        <Link href={route('admin.event-years.participants.index', year.id)}>
+                                            <Calendar className="mr-2 h-4 w-4" />
+                                            <div className="text-left">
+                                                <div className="font-medium">{year.year}</div>
+                                                <div className="text-muted-foreground text-xs">{year.title}</div>
+                                            </div>
+                                        </Link>
+                                    </Button>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* Filters */}
                 <Card>
@@ -93,8 +141,8 @@ export default function ParticipantsIndex({ participants, categories, event_year
                             Filter & Pencarian
                         </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    <CardContent className="space-y-6">
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Pencarian</label>
                                 <div className="relative">
@@ -158,15 +206,20 @@ export default function ParticipantsIndex({ participants, categories, event_year
                             </div>
                         </div>
 
-                        <div className="mt-4 flex gap-2">
-                            <Button onClick={handleFilter}>
-                                <Search className="mr-2 h-4 w-4" />
-                                Filter
-                            </Button>
-                            <Button variant="outline" onClick={clearFilters}>
-                                <X className="mr-2 h-4 w-4" />
-                                Bersihkan
-                            </Button>
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="text-muted-foreground text-sm">
+                                Gunakan filter di atas untuk menyempitkan hasil pencarian
+                            </div>
+                            <div className="flex gap-2">
+                                <Button onClick={handleFilter} className="flex-1 sm:flex-none">
+                                    <Search className="mr-2 h-4 w-4" />
+                                    Filter
+                                </Button>
+                                <Button variant="outline" onClick={clearFilters} className="flex-1 sm:flex-none">
+                                    <X className="mr-2 h-4 w-4" />
+                                    Bersihkan
+                                </Button>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>

@@ -82,7 +82,8 @@ export default function Submission({
         synopsis: existingFilm?.synopsis || '',
         film_url: existingFilm?.film_url || '',
         originality_file: null as File | null,
-        poster_file: null as File | null,
+        poster_landscape_file: null as File | null,
+        poster_portrait_file: null as File | null,
         backdrop_file: null as File | null,
     });
 
@@ -187,7 +188,10 @@ export default function Submission({
         setDragOver(null);
     };
 
-    const handleDrop = (e: React.DragEvent, field: 'originality_file' | 'poster_file' | 'backdrop_file') => {
+    const handleDrop = (
+        e: React.DragEvent,
+        field: 'originality_file' | 'poster_landscape_file' | 'poster_portrait_file' | 'backdrop_file',
+    ) => {
         e.preventDefault();
         setDragOver(null);
 
@@ -948,56 +952,121 @@ export default function Submission({
 
                                     {/* Poster and Backdrop Files - Half Width Each */}
                                     <div className="grid gap-6 md:grid-cols-2">
-                                        {/* Poster File */}
+                                        {/* Poster Landscape File */}
                                         <div className="space-y-2">
-                                            <Label>Poster Film *</Label>
+                                            <Label>Poster Landscape (16:9) *</Label>
                                             <div
                                                 className={`rounded-lg border-2 border-dashed p-4 transition-all duration-200 ${
-                                                    dragOver === 'poster_file'
+                                                    dragOver === 'poster_landscape_file'
                                                         ? 'border-primary bg-primary/5 scale-105'
-                                                        : filmForm.data.poster_file
+                                                        : filmForm.data.poster_landscape_file
                                                           ? 'border-green-300 bg-green-50'
                                                           : 'border-primary/30 hover:border-primary/50'
                                                 }`}
-                                                onDragOver={(e) => handleDragOver(e, 'poster_file')}
+                                                onDragOver={(e) => handleDragOver(e, 'poster_landscape_file')}
                                                 onDragLeave={handleDragLeave}
-                                                onDrop={(e) => handleDrop(e, 'poster_file')}
+                                                onDrop={(e) => handleDrop(e, 'poster_landscape_file')}
                                             >
                                                 <div className="text-center">
                                                     <Upload className="text-primary mx-auto mb-3 h-6 w-6" />
-                                                    <p className="text-sm font-medium">Upload Poster</p>
-                                                    <p className="text-muted-foreground text-xs">JPG, PNG (max 4MB)</p>
+                                                    <p className="text-sm font-medium">Upload Poster Landscape</p>
+                                                    <p className="text-muted-foreground text-xs">
+                                                        JPG, PNG (max 3MB) • Rasio 16:9
+                                                    </p>
                                                     <Input
                                                         type="file"
                                                         accept=".jpg,.jpeg,.png"
                                                         onChange={(e) =>
-                                                            filmForm.setData('poster_file', e.target.files?.[0] || null)
+                                                            filmForm.setData(
+                                                                'poster_landscape_file',
+                                                                e.target.files?.[0] || null,
+                                                            )
                                                         }
                                                         className="mt-2"
                                                     />
                                                 </div>
                                                 {/* Image Preview */}
-                                                {filmForm.data.poster_file && (
+                                                {filmForm.data.poster_landscape_file && (
                                                     <div className="mt-3">
                                                         <p className="mb-2 text-xs font-medium text-gray-700">
                                                             Preview:
                                                         </p>
-                                                        <div className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-100">
+                                                        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg bg-gray-100">
                                                             <img
-                                                                src={URL.createObjectURL(filmForm.data.poster_file)}
-                                                                alt="Poster preview"
+                                                                src={URL.createObjectURL(
+                                                                    filmForm.data.poster_landscape_file,
+                                                                )}
+                                                                alt="Poster landscape preview"
                                                                 className="h-full w-full object-cover"
                                                             />
                                                         </div>
                                                     </div>
                                                 )}
                                             </div>
-                                            {filmForm.errors.poster_file && (
-                                                <p className="text-sm text-red-600">{filmForm.errors.poster_file}</p>
+                                            {filmForm.errors.poster_landscape_file && (
+                                                <p className="text-sm text-red-600">
+                                                    {filmForm.errors.poster_landscape_file}
+                                                </p>
                                             )}
                                         </div>
-
-                                        {/* Backdrop File */}
+                                        {/* Poster Portrait File */}
+                                        <div className="space-y-2">
+                                            <Label>Poster Portrait (2:3) *</Label>
+                                            <div
+                                                className={`rounded-lg border-2 border-dashed p-4 transition-all duration-200 ${
+                                                    dragOver === 'poster_portrait_file'
+                                                        ? 'border-primary bg-primary/5 scale-105'
+                                                        : filmForm.data.poster_portrait_file
+                                                          ? 'border-green-300 bg-green-50'
+                                                          : 'border-primary/30 hover:border-primary/50'
+                                                }`}
+                                                onDragOver={(e) => handleDragOver(e, 'poster_portrait_file')}
+                                                onDragLeave={handleDragLeave}
+                                                onDrop={(e) => handleDrop(e, 'poster_portrait_file')}
+                                            >
+                                                <div className="text-center">
+                                                    <Upload className="text-primary mx-auto mb-3 h-6 w-6" />
+                                                    <p className="text-sm font-medium">Upload Poster Portrait</p>
+                                                    <p className="text-muted-foreground text-xs">
+                                                        JPG, PNG (max 3MB) • Rasio 2:3
+                                                    </p>
+                                                    <Input
+                                                        type="file"
+                                                        accept=".jpg,.jpeg,.png"
+                                                        onChange={(e) =>
+                                                            filmForm.setData(
+                                                                'poster_portrait_file',
+                                                                e.target.files?.[0] || null,
+                                                            )
+                                                        }
+                                                        className="mt-2"
+                                                    />
+                                                </div>
+                                                {/* Image Preview */}
+                                                {filmForm.data.poster_portrait_file && (
+                                                    <div className="mt-3">
+                                                        <p className="mb-2 text-xs font-medium text-gray-700">
+                                                            Preview:
+                                                        </p>
+                                                        <div className="relative aspect-[2/3] w-full overflow-hidden rounded-lg bg-gray-100">
+                                                            <img
+                                                                src={URL.createObjectURL(
+                                                                    filmForm.data.poster_portrait_file,
+                                                                )}
+                                                                alt="Poster portrait preview"
+                                                                className="h-full w-full object-cover"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            {filmForm.errors.poster_portrait_file && (
+                                                <p className="text-sm text-red-600">
+                                                    {filmForm.errors.poster_portrait_file}
+                                                </p>
+                                            )}
+                                        </div>
+                                        {/* Backdrop File (unchanged) */}
                                         <div className="space-y-2">
                                             <Label>Backdrop Film (Opsional)</Label>
                                             <div

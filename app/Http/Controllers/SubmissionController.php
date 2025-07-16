@@ -139,14 +139,16 @@ class SubmissionController extends Controller
             'title' => 'required|string|max:255',
             'synopsis' => 'required|string|max:1000',
             'film_url' => 'required|url',
-            'originality_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:4096',
-            'poster_file' => 'required|file|mimes:jpg,jpeg,png|max:4096',
-            'backdrop_file' => 'nullable|file|mimes:jpg,jpeg,png|max:4096',
+            'originality_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:3072',
+            'poster_landscape_file' => 'required|file|mimes:jpg,jpeg,png|max:3072',
+            'poster_portrait_file' => 'required|file|mimes:jpg,jpeg,png|max:3072',
+            'backdrop_file' => 'nullable|file|mimes:jpg,jpeg,png|max:3072',
         ]);
 
         // Handle file uploads
         $originalityPath = $request->file('originality_file')->store('originality-files', 'public');
-        $posterPath = $request->file('poster_file')->store('poster-files', 'public');
+        $posterLandscapePath = $request->file('poster_landscape_file')->store('posters/landscape', 'public');
+        $posterPortraitPath = $request->file('poster_portrait_file')->store('posters/portrait', 'public');
         $backdropPath = null;
 
         if ($request->hasFile('backdrop_file')) {
@@ -159,7 +161,8 @@ class SubmissionController extends Controller
             'synopsis' => $validated['synopsis'],
             'film_url' => $validated['film_url'],
             'originality_file' => $originalityPath,
-            'poster_file' => $posterPath,
+            'poster_landscape_file' => $posterLandscapePath,
+            'poster_portrait_file' => $posterPortraitPath,
             'backdrop_file' => $backdropPath,
         ]);
 
@@ -193,9 +196,10 @@ class SubmissionController extends Controller
 
         $validated = $request->validate([
             'film_url' => 'required|url',
-            'originality_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:4096',
-            'poster_file' => 'nullable|file|mimes:jpg,jpeg,png|max:4096',
-            'backdrop_file' => 'nullable|file|mimes:jpg,jpeg,png|max:4096',
+            'originality_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:3072',
+            'poster_landscape_file' => 'nullable|file|mimes:jpg,jpeg,png|max:3072',
+            'poster_portrait_file' => 'nullable|file|mimes:jpg,jpeg,png|max:3072',
+            'backdrop_file' => 'nullable|file|mimes:jpg,jpeg,png|max:3072',
         ]);
 
         $updateData = [
@@ -206,11 +210,12 @@ class SubmissionController extends Controller
         if ($request->hasFile('originality_file')) {
             $updateData['originality_file'] = $request->file('originality_file')->store('originality-files', 'public');
         }
-
-        if ($request->hasFile('poster_file')) {
-            $updateData['poster_file'] = $request->file('poster_file')->store('poster-files', 'public');
+        if ($request->hasFile('poster_landscape_file')) {
+            $updateData['poster_landscape_file'] = $request->file('poster_landscape_file')->store('posters/landscape', 'public');
         }
-
+        if ($request->hasFile('poster_portrait_file')) {
+            $updateData['poster_portrait_file'] = $request->file('poster_portrait_file')->store('posters/portrait', 'public');
+        }
         if ($request->hasFile('backdrop_file')) {
             $updateData['backdrop_file'] = $request->file('backdrop_file')->store('backdrop-files', 'public');
         }

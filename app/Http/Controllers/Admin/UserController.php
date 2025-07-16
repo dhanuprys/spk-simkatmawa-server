@@ -3,16 +3,21 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UserRequest;
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
 class UserController extends Controller
 {
+    public function __construct(
+        private UserService $userService
+    ) {}
+
     public function index()
     {
-        $users = User::latest()->paginate(20);
+        $users = $this->userService->getUsers();
 
         return Inertia::render('admin/users/index', [
             'users' => $users,
@@ -24,19 +29,9 @@ class UserController extends Controller
         return Inertia::render('admin/users/create');
     }
 
-    public function store(Request $request)
+    public function store(UserRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
+        $this->userService->create($request->validated());
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User berhasil dibuat');
@@ -56,24 +51,9 @@ class UserController extends Controller
         ]);
     }
 
-    public function update(Request $request, User $user)
+    public function update(UserRequest $request, User $user)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8|confirmed',
-        ]);
-
-        $user->update([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-        ]);
-
-        if ($validated['password']) {
-            $user->update([
-                'password' => Hash::make($validated['password']),
-            ]);
-        }
+        $this->userService->update($user, $request->validated());
 
         return redirect()->route('admin.users.show', $user)
             ->with('success', 'User berhasil diperbarui');
@@ -81,11 +61,11 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        if ($user->id === auth()->id()) {
-            return back()->with('error', 'Tidak dapat menghapus akun sendiri');
+        try {
+            $this->userService->delete($user);
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        $user->delete();
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User berhasil dihapus');

@@ -66,6 +66,8 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
     const [showResetTooltip, setShowResetTooltip] = useState(false);
     // 1. Add state for the confirmation checkbox
     const [isReadyChecked, setIsReadyChecked] = useState(false);
+    const [teamNameUnique, setTeamNameUnique] = useState(true);
+    const [checkingTeamName, setCheckingTeamName] = useState(false);
 
     // Load cached form data from localStorage - memoized to prevent unnecessary calls
     const loadCachedFormData = useCallback((): Partial<RegistrationFormData> => {
@@ -99,11 +101,13 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
     const clearCachedFormData = useCallback(() => {
         if (typeof window === 'undefined') return;
 
-        try {
-            localStorage.removeItem(STORAGE_KEY);
-        } catch (error) {
-            console.warn('Failed to clear cached form data:', error);
-        }
+        setTimeout(() => {
+            try {
+                localStorage.removeItem(STORAGE_KEY);
+            } catch (error) {
+                console.warn('Failed to clear cached form data:', error);
+            }
+        }, 200);
     }, []);
 
     const form = useForm<RegistrationFormData>({
@@ -368,6 +372,30 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
         setActiveStep(activeStep + 1);
     }, [activeStep, form, isStepComplete]);
 
+    // Check team name uniqueness
+    useEffect(() => {
+        const teamName = form.getValues('team_name');
+        const eventYearId = eventYears[0]?.id;
+        if (!teamName || !eventYearId) {
+            setTeamNameUnique(true);
+            return;
+        }
+        setCheckingTeamName(true);
+        const controller = new AbortController();
+        fetch(`/registration/check-team-name?team_name=${encodeURIComponent(teamName)}&event_year_id=${eventYearId}`, {
+            signal: controller.signal,
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                setTeamNameUnique(data.unique);
+            })
+            .catch(() => {
+                setTeamNameUnique(true); // fallback to allow
+            })
+            .finally(() => setCheckingTeamName(false));
+        return () => controller.abort();
+    }, [form.watch('team_name'), eventYears]);
+
     return (
         <SafeWidth className="py-16">
             <div className="mx-auto max-w-4xl">
@@ -573,6 +601,16 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                                                 {...field}
                                                             />
                                                         </FormControl>
+                                                        {!teamNameUnique && !checkingTeamName && (
+                                                            <p className="mt-1 text-xs text-red-500">
+                                                                Nama tim sudah terdaftar untuk event tahun ini.
+                                                            </p>
+                                                        )}
+                                                        {checkingTeamName && (
+                                                            <p className="mt-1 text-xs text-gray-500">
+                                                                Memeriksa ketersediaan nama tim...
+                                                            </p>
+                                                        )}
                                                         <FormMessage />
                                                     </FormItem>
                                                 )}
@@ -1019,7 +1057,7 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                             <Button
                                                 type="button"
                                                 onClick={handleNextStep}
-                                                disabled={!isStepComplete(activeStep)}
+                                                disabled={!isStepComplete(activeStep) || !teamNameUnique}
                                                 className="flex w-full items-center justify-center gap-2 sm:w-auto"
                                             >
                                                 Selanjutnya
@@ -1030,7 +1068,11 @@ export default function JoinForm({ eventYears, categories }: JoinFormProps) {
                                         {activeStep === 4 && (
                                             <Button
                                                 type="submit"
-                                                disabled={isSubmitting || (activeStep === 4 && !isReadyChecked)}
+                                                disabled={
+                                                    isSubmitting ||
+                                                    (activeStep === 4 && !isReadyChecked) ||
+                                                    !teamNameUnique
+                                                }
                                                 className="flex w-full items-center justify-center gap-2 px-8 sm:w-auto"
                                             >
                                                 {isSubmitting ? (

@@ -17,7 +17,9 @@ import {
     CheckCircle,
     ChevronDown,
     ChevronUp,
+    Delete,
     Film,
+    Hash,
     LogOut,
     Star,
     Ticket,
@@ -31,7 +33,8 @@ interface FilmType {
     id: number;
     title: string;
     synopsis: string;
-    poster_file: string;
+    poster_landscape_file?: string;
+    poster_portrait_file?: string;
     participant: {
         team_name: string;
         company: string;
@@ -339,7 +342,24 @@ export default function VotingIndex({ filmsByCategory, categories, session, acti
     const countdownRef = useRef<NodeJS.Timeout | null>(null);
     const headerTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+    // Add local state for delayed pageDisabled
+    const [delayedPageDisabled, setDelayedPageDisabled] = useState(true);
+    const [delayedSessionValid, setDelayedSessionValid] = useState(true);
+    const [delayDone, setDelayDone] = useState(false);
+
+    // Get the real session validation values
     const { sessionValid, pageDisabled, timeLeft } = useSessionValidation(session);
+
+    // Delay logic: after 2 seconds, update the local state to match the real API check
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDelayedPageDisabled(pageDisabled);
+            setDelayedSessionValid(sessionValid);
+            setDelayDone(true);
+        }, 2000);
+        return () => clearTimeout(timer);
+    }, [pageDisabled, sessionValid]);
+
     const {
         votingSession,
         loading: sessionLoading,
@@ -349,6 +369,14 @@ export default function VotingIndex({ filmsByCategory, categories, session, acti
         resetSession,
         updateVotingSession,
     } = useVotingSession();
+
+    // Move inputRef and useEffect here, after votingSession is declared
+    const inputRef = useRef<HTMLInputElement>(null);
+    useEffect(() => {
+        if (!votingSession && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [votingSession]);
 
     const handleVotingComplete = useCallback(() => {
         setCompletionDialogOpen(true);
@@ -472,12 +500,36 @@ export default function VotingIndex({ filmsByCategory, categories, session, acti
         return message.includes('sudah digunakan');
     }, []);
 
-    if (!sessionValid && !pageDisabled) {
+    useEffect(() => {
+        if (messageDialogOpen && messageType === 'error') {
+            const timer = setTimeout(() => {
+                setMessageDialogOpen(false);
+                setTicketCode(''); // Reset the ticket code input after error
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [messageDialogOpen, messageType]);
+
+    // Use delayedPageDisabled and delayedSessionValid for rendering
+    if (!delayDone || delayedPageDisabled) {
+        return <DisabledPage />;
+    }
+    if (!delayedSessionValid) {
         return null;
     }
-
-    if (pageDisabled) {
-        return <DisabledPage />;
+    if (!activeEventYear) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-black">
+                <div className="text-center">
+                    <h1 className="mb-4 text-4xl font-bold text-white">Voting Belum Dibuka</h1>
+                    <p className="text-lg text-gray-300">
+                        Saat ini tidak ada event voting yang sedang berlangsung.
+                        <br />
+                        Silakan cek kembali nanti.
+                    </p>
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -546,7 +598,7 @@ export default function VotingIndex({ filmsByCategory, categories, session, acti
                 >
                     {!votingSession ? (
                         // Ticket Input Screen
-                        <div className="mx-auto max-w-md">
+                        <div className="mx-auto w-full max-w-3xl">
                             <div className="mb-8 text-center">
                                 <div className="mb-4 inline-block rounded-full bg-gray-100 p-4">
                                     <Ticket className="h-12 w-12 text-gray-600" />
@@ -557,49 +609,174 @@ export default function VotingIndex({ filmsByCategory, categories, session, acti
                                 </p>
                             </div>
 
-                            <Card className="border-0 bg-white shadow-lg">
-                                <CardContent className="p-8">
-                                    <div className="space-y-6">
-                                        <div className="space-y-3">
-                                            <Label htmlFor="ticket" className="text-base font-medium">
-                                                Kode Tiket
-                                            </Label>
-                                            <Input
-                                                id="ticket"
-                                                placeholder="0000"
-                                                value={ticketCode}
-                                                onChange={(e) => setTicketCode(e.target.value.toUpperCase())}
-                                                maxLength={4}
-                                                className="h-16 border-2 text-center font-mono text-3xl tracking-widest focus:border-gray-400"
-                                                autoComplete="off"
-                                                disabled={sessionLoading}
-                                            />
-                                            <p className="text-center text-xs text-gray-500">
-                                                Masukkan kode 4 digit untuk Voting Login
-                                            </p>
-                                        </div>
+                            {/* Two-column layout for form and instructions */}
+                            <div className="flex flex-col gap-8 md:flex-row md:gap-12">
+                                {/* Left: Form */}
+                                <div className="md:w-1/2">
+                                    <Card className="border-0 bg-white shadow-lg">
+                                        <CardContent className="p-8">
+                                            <div className="space-y-6">
+                                                <div className="space-y-3">
+                                                    <Label htmlFor="ticket" className="text-base font-medium">
+                                                        Kode Tiket
+                                                    </Label>
+                                                    {/* Input with auto-focus and shake on error */}
+                                                    <input
+                                                        id="ticket"
+                                                        ref={inputRef}
+                                                        placeholder="0000"
+                                                        value={ticketCode}
+                                                        onChange={(e) => setTicketCode(e.target.value.toUpperCase())}
+                                                        maxLength={4}
+                                                        className={`h-16 w-full border-2 text-center font-mono text-3xl tracking-widest transition-all duration-150 focus:border-gray-400 ${sessionError ? 'animate-shake border-red-500' : ''}`}
+                                                        autoComplete="off"
+                                                        disabled={sessionLoading}
+                                                        aria-label="Kode Tiket"
+                                                        onKeyDown={(e) => {
+                                                            if (
+                                                                e.key === 'Enter' &&
+                                                                ticketCode.length === 4 &&
+                                                                !sessionLoading
+                                                            ) {
+                                                                handleStartVotingSession();
+                                                            }
+                                                        }}
+                                                    />
+                                                    {/* Numpad alternative input */}
+                                                    <div className="mt-6 flex flex-col items-center">
+                                                        <div className="grid grid-cols-3 gap-4">
+                                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                                                                <button
+                                                                    key={num}
+                                                                    type="button"
+                                                                    className="hover:bg-primary/10 active:bg-primary/20 focus:ring-primary/40 h-16 w-16 rounded-2xl border border-gray-200 bg-white text-3xl font-bold text-gray-800 shadow-md transition-all duration-150 focus:ring-2 focus:ring-offset-2 focus:outline-none"
+                                                                    onClick={() => {
+                                                                        if (ticketCode.length < 4 && !sessionLoading) {
+                                                                            setTicketCode(ticketCode + num.toString());
+                                                                            inputRef.current?.focus();
+                                                                        }
+                                                                    }}
+                                                                    disabled={ticketCode.length >= 4 || sessionLoading}
+                                                                    aria-label={`Input ${num}`}
+                                                                >
+                                                                    {num}
+                                                                </button>
+                                                            ))}
+                                                            {/* Empty cell for layout */}
+                                                            <div></div>
+                                                            {/* 0 button */}
+                                                            <button
+                                                                type="button"
+                                                                className="hover:bg-primary/10 active:bg-primary/20 focus:ring-primary/40 h-16 w-16 rounded-2xl border border-gray-200 bg-white text-3xl font-bold text-gray-800 shadow-md transition-all duration-150 focus:ring-2 focus:ring-offset-2 focus:outline-none"
+                                                                onClick={() => {
+                                                                    if (ticketCode.length < 4 && !sessionLoading) {
+                                                                        setTicketCode(ticketCode + '0');
+                                                                        inputRef.current?.focus();
+                                                                    }
+                                                                }}
+                                                                disabled={ticketCode.length >= 4 || sessionLoading}
+                                                                aria-label="Input 0"
+                                                            >
+                                                                0
+                                                            </button>
+                                                            {/* Backspace button */}
+                                                            <button
+                                                                type="button"
+                                                                className="flex h-16 w-16 items-center justify-center rounded-2xl border border-gray-200 bg-white text-2xl font-bold text-gray-800 shadow-md transition-all duration-150 hover:bg-red-50 focus:ring-2 focus:ring-red-300 focus:ring-offset-2 focus:outline-none active:bg-red-100"
+                                                                onClick={() => {
+                                                                    if (ticketCode.length > 0 && !sessionLoading) {
+                                                                        setTicketCode(ticketCode.slice(0, -1));
+                                                                        inputRef.current?.focus();
+                                                                    }
+                                                                }}
+                                                                disabled={ticketCode.length === 0 || sessionLoading}
+                                                                aria-label="Delete"
+                                                            >
+                                                                <Delete className="h-7 w-7" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-center text-xs text-gray-500">
+                                                        Masukkan kode 4 digit untuk Voting Login
+                                                    </p>
+                                                </div>
 
-                                        <Button
-                                            onClick={handleStartVotingSession}
-                                            disabled={ticketCode.length !== 4 || sessionLoading}
-                                            className="h-12 w-full text-lg font-medium"
-                                            size="lg"
-                                        >
-                                            {sessionLoading ? (
-                                                <>
-                                                    <div className="mr-2 h-5 w-5 animate-spin rounded-full border-b-2 border-white"></div>
-                                                    Memproses...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Award className="mr-2 h-5 w-5" />
-                                                    Mulai Voting
-                                                </>
-                                            )}
-                                        </Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                                <Button
+                                                    onClick={handleStartVotingSession}
+                                                    disabled={ticketCode.length !== 4 || sessionLoading}
+                                                    className="h-12 w-full text-lg font-medium"
+                                                    size="lg"
+                                                    aria-label="Mulai Voting"
+                                                >
+                                                    {sessionLoading ? (
+                                                        <>
+                                                            <div className="mr-2 h-5 w-5 animate-spin rounded-full border-b-2 border-white"></div>
+                                                            Memproses...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Award className="mr-2 h-5 w-5" />
+                                                            Mulai Voting
+                                                        </>
+                                                    )}
+                                                </Button>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+
+                                {/* Right: Instructions */}
+                                <div className="md:w-1/2">
+                                    <Card className="border-0 bg-gray-50 shadow-none">
+                                        <CardHeader>
+                                            <CardTitle className="text-lg font-semibold text-gray-800">
+                                                Langkah-langkah Voting
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-4 text-gray-700">
+                                            <ol className="list-decimal space-y-3 pl-5 text-base">
+                                                <li className="flex items-start gap-2">
+                                                    <Ticket className="text-primary mt-1 h-5 w-5" />
+                                                    <span>
+                                                        <span className="font-medium">Dapatkan kode tiket voting</span>{' '}
+                                                        dari panitia atau pada tiket fisik/digital Anda.
+                                                    </span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <Hash className="text-primary mt-1 h-5 w-5" />
+                                                    <span>
+                                                        <span className="font-medium">Masukkan kode tiket 4 digit</span>{' '}
+                                                        pada kolom di sebelah kiri, lalu klik{' '}
+                                                        <span className="font-semibold">Mulai Voting</span>.
+                                                    </span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <Film className="text-primary mt-1 h-5 w-5" />
+                                                    <span>
+                                                        Setelah login,{' '}
+                                                        <span className="font-medium">pilih satu film terbaik</span>{' '}
+                                                        untuk setiap kategori yang tersedia.
+                                                    </span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <CheckCircle className="mt-1 h-5 w-5 text-green-600" />
+                                                    <span>
+                                                        Setelah semua kategori dipilih, voting Anda akan{' '}
+                                                        <span className="font-medium">tersimpan otomatis</span> dan Anda
+                                                        akan melihat pesan konfirmasi.
+                                                    </span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <XCircle className="mt-1 h-5 w-5 text-red-500" />
+                                                    <span>
+                                                        Jika mengalami kendala, silakan hubungi panitia di lokasi.
+                                                    </span>
+                                                </li>
+                                            </ol>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                            </div>
                         </div>
                     ) : (
                         // Voting Session Screen
@@ -720,9 +897,9 @@ export default function VotingIndex({ filmsByCategory, categories, session, acti
                                                             onClick={() => openVotingDialog(film)}
                                                         >
                                                             <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200">
-                                                                {film.poster_file ? (
+                                                                {film.poster_landscape_file ? (
                                                                     <img
-                                                                        src={`/storage/${film.poster_file}`}
+                                                                        src={`/storage/${film.poster_landscape_file}`}
                                                                         alt={film.title}
                                                                         className="h-full w-full object-cover"
                                                                     />

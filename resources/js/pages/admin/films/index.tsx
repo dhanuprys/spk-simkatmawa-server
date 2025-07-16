@@ -73,7 +73,10 @@ export default function FilmsIndex({ films, filters }: FilmsIndexProps) {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold">Film</h1>
-                        <p className="text-muted-foreground">Kelola data film festival NITISARA</p>
+                        <p className="text-muted-foreground">
+                            Verifikasi dan kelola film festival NITISARA. Film baru dapat ditambahkan melalui halaman
+                            peserta.
+                        </p>
                     </div>
                     <div className="flex items-center gap-2">
                         <Badge variant="outline" className="text-sm">

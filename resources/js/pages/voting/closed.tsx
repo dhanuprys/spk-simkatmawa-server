@@ -11,7 +11,7 @@ export default function VotingClosed() {
                         <Lock className="h-16 w-16 text-red-600 dark:text-red-400" />
                     </div>
 
-                    <h1 className="mb-2 text-3xl font-bold">Voting Ditutup</h1>
+                    <h1 className="mb-2 text-3xl font-bold text-white">Voting Ditutup</h1>
                     <p className="mb-8 text-gray-600 dark:text-gray-400">
                         Halaman voting saat ini tidak aktif atau telah ditutup oleh admin.
                     </p>

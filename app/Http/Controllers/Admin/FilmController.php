@@ -3,43 +3,30 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\FilmRequest;
 use App\Models\Film;
+use App\Services\FilmService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Storage;
 
 class FilmController extends Controller
 {
+    public function __construct(
+        private FilmService $filmService
+    ) {
+    }
+
     public function index(Request $request)
     {
-        $films = Film::with(['participant', 'verifiedBy'])
-            ->when($request->search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('title', 'like', "%{$search}%")
-                        ->orWhere('synopsis', 'like', "%{$search}%")
-                        ->orWhereHas('participant', function ($participantQuery) use ($search) {
-                            $participantQuery->where('team_name', 'like', "%{$search}%")
-                                ->orWhere('leader_name', 'like', "%{$search}%")
-                                ->orWhere('city', 'like', "%{$search}%")
-                                ->orWhere('company', 'like', "%{$search}%");
-                        });
-                });
-            })
-            ->when($request->status, function ($query, $status) {
-                if ($status === 'verified') {
-                    $query->whereNotNull('verified_by_user_id');
-                } elseif ($status === 'pending') {
-                    $query->whereNull('verified_by_user_id');
-                }
-            })
-            ->latest()
-            ->paginate(20);
+        $films = $this->filmService->getFilmsWithFilters($request->only(['search', 'status']));
 
         return Inertia::render('admin/films/index', [
             'films' => $films,
             'filters' => $request->only(['search', 'status']),
         ]);
     }
+
+
 
     public function show(Film $film)
     {
@@ -50,22 +37,18 @@ class FilmController extends Controller
         ]);
     }
 
+    public function edit(Film $film)
+    {
+        $film->load(['participant', 'verifiedBy']);
+
+        return Inertia::render('admin/films/edit', [
+            'film' => $film,
+        ]);
+    }
+
     public function destroy(Film $film)
     {
-        // Delete uploaded files if they exist
-        if ($film->originality_file && Storage::disk('public')->exists($film->originality_file)) {
-            Storage::disk('public')->delete($film->originality_file);
-        }
-
-        if ($film->poster_file && Storage::disk('public')->exists($film->poster_file)) {
-            Storage::disk('public')->delete($film->poster_file);
-        }
-
-        if ($film->backdrop_file && Storage::disk('public')->exists($film->backdrop_file)) {
-            Storage::disk('public')->delete($film->backdrop_file);
-        }
-
-        $film->delete();
+        $this->filmService->delete($film);
 
         return redirect()->route('admin.films.index')
             ->with('success', 'Film berhasil dihapus');
@@ -73,57 +56,110 @@ class FilmController extends Controller
 
     public function verify(Film $film)
     {
-        $film->update([
-            'verified_by_user_id' => auth()->id(),
-            'verified_at' => now(),
-        ]);
+        $this->filmService->verify($film);
 
         return back()->with('success', 'Film berhasil diverifikasi');
     }
 
     public function reject(Film $film)
     {
-        $film->update([
-            'verified_by_user_id' => null,
-            'verified_at' => null,
-        ]);
+        $this->filmService->reject($film);
 
         return back()->with('success', 'Verifikasi film dibatalkan');
     }
 
     public function download(Film $film)
     {
-        if (!$film->originality_file || !Storage::disk('public')->exists($film->originality_file)) {
-            abort(404, 'File tidak ditemukan');
-        }
+        $filePath = $this->filmService->getFilmForDownload($film, 'originality');
+        $filename = $this->filmService->getDownloadFilename($film, 'originality');
 
-        return Storage::disk('public')->download($film->originality_file, 'surat_orisinalitas_' . $film->title . '.pdf');
+        return response()->download($filePath, $filename);
     }
 
     public function downloadPoster(Film $film)
     {
-        if (!$film->poster_file || !Storage::disk('public')->exists($film->poster_file)) {
-            abort(404, 'File poster tidak ditemukan');
-        }
+        $filePath = $this->filmService->getFilmForDownload($film, 'poster');
+        $filename = $this->filmService->getDownloadFilename($film, 'poster');
 
-        return Storage::disk('public')->download($film->poster_file, 'poster_' . $film->title . '.jpg');
+        return response()->download($filePath, $filename);
     }
 
     public function downloadBackdrop(Film $film)
     {
-        if (!$film->backdrop_file || !Storage::disk('public')->exists($film->backdrop_file)) {
-            abort(404, 'File backdrop tidak ditemukan');
-        }
+        $filePath = $this->filmService->getFilmForDownload($film, 'backdrop');
+        $filename = $this->filmService->getDownloadFilename($film, 'backdrop');
 
-        return Storage::disk('public')->download($film->backdrop_file, 'backdrop_' . $film->title . '.jpg');
+        return response()->download($filePath, $filename);
     }
 
-    public function update(Request $request, Film $film)
+    public function update(FilmRequest $request, Film $film)
     {
-        $validated = $request->validate([
-            'ranking' => 'nullable|integer',
+        $validated = $request->validated();
+
+        // Transform data for database
+        $updateData = [
+            'title' => $validated['title'],
+            'synopsis' => $validated['synopsis'],
+            'film_url' => $validated['film_url'],
+            'direct_video_url' => $validated['direct_video_url'] ?: null,
+            'ranking' => $validated['ranking'] ? (int) $validated['ranking'] : null,
+        ];
+
+        // Handle file uploads if provided
+        if ($request->hasFile('originality_file')) {
+            $updateData['originality_file'] = $request->file('originality_file')->store('originality-files', 'public');
+        }
+        if ($request->hasFile('poster_landscape_file')) {
+            $updateData['poster_landscape_file'] = $request->file('poster_landscape_file')->store('posters/landscape', 'public');
+        }
+        if ($request->hasFile('poster_portrait_file')) {
+            $updateData['poster_portrait_file'] = $request->file('poster_portrait_file')->store('posters/portrait', 'public');
+        }
+        if ($request->hasFile('backdrop_file')) {
+            $updateData['backdrop_file'] = $request->file('backdrop_file')->store('backdrop-files', 'public');
+        }
+
+        $film->update($updateData);
+
+        return redirect()->route('admin.films.show', $film)
+            ->with('success', 'Film berhasil diperbarui.');
+    }
+
+    public function createForParticipant(\App\Models\Participant $participant)
+    {
+        return Inertia::render('admin/films/create-for-participant', [
+            'participant' => $participant->load(['eventYear', 'category']),
         ]);
-        $film->update($validated);
-        return back()->with('success', 'Peringkat film berhasil diperbarui.');
+    }
+
+    public function storeForParticipant(FilmRequest $request, \App\Models\Participant $participant)
+    {
+        $validated = $request->validated();
+
+        // Set the participant_id automatically
+        $validated['participant_id'] = $participant->id;
+
+        // Handle file uploads if provided
+        if ($request->hasFile('originality_file')) {
+            $validated['originality_file'] = $request->file('originality_file')->store('originality-files', 'public');
+        }
+        if ($request->hasFile('poster_landscape_file')) {
+            $validated['poster_landscape_file'] = $request->file('poster_landscape_file')->store('posters/landscape', 'public');
+        }
+        if ($request->hasFile('poster_portrait_file')) {
+            $validated['poster_portrait_file'] = $request->file('poster_portrait_file')->store('posters/portrait', 'public');
+        }
+        if ($request->hasFile('backdrop_file')) {
+            $validated['backdrop_file'] = $request->file('backdrop_file')->store('backdrop-files', 'public');
+        }
+
+        // Auto-verify admin-created films
+        $validated['verified_by_user_id'] = auth()->id();
+        $validated['verified_at'] = now();
+
+        $film = Film::create($validated);
+
+        return redirect()->route('admin.participants.show', $participant)
+            ->with('success', 'Film berhasil ditambahkan untuk peserta ini');
     }
 }

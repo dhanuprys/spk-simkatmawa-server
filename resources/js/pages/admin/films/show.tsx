@@ -20,6 +20,7 @@ import {
     CheckCircle,
     Clock,
     Download,
+    Edit,
     ExternalLink,
     FileText,
     FileVideo,
@@ -33,8 +34,10 @@ interface FilmShowProps {
         title: string;
         synopsis: string;
         film_url: string;
+        direct_video_url?: string;
         originality_file: string;
-        poster_file: string;
+        poster_landscape_file?: string;
+        poster_portrait_file?: string;
         backdrop_file: string | null;
         verified_by_user_id: number | null;
         verified_at: string | null;
@@ -49,9 +52,6 @@ interface FilmShowProps {
 export default function FilmShow({ film }: FilmShowProps) {
     const [showVerifyDialog, setShowVerifyDialog] = useState(false);
     const [showRejectDialog, setShowRejectDialog] = useState(false);
-    const [editRankingOpen, setEditRankingOpen] = useState(false);
-    const [ranking, setRanking] = useState<number | ''>(film.ranking ?? '');
-    const [saving, setSaving] = useState(false);
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('id-ID', {
@@ -72,20 +72,6 @@ export default function FilmShow({ film }: FilmShowProps) {
     const handleReject = () => {
         router.post(route('admin.films.reject', film.id));
         setShowRejectDialog(false);
-    };
-
-    const handleSaveRanking = async () => {
-        setSaving(true);
-        await router.put(
-            route('admin.films.update', film.id),
-            { ranking },
-            {
-                onFinish: () => {
-                    setSaving(false);
-                    setEditRankingOpen(false);
-                },
-            },
-        );
     };
 
     return (
@@ -119,17 +105,13 @@ export default function FilmShow({ film }: FilmShowProps) {
                                 Menunggu Verifikasi
                             </Badge>
                         )}
-                        <span className="ml-4 font-semibold">
-                            Peringkat: {film.ranking ?? '-'}
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="ml-2"
-                                onClick={() => setEditRankingOpen(true)}
-                            >
-                                Edit
-                            </Button>
-                        </span>
+                        <span className="ml-4 font-semibold">Peringkat: {film.ranking ?? '-'}</span>
+                        <Button variant="outline" size="sm" asChild>
+                            <Link href={route('admin.films.edit', film.id)}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit Film
+                            </Link>
+                        </Button>
                     </div>
                 </div>
 
@@ -171,6 +153,27 @@ export default function FilmShow({ film }: FilmShowProps) {
                                     </Button>
                                 </div>
                             </div>
+
+                            {film.direct_video_url && (
+                                <div>
+                                    <div className="font-medium text-gray-900">Direct Video URL</div>
+                                    <div className="flex items-center gap-2">
+                                        <a
+                                            href={film.direct_video_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="truncate text-blue-600 hover:text-blue-800"
+                                        >
+                                            {film.direct_video_url}
+                                        </a>
+                                        <Button variant="ghost" size="sm" asChild>
+                                            <a href={film.direct_video_url} target="_blank" rel="noopener noreferrer">
+                                                <ExternalLink className="h-4 w-4" />
+                                            </a>
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
 
                             <Separator />
 
@@ -275,26 +278,46 @@ export default function FilmShow({ film }: FilmShowProps) {
                             </div>
 
                             <div className="space-y-2">
-                                <div className="font-medium text-gray-900">Poster Film</div>
+                                <div className="font-medium text-gray-900">Poster Landscape (16:9)</div>
                                 <div className="flex items-center gap-2">
-                                    <Badge variant="outline" className="bg-green-50 text-green-700">
-                                        ✓ Terupload
-                                    </Badge>
-                                    <Button variant="ghost" size="sm" asChild>
-                                        <a
-                                            href={route('admin.films.download-poster', film.id)}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            <Download className="h-4 w-4" />
-                                        </a>
-                                    </Button>
+                                    {film.poster_landscape_file ? (
+                                        <Badge variant="outline" className="bg-green-50 text-green-700">
+                                            ✓ Terupload
+                                        </Badge>
+                                    ) : (
+                                        <Badge variant="outline" className="bg-gray-50 text-gray-500">
+                                            Tidak ada
+                                        </Badge>
+                                    )}
                                 </div>
-                                {film.poster_file && (
+                                {film.poster_landscape_file && (
                                     <div className="h-32 w-full overflow-hidden rounded-lg bg-gray-100">
                                         <img
-                                            src={`/storage/${film.poster_file}`}
-                                            alt="Poster film"
+                                            src={`/storage/${film.poster_landscape_file}`}
+                                            alt="Poster landscape"
+                                            className="h-full w-full object-cover"
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="space-y-2">
+                                <div className="font-medium text-gray-900">Poster Portrait (2:3)</div>
+                                <div className="flex items-center gap-2">
+                                    {film.poster_portrait_file ? (
+                                        <Badge variant="outline" className="bg-green-50 text-green-700">
+                                            ✓ Terupload
+                                        </Badge>
+                                    ) : (
+                                        <Badge variant="outline" className="bg-gray-50 text-gray-500">
+                                            Tidak ada
+                                        </Badge>
+                                    )}
+                                </div>
+                                {film.poster_portrait_file && (
+                                    <div className="h-32 w-20 overflow-hidden rounded-lg bg-gray-100">
+                                        <img
+                                            src={`/storage/${film.poster_portrait_file}`}
+                                            alt="Poster portrait"
                                             className="h-full w-full object-cover"
                                         />
                                     </div>
@@ -416,32 +439,6 @@ export default function FilmShow({ film }: FilmShowProps) {
                     </CardContent>
                 </Card>
             </div>
-            <Dialog open={editRankingOpen} onOpenChange={setEditRankingOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Edit Peringkat Film</DialogTitle>
-                        <DialogDescription>Masukkan peringkat film (integer, boleh kosong).</DialogDescription>
-                    </DialogHeader>
-                    <div className="py-2">
-                        <input
-                            type="number"
-                            className="input input-bordered w-full"
-                            value={ranking}
-                            onChange={(e) => setRanking(e.target.value === '' ? '' : parseInt(e.target.value))}
-                            placeholder="Peringkat (misal: 1, 2, 3)"
-                            min={1}
-                        />
-                    </div>
-                    <DialogFooter>
-                        <Button variant="secondary" onClick={() => setEditRankingOpen(false)} disabled={saving}>
-                            Batal
-                        </Button>
-                        <Button onClick={handleSaveRanking} disabled={saving}>
-                            {saving ? 'Menyimpan...' : 'Simpan'}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </AdminLayout>
     );
 }

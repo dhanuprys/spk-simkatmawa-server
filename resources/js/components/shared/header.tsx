@@ -13,7 +13,7 @@ const navigations = [
     },
     {
         label: 'Jelajahi Film',
-        path: '/film',
+        path: '/theater',
     },
 
     {

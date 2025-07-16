@@ -3,15 +3,23 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\CategoryRequest;
 use App\Models\Category;
+use App\Services\CategoryService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Http\Resources\CategoryResource;
 
 class CategoryController extends Controller
 {
+    public function __construct(
+        private CategoryService $categoryService
+    ) {
+    }
+
     public function index()
     {
-        $categories = Category::withCount('participants')->latest()->paginate(20);
+        $categories = $this->categoryService->getCategoriesWithParticipantCount();
 
         return Inertia::render('admin/categories/index', [
             'categories' => $categories,
@@ -29,37 +37,34 @@ class CategoryController extends Controller
         ]);
     }
 
-    public function store(Request $request, $eventYearId)
+    public function store(CategoryRequest $request, $eventYearId)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,NULL,id,event_year_id,' . $eventYearId,
-            'is_active' => 'boolean',
-        ]);
-        $validated['event_year_id'] = $eventYearId;
-        Category::create($validated);
+        $this->categoryService->createForEventYear($eventYearId, $request->validated());
+
         return redirect()->route('admin.event-years.show', $eventYearId)
             ->with('success', 'Kategori berhasil dibuat');
     }
 
-    public function show(Category $category)
+    public function show(\App\Models\EventYear $eventYear, \App\Models\Category $category)
     {
-        $category->load([
-            'participants' => function ($query) {
-                $query->with(['eventYear', 'verifiedBy', 'films'])->latest();
-            }
-        ]);
+        // Optionally ensure the category belongs to the event year
+        if ($category->event_year_id !== $eventYear->id) {
+            abort(404, 'Kategori tidak ditemukan dalam tahun event ini');
+        }
+        $category = $this->categoryService->getCategoryWithFilms($category);
 
         return Inertia::render('admin/categories/show', [
-            'category' => $category,
+            'category' => new CategoryResource($category),
         ]);
     }
 
     public function edit($eventYearId, Category $category)
     {
-        // Ensure the category belongs to the specified event year
-        if ($category->event_year_id != $eventYearId) {
+        try {
+            $this->categoryService->ensureCategoryBelongsToEventYear($category, $eventYearId);
+        } catch (\Exception $e) {
             return redirect()->route('admin.event-years.show', $eventYearId)
-                ->with('error', 'Kategori tidak ditemukan dalam tahun event ini');
+                ->with('error', $e->getMessage());
         }
 
         return Inertia::render('admin/categories/edit', [
@@ -68,23 +73,22 @@ class CategoryController extends Controller
         ]);
     }
 
-    public function update(Request $request, $eventYearId, Category $category)
+    public function update(CategoryRequest $request, $eventYearId, Category $category)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,' . $category->id . ',id,event_year_id,' . $eventYearId,
-            'is_active' => 'boolean',
-        ]);
-        $category->update($validated);
+        $this->categoryService->update($category, $request->validated());
+
         return redirect()->route('admin.event-years.show', $eventYearId)
             ->with('success', 'Kategori berhasil diperbarui');
     }
 
     public function destroy($eventYearId, Category $category)
     {
-        if ($category->participants()->count() > 0) {
-            return back()->with('error', 'Tidak dapat menghapus kategori yang memiliki peserta');
+        try {
+            $this->categoryService->delete($category);
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-        $category->delete();
+
         return redirect()->route('admin.event-years.show', $eventYearId)
             ->with('success', 'Kategori berhasil dihapus');
     }
