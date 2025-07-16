@@ -14,7 +14,7 @@ export function TheaterHero({ films }: TheaterHeroProps) {
     if (!featured) return null;
 
     return (
-        <section className="relative mb-8 flex h-[60vh] w-full items-end overflow-hidden bg-gradient-to-t from-black via-black/60 to-transparent md:mb-12">
+        <section className="relative mb-8 flex h-[60vh] w-full items-end overflow-hidden bg-gradient-to-t from-black via-black/60 to-transparent md:mb-12 md:h-[75vh]">
             {/* Bottom shadow overlay */}
             <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-32 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
             <img
@@ -31,7 +31,7 @@ export function TheaterHero({ films }: TheaterHeroProps) {
                 }}
             />
             <div className="relative z-10 max-w-4xl p-4 md:p-8 lg:p-16">
-                <h2 className="mb-4 text-2xl leading-tight font-bold text-white drop-shadow-2xl md:mb-6 md:text-4xl lg:text-6xl xl:text-7xl">
+                <h2 className="mb-4 text-2xl leading-tight font-bold text-white drop-shadow-2xl md:mb-6 md:text-3xl lg:text-4xl xl:text-5xl">
                     {featured.title}
                 </h2>
                 <div className="mb-3 flex flex-wrap items-center gap-2 text-gray-200 md:mb-4 md:gap-4">
@@ -42,7 +42,7 @@ export function TheaterHero({ films }: TheaterHeroProps) {
                     <span className="hidden text-lg md:inline">•</span>
                     <span className="hidden text-lg md:inline">{featured.participant?.team_name}</span>
                 </div>
-                <p className="mb-4 max-w-2xl text-sm leading-relaxed text-gray-200 md:mb-6 md:text-lg lg:text-xl">
+                <p className="mb-4 max-w-2xl text-sm leading-relaxed text-gray-200 md:mb-6 md:text-lg">
                     {featured.synopsis}
                 </p>
                 <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
