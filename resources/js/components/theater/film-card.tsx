@@ -24,7 +24,8 @@ interface FilmCardProps {
 }
 
 export function FilmCard({ film, className = '' }: FilmCardProps) {
-    const [imageError, setImageError] = useState(false);
+    const [landscapeError, setLandscapeError] = useState(false);
+    const [portraitError, setPortraitError] = useState(false);
 
     // Check if film is newly added (event year ended < 30 days ago)
     const isNewlyAdded = useMemo(() => {
@@ -43,13 +44,26 @@ export function FilmCard({ film, className = '' }: FilmCardProps) {
         >
             {/* Image with fallback */}
             <div className="relative h-full w-full overflow-hidden">
-                {!imageError && film.poster_landscape_file ? (
+                {!landscapeError && film.poster_landscape_file ? (
                     <img
                         src={`/storage/${film.poster_landscape_file}`}
                         alt={film.title}
                         className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-110"
-                        onError={() => setImageError(true)}
+                        onError={() => setLandscapeError(true)}
                     />
+                ) : !portraitError && film.poster_portrait_file ? (
+                    <div className="relative size-full">
+                        <img
+                            src={`/storage/${film.poster_portrait_file}`}
+                            className="absolute top-0 left-0 size-full object-cover object-center opacity-30"
+                        />
+                        <img
+                            src={`/storage/${film.poster_portrait_file}`}
+                            alt={film.title}
+                            className="relative z-[2] mx-auto aspect-[2/3] h-full object-cover object-center transition-transform duration-300 group-hover:scale-110"
+                            onError={() => setPortraitError(true)}
+                        />
+                    </div>
                 ) : (
                     <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900"></div>
                 )}
@@ -66,7 +80,7 @@ export function FilmCard({ film, className = '' }: FilmCardProps) {
             </div>
 
             {/* Hover overlay */}
-            <div className="bg-opacity-50 absolute inset-0 bg-black opacity-0 transition-all duration-300 group-hover:opacity-100">
+            <div className="bg-opacity-50 absolute inset-0 z-[3] bg-black/50 opacity-0 transition-all duration-300 group-hover:opacity-100">
                 <div className="flex h-full items-center justify-center">
                     <div className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-black">
                         <svg className="h-4 w-4 md:h-5 md:w-5" fill="currentColor" viewBox="0 0 24 24">
