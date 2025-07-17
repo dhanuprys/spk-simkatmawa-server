@@ -14,7 +14,7 @@ export function TheaterHero({ films }: TheaterHeroProps) {
     if (!featured) return null;
 
     return (
-        <section className="relative mb-8 flex h-[60vh] w-full items-end overflow-hidden bg-gradient-to-t from-black via-black/60 to-transparent md:mb-12 md:h-[75vh]">
+        <section className="relative mb-8 flex h-[75vh] w-full items-end overflow-hidden bg-gradient-to-t from-black via-black/60 to-transparent md:mb-12">
             {/* Bottom shadow overlay */}
             <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-32 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
             <img
