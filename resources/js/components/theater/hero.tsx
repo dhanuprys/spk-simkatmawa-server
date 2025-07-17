@@ -43,7 +43,7 @@ export function TheaterHero({ films }: TheaterHeroProps) {
                     <span className="hidden text-lg md:inline">{featured.participant?.team_name}</span>
                 </div>
                 <p className="mb-4 max-w-2xl text-sm leading-relaxed text-gray-200 md:mb-6 md:text-lg">
-                    {featured.synopsis}
+                    {featured.synopsis.slice(0, 150)}...
                 </p>
                 <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
                     <a

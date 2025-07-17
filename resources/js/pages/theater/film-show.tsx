@@ -150,7 +150,7 @@ function FilmMeta({ film }: { film: Film }) {
                 <span className="hidden text-lg md:inline">•</span>
                 <span className="hidden text-lg md:inline">Festival Film</span>
             </div>
-            <p className="mb-6 max-w-3xl text-sm leading-relaxed text-gray-200 md:mb-6 md:text-lg">{film.synopsis}</p>
+            <p className="mb-6 text-sm leading-relaxed text-gray-200 md:mb-6 md:text-lg">{film.synopsis}</p>
             {/* Director */}
             {film.director && (
                 <div className="mb-4 flex items-center gap-2 text-sm text-gray-300">
