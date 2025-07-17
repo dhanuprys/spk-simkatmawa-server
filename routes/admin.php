@@ -57,6 +57,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     // Films Management
     Route::resource('films', FilmController::class)->except(['create', 'store']);
+    // Add POST support for film updates to handle file uploads
+    Route::post('films/{film}', [FilmController::class, 'update'])->name('films.update-post');
     Route::prefix('films/{film}')->name('films.')->group(function () {
         Route::post('verify', [FilmController::class, 'verify'])->name('verify');
         Route::post('reject', [FilmController::class, 'reject'])->name('reject');

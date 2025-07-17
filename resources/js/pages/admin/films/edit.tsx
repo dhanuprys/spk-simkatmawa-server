@@ -58,8 +58,10 @@ export default function FilmEdit({ film }: FilmEditProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        form.setData('castings', castings);
-        form.put(route('admin.films.update', film.id));
+        // Use POST with method override for PUT to support file uploads in Laravel
+        form.post(route('admin.films.update', film.id), {
+            method: 'put',
+        });
     };
 
     const handleAddCasting = () => setCastings([...castings, { real_name: '', film_name: '' }]);

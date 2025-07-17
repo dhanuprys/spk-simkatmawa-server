@@ -19,6 +19,14 @@ class FilmRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Debug: Log what data is being received
+        \Log::info('FilmRequest data:', [
+            'all' => $this->all(),
+            'has_files' => $this->hasFile('originality_file') || $this->hasFile('poster_landscape_file') || $this->hasFile('poster_portrait_file') || $this->hasFile('backdrop_file'),
+            'content_type' => $this->header('Content-Type'),
+            'method' => $this->method(),
+        ]);
+
         $rules = [
             'title' => 'required|string|max:255',
             'synopsis' => 'required|string|max:1000',
@@ -39,20 +47,6 @@ class FilmRequest extends FormRequest
         // Participant ID validation (only for new films, and only if provided)
         if ($this->isMethod('POST') && $this->has('participant_id')) {
             $rules['participant_id'] = 'required|exists:participants,id';
-        }
-
-        // File validation rules (only if files are being uploaded)
-        if ($this->hasFile('originality_file')) {
-            $rules['originality_file'] = 'file|mimes:pdf,jpg,jpeg,png|max:3072';
-        }
-        if ($this->hasFile('poster_landscape_file')) {
-            $rules['poster_landscape_file'] = 'file|mimes:jpg,jpeg,png|max:3072';
-        }
-        if ($this->hasFile('poster_portrait_file')) {
-            $rules['poster_portrait_file'] = 'file|mimes:jpg,jpeg,png|max:3072';
-        }
-        if ($this->hasFile('backdrop_file')) {
-            $rules['backdrop_file'] = 'file|mimes:jpg,jpeg,png|max:3072';
         }
 
         return $rules;
