@@ -225,7 +225,7 @@ function FilmShow() {
             <div className="absolute top-0 left-0 h-[70vh] w-full">
                 <img
                     src={`/storage/${film.poster_landscape_file || film.poster_portrait_file}`}
-                    className="size-full object-cover opacity-50"
+                    className="size-full object-cover opacity-15 sm:opacity-50"
                 />
                 <div className="absolute top-0 left-0 z-[9] h-full w-full bg-gradient-to-b from-transparent via-transparent to-black"></div>
                 <div className="absolute bottom-0 left-0 z-[9] h-[50%] w-full translate-y-[40%] bg-gradient-to-b from-transparent via-black to-transparent opacity-50"></div>
