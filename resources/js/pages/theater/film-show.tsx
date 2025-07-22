@@ -1,4 +1,4 @@
-import { FilmCard, RecommendedFilms, TheaterHeader, type Film } from '@/components/theater';
+import { RecommendedFilms, TheaterHeader, type Film } from '@/components/theater';
 import { Button } from '@/components/ui/button';
 import { Head, usePage } from '@inertiajs/react';
 import { useState } from 'react';
@@ -37,7 +37,7 @@ function ShareButton({ url, title }: { url: string; title: string }) {
 function FilmPlayer({ film }: { film: Film }) {
     if (!film.direct_video_url) {
         return (
-            <div className="mb-4 flex aspect-video w-full items-center justify-center overflow-hidden rounded-lg bg-black shadow-lg md:mb-6">
+            <div className="mb-4 flex aspect-video w-full items-center justify-center overflow-hidden rounded-lg bg-black shadow-2xl md:mb-6">
                 <div className="text-center text-gray-400">
                     <svg
                         className="mx-auto mb-3 h-12 w-12 md:mb-4 md:h-16 md:w-16"
@@ -88,7 +88,7 @@ function FilmPlayer({ film }: { film: Film }) {
     const showYTBadge = isYouTubeUrl(videoUrl);
 
     return (
-        <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-lg bg-black shadow-lg md:mb-6">
+        <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-lg bg-black shadow-2xl md:mb-6">
             {/* YT badge removed from here */}
             {showYTBadge ? (
                 // YouTube iframe
@@ -191,34 +191,6 @@ function FilmMeta({ film }: { film: Film }) {
     );
 }
 
-function FilmRow({ title, films }: { title: string; films: Film[] }) {
-    if (!films?.length) return null;
-
-    return (
-        <section className="mb-8 md:mb-12">
-            <h2 className="mb-4 text-xl font-bold text-white md:mb-6 md:text-2xl">{title}</h2>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-                {films.map((film) => (
-                    <FilmCard key={film.id} film={film} />
-                ))}
-            </div>
-        </section>
-    );
-}
-
-// Loading skeleton for film cards
-function FilmCardSkeleton() {
-    return (
-        <div className="animate-pulse">
-            <div className="h-32 w-full rounded-lg bg-zinc-800"></div>
-            <div className="mt-2 space-y-2">
-                <div className="h-4 w-3/4 rounded bg-zinc-800"></div>
-                <div className="h-3 w-1/2 rounded bg-zinc-800"></div>
-            </div>
-        </div>
-    );
-}
-
 function FilmShow() {
     const { film, recommended } = usePage<{ film: Film; recommended: Film[] }>().props;
     const url = typeof window !== 'undefined' ? window.location.href : '';
@@ -249,11 +221,20 @@ function FilmShow() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-black via-zinc-900 to-black pt-24 text-white">
+        <div className="relative min-h-screen bg-gradient-to-b from-black via-zinc-900 to-black pt-24 text-white">
+            <div className="absolute top-0 left-0 h-[70vh] w-full">
+                <img
+                    src={`/storage/${film.poster_landscape_file || film.poster_portrait_file}`}
+                    className="size-full object-cover opacity-50"
+                />
+                <div className="absolute top-0 left-0 z-[9] h-full w-full bg-gradient-to-b from-transparent via-transparent to-black"></div>
+                <div className="absolute bottom-0 left-0 z-[9] h-[50%] w-full translate-y-[40%] bg-gradient-to-b from-transparent via-black to-transparent opacity-50"></div>
+                <div className="absolute bottom-0 left-0 z-[9] h-[80%] w-full translate-y-[60%] bg-gradient-to-b from-transparent via-black to-transparent opacity-50"></div>
+            </div>
             <Head title={`${film.title} | NITISARA Theater`} />
             <TheaterHeader onSearch={handleSearch} isSearching={!!searchQuery} homeUrl="/theater" />
-            <main className="mx-auto max-w-6xl px-4 pb-16">
-                <div className="pt-6 md:pt-8">
+            <main className="relative z-[10] mx-auto max-w-6xl px-4 pb-16">
+                <div className="md:pt-4">
                     <FilmPlayer film={film} />
                     <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
                         <div className="flex-1">
