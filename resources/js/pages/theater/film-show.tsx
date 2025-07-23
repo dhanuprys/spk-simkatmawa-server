@@ -1,6 +1,7 @@
 import { RecommendedFilms, TheaterHeader, type Film } from '@/components/theater';
 import { Button } from '@/components/ui/button';
 import { Head, usePage } from '@inertiajs/react';
+import { motion } from 'motion/react';
 import { useState } from 'react';
 
 function ShareButton({ url, title }: { url: string; title: string }) {
@@ -223,10 +224,17 @@ function FilmShow() {
     return (
         <div className="relative min-h-screen bg-gradient-to-b from-black via-zinc-900 to-black pt-24 text-white">
             <div className="absolute top-0 left-0 h-[70vh] w-full">
-                <img
-                    src={`/storage/${film.poster_landscape_file || film.poster_portrait_file}`}
-                    className="size-full object-cover opacity-15 sm:opacity-50"
-                />
+                <motion.div
+                    className="relative size-full"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1, duration: 1 }}
+                >
+                    <img
+                        src={`/storage/${film.poster_landscape_file || film.poster_portrait_file}`}
+                        className="size-full object-cover opacity-15 sm:opacity-50"
+                    />
+                </motion.div>
                 <div className="absolute top-0 left-0 z-[9] h-full w-full bg-gradient-to-b from-transparent via-transparent to-black"></div>
                 <div className="absolute bottom-0 left-0 z-[9] h-[50%] w-full translate-y-[40%] bg-gradient-to-b from-transparent via-black to-transparent opacity-50"></div>
                 <div className="absolute bottom-0 left-0 z-[9] h-[80%] w-full translate-y-[60%] bg-gradient-to-b from-transparent via-black to-transparent opacity-50"></div>
