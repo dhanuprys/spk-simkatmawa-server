@@ -7,6 +7,7 @@ export interface Film {
     synopsis: string;
     poster_landscape_file?: string;
     poster_portrait_file?: string;
+    backdrop_file?: string;
     direct_video_url?: string;
     participant?: {
         team_name?: string;

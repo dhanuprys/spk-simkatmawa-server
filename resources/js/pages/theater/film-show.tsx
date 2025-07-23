@@ -231,7 +231,7 @@ function FilmShow() {
                     transition={{ delay: 1, duration: 1 }}
                 >
                     <img
-                        src={`/storage/${film.poster_landscape_file || film.poster_portrait_file}`}
+                        src={`/storage/${film.poster_landscape_file || film.poster_portrait_file || film.backdrop_file}`}
                         className="size-full object-cover opacity-15 sm:opacity-50"
                     />
                 </motion.div>
