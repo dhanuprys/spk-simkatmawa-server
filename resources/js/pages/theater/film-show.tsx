@@ -261,7 +261,7 @@ function FilmShow() {
 
                 {/* Recommended Films (responsive) */}
                 <div className="hidden sm:block">
-                    {recommended?.length > 0 && <RecommendedFilms films={recommended} title="Film Serupa" />}
+                    {recommended?.length > 0 && <RecommendedFilms films={recommended} title="Rekomendasi Lainnya" />}
                 </div>
             </main>
             <footer className="bg-opacity-80 mt-8 w-full bg-black py-6 text-center text-xs text-zinc-500 md:py-8">

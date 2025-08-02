@@ -2,11 +2,10 @@ import { FilmCard, FilmRow, TheaterHeader, TheaterHero, type Film } from '@/comp
 import { Head, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
-// Types for props (adjust as needed for your backend data)
+// Types for props
 type Category = { id: number; name: string };
 type EventYear = { id: number; year: number; show_end?: string };
 
-// Empty state component
 function EmptyState() {
     return (
         <div className="flex min-h-[90vh] items-center justify-center">
@@ -26,10 +25,8 @@ function EmptyState() {
     );
 }
 
-// Search results component
 function SearchResults({ films, searchQuery }: { films: Film[]; searchQuery: string }) {
     if (!searchQuery) return null;
-
     return (
         <section className="mb-8 md:mb-12">
             <div className="mb-3 px-4 md:mb-4 md:px-8">
@@ -49,7 +46,6 @@ function SearchResults({ films, searchQuery }: { films: Film[]; searchQuery: str
     );
 }
 
-// No search results component
 function NoSearchResults({ searchQuery }: { searchQuery: string }) {
     return (
         <div className="flex min-h-[400px] items-center justify-center">
@@ -69,7 +65,6 @@ function NoSearchResults({ searchQuery }: { searchQuery: string }) {
     );
 }
 
-// Scroll to top button
 function ScrollToTop() {
     const [isVisible, setIsVisible] = useState(false);
 
@@ -146,89 +141,64 @@ function ComingSoonRow({ films }: { films: { id: number; poster_landscape_file?:
 }
 
 export default function TheaterIndex() {
-    const { films, categories, eventYears, ongoingFilms } = usePage<{
+    const {
+        films,
+        categories,
+        eventYears,
+        ongoingFilms,
+        latestFilms,
+        currentYearFilms,
+        trendingFilms,
+        allFilms: allFilmsProp,
+        search,
+    } = usePage<{
         films: { data: Film[] };
         categories: Category[];
         eventYears: EventYear[];
         ongoingFilms: { id: number; poster_landscape_file?: string }[];
+        latestFilms: Film[];
+        currentYearFilms: Film[];
+        trendingFilms: Film[];
+        allFilms: Film[];
+        search?: string;
     }>().props;
-    const allFilms = films?.data || [];
 
-    // Search state
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState<Film[]>([]);
+    const allFilms = allFilmsProp || [];
 
-    // Initialize search from URL parameters
-    useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const searchParam = urlParams.get('search');
-        if (searchParam) {
-            setSearchQuery(searchParam);
-            handleSearch(searchParam);
-        }
-    }, []);
+    const paginatedFilms = films?.data || [];
 
-    // Search function
+    const [searchQuery, setSearchQuery] = useState(search || '');
+
     const handleSearch = (query: string) => {
         setSearchQuery(query);
-
-        // Update URL with search parameter
-        const url = new URL(window.location.href);
         if (query.trim()) {
-            url.searchParams.set('search', query);
+            window.location.href = `?search=${encodeURIComponent(query)}`;
         } else {
-            url.searchParams.delete('search');
+            window.location.href = window.location.pathname;
         }
-        window.history.replaceState({}, '', url.toString());
-
-        if (!query.trim()) {
-            setSearchResults([]);
-            return;
-        }
-
-        const results = allFilms.filter((film) => {
-            const searchTerm = query.toLowerCase();
-            const title = film.title.toLowerCase();
-            const synopsis = film.synopsis.toLowerCase();
-            const teamName = film.participant?.team_name?.toLowerCase() || '';
-            const category = film.participant?.category?.name?.toLowerCase() || '';
-            const year = film.participant?.event_year?.year?.toString() || '';
-
-            return (
-                title.includes(searchTerm) ||
-                synopsis.includes(searchTerm) ||
-                teamName.includes(searchTerm) ||
-                category.includes(searchTerm) ||
-                year.includes(searchTerm)
-            );
-        });
-
-        setSearchResults(results);
     };
 
-    // Show empty state if no films
-    if (!allFilms.length) {
+    // Debugging allFilms before rendering
+    console.log('allFilms:', allFilms);
+
+    if (!paginatedFilms.length && !searchQuery) {
         return (
             <div className="min-h-screen bg-gradient-to-b from-black via-zinc-900 to-black text-white">
                 <TheaterHeader onSearch={handleSearch} isSearching={!!searchQuery} homeUrl="/" />
                 <main className="pb-16">
                     <EmptyState />
                 </main>
-                <footer className="bg-opacity-80 mt-8 w-full bg-black py-8 text-center text-xs text-zinc-500">
-                    &copy; {new Date().getFullYear()} NITISARA VITHEATER. Hak cipta dilindungi.
-                </footer>
             </div>
         );
     }
 
-    // Show search results if searching
     if (searchQuery) {
         return (
             <div className="min-h-screen bg-gradient-to-b from-black via-zinc-900 to-black pt-24 text-white">
                 <TheaterHeader onSearch={handleSearch} isSearching={!!searchQuery} homeUrl="/" />
                 <main className="min-h-screen pb-16">
-                    {searchResults.length > 0 ? (
-                        <SearchResults films={searchResults} searchQuery={searchQuery} />
+                    {paginatedFilms.length > 0 ? (
+                        <SearchResults films={paginatedFilms} searchQuery={searchQuery} />
                     ) : (
                         <NoSearchResults searchQuery={searchQuery} />
                     )}
@@ -241,46 +211,46 @@ export default function TheaterIndex() {
         );
     }
 
-    // Create more realistic Netflix-style rows
-    const rows = [
-        {
-            title: 'Sedang Tren',
-            films: allFilms.slice(0, 8),
-        },
-        {
-            title: 'Semua Film',
-            films: allFilms,
-        },
-    ];
+    // Build Netflix-style rows: ensure no empty rows
+    const rows = [];
 
-    // Add category-based rows if we have categories
-    if (categories?.length > 0) {
+    if (latestFilms && latestFilms.length > 0) {
+        rows.push({ title: 'Terbaru Ditambahkan', films: latestFilms });
+    }
+
+    if (trendingFilms && trendingFilms.length > 0) {
+        rows.push({ title: 'Sedang Tren', films: trendingFilms });
+    }
+
+    const currentYear = new Date().getFullYear();
+    if (currentYearFilms && currentYearFilms.length > 0) {
+        rows.push({ title: `Film Tahun ${currentYear}`, films: currentYearFilms });
+    }
+
+    if (allFilms && allFilms.length > 0) {
+        rows.push({ title: 'Semua Film', films: allFilms });
+    }
+
+    if (categories && categories.length > 0) {
         categories.slice(0, 3).forEach((category) => {
             const categoryFilms = allFilms.filter((film) => film.participant?.category?.id === category.id);
             if (categoryFilms.length > 0) {
-                rows.push({
-                    title: `Film ${category.name}`,
-                    films: categoryFilms,
-                });
+                rows.push({ title: `Film ${category.name}`, films: categoryFilms });
             }
         });
     }
 
-    // Add year-based rows if we have multiple years
-    if (eventYears?.length > 1) {
+    if (eventYears && eventYears.length > 1) {
         eventYears.slice(0, 2).forEach((eventYear) => {
             const yearFilms = allFilms.filter((film) => film.participant?.event_year?.id === eventYear.id);
             if (yearFilms.length > 0) {
-                rows.push({
-                    title: `Film ${eventYear.year}`,
-                    films: yearFilms,
-                });
+                rows.push({ title: `Film ${eventYear.year}`, films: yearFilms });
             }
         });
     }
 
-    // Add a random row
     if (allFilms.length > 6) {
+        // Shuffle only for the personalized row (safe, not affecting main rows)
         const shuffled = [...allFilms].sort(() => 0.5 - Math.random());
         rows.push({
             title: 'Karena Anda menonton...',
@@ -293,12 +263,13 @@ export default function TheaterIndex() {
             <Head title="NITISARA Theater" />
             <TheaterHeader onSearch={handleSearch} isSearching={!!searchQuery} homeUrl="/" />
             <main className="pb-16">
-                <TheaterHero films={allFilms} />
-                {/* Coming Soon Section */}
+                <TheaterHero films={paginatedFilms} />
                 {ongoingFilms && ongoingFilms.length > 0 && <ComingSoonRow films={ongoingFilms} />}
-                {rows.map((row, i) => (
-                    <FilmRow key={i} title={row.title} films={row.films} />
-                ))}
+                {rows.length > 0 ? (
+                    rows.map((row, i) => <FilmRow key={i} title={row.title} films={row.films} />)
+                ) : (
+                    <EmptyState />
+                )}
             </main>
             <footer className="bg-opacity-80 mt-8 w-full bg-black py-8 text-center text-xs text-zinc-500">
                 &copy; {new Date().getFullYear()} NITISARA Virtual Theater. Hak cipta dilindungi.
