@@ -100,6 +100,36 @@ class RegistrationController extends Controller
         return redirect()->route('registration.success', ['token' => $session->token]);
     }
 
+    public function guidebook()
+    {
+        // Get the active event year
+        $activeEventYear = EventYear::where('show_start', '<=', now())
+            ->where('show_end', '>=', now())
+            ->where('registration_start', '<=', now())
+            ->where('registration_end', '>=', now())
+            ->orderBy('registration_start')
+            ->first();
+
+        if (!$activeEventYear) {
+            abort(404);
+        }
+
+        if (
+            !$activeEventYear->event_guide_document
+            || !file_exists(
+                storage_path(
+                    'app/public/' . $activeEventYear->event_guide_document
+                )
+            )
+        ) {
+            abort(404);
+        }
+
+        return response()->download(
+            storage_path('app/public/' . $activeEventYear->event_guide_document)
+        );
+    }
+
     public function success(Request $request)
     {
         $token = $request->query('token');

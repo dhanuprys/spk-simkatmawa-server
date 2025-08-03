@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\EventYear;
+use App\Models\Film;
 use Illuminate\Http\Request;
 use App\Models\Participant;
 
@@ -13,8 +14,16 @@ Route::get('/', function () {
         ->where('show_end', '>=', now())
         ->orderBy('registration_start')
         ->first();
+
+    $images = Film::query()
+        ->whereNotNull('poster_landscape_file')
+        ->inRandomOrder()
+        ->limit(5)
+        ->pluck('poster_landscape_file');
+
     return Inertia::render('home', [
         'activeEvent' => $activeEvent,
+        'images' => $images
     ]);
 })->name('home');
 Route::get('/contact', function () {
@@ -22,6 +31,7 @@ Route::get('/contact', function () {
 });
 Route::get('/registration', [App\Http\Controllers\RegistrationController::class, 'index'])->name('registration');
 Route::post('/registration', [App\Http\Controllers\RegistrationController::class, 'store'])->name('registration.store');
+Route::get('/registration/guidebook', [App\Http\Controllers\RegistrationController::class, 'guidebook'])->name('registration.guidebook');
 Route::get('/registration/success', [App\Http\Controllers\RegistrationController::class, 'success'])->name('registration.success');
 Route::get('/registration/{pin}/download/{type}', [App\Http\Controllers\RegistrationController::class, 'download'])->name('registration.download');
 
