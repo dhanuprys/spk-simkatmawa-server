@@ -1,15 +1,94 @@
 import { cn } from '@/lib/utils';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import SafeWidth from '../safe-width';
 import { Button } from '../ui/button';
+// Recommended: Add an icon library like lucide-react
+// import { ArrowRight, Download } from 'lucide-react';
+
 dayjs.extend(duration);
 
-const images = ['/assets/images/1.avif', '/assets/images/2.avif'];
+// Helper function to pad numbers with a leading zero
+const pad = (n: number) => n.toString().padStart(2, '0');
+
+// --- NEW: Countdown Display Component ---
+// This component makes the countdown much clearer to the user.
+interface CountdownDisplayProps {
+    timeParts: { days: string; hours: string; minutes: string; seconds: string };
+}
+
+function CountdownDisplay({ timeParts }: CountdownDisplayProps) {
+    const timeUnits = [
+        { label: 'Hari', value: timeParts.days },
+        { label: 'Jam', value: timeParts.hours },
+        { label: 'Menit', value: timeParts.minutes },
+        { label: 'Detik', value: timeParts.seconds },
+    ];
+
+    return (
+        <div className="flex w-full justify-center gap-3 sm:gap-4">
+            {timeUnits.map((unit, index) => (
+                <div key={unit.label} className="flex items-center gap-3 sm:gap-4">
+                    <div className="flex flex-col items-center">
+                        <span className="font-mono text-3xl font-bold text-white tabular-nums md:text-4xl">
+                            {unit.value}
+                        </span>
+                        <span className="text-xs font-medium tracking-widest text-blue-300">
+                            {unit.label.toUpperCase()}
+                        </span>
+                    </div>
+                    {index < timeUnits.length - 1 && <span className="text-3xl font-light text-blue-300/50">:</span>}
+                </div>
+            ))}
+        </div>
+    );
+}
+
+// --- NEW: CTA Buttons Component ---
+// This component cleanly handles the logic for which buttons to show.
+function CtaButtons({ activeEvent, registrationIsOpen }: { activeEvent: any; registrationIsOpen: boolean }) {
+    if (!activeEvent) return null;
+
+    const showGuideButton = !!activeEvent.event_guide_document;
+
+    return (
+        <div className="flex w-full max-w-lg flex-col items-center justify-center gap-4 sm:flex-row">
+            {/* Improved Download Button */}
+            {showGuideButton && (
+                <Button
+                    className="w-full items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-6 text-base font-semibold text-white shadow-lg backdrop-blur-lg transition-transform hover:scale-105 active:scale-95 sm:w-auto"
+                    size="lg"
+                    asChild
+                >
+                    <a href={route('registration.guidebook')} target="_blank" rel="noopener noreferrer">
+                        {/* <Download className="h-5 w-5" /> */}
+                        <span>Unduh Buku Panduan</span>
+                    </a>
+                </Button>
+            )}
+
+            {/* Main Registration Button (shown only when open) */}
+            {registrationIsOpen && (
+                <Button
+                    className="w-full items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-6 text-base font-bold text-white shadow-md shadow-blue-500/30 transition-transform hover:scale-105 active:scale-95 sm:w-auto"
+                    size="lg"
+                    asChild
+                >
+                    <a href="/registration">
+                        <span>Daftar Sekarang!</span>
+                        {/* <ArrowRight className="h-5 w-5" /> */}
+                    </a>
+                </Button>
+            )}
+        </div>
+    );
+}
 
 interface HeroProps {
+    images: string[];
     activeEvent?: {
+        // ... same props as before
         id: number;
         year: number;
         title: string;
@@ -22,144 +101,101 @@ interface HeroProps {
     } | null;
 }
 
-export default function Hero({ activeEvent }: HeroProps) {
+export default function Hero({ activeEvent, images }: HeroProps) {
     const [activeSlideIndex, setActiveSlideIndex] = useState(0);
-    const [now, setNow] = useState(dayjs());
+    const [now, setNow] = useState(() => dayjs());
     const [mounted, setMounted] = useState(false);
+
+    // --- IMPROVED: Logic is memoized for better performance ---
+    const registrationStart = useMemo(
+        () => (activeEvent?.registration_start ? dayjs(activeEvent.registration_start) : null),
+        [activeEvent?.registration_start],
+    );
+
+    const registrationIsOpen = !registrationStart || now.isAfter(registrationStart);
+
+    const countdownTimeParts = useMemo(() => {
+        if (registrationIsOpen || !registrationStart) {
+            return { days: '00', hours: '00', minutes: '00', seconds: '00' };
+        }
+        const diff = dayjs.duration(registrationStart.diff(now));
+        return {
+            days: pad(Math.floor(diff.asDays())),
+            hours: pad(diff.hours()),
+            minutes: pad(diff.minutes()),
+            seconds: pad(diff.seconds()),
+        };
+    }, [now, registrationStart, registrationIsOpen]);
 
     useEffect(() => {
         setMounted(true);
-        let currentIndex = 0;
-        const counter = setInterval(() => {
-            if (currentIndex >= images.length - 1) {
-                currentIndex = -1;
-            }
-            currentIndex++;
-            setActiveSlideIndex(currentIndex);
+        const slideInterval = setInterval(() => {
+            setActiveSlideIndex((prevIndex) => (prevIndex + 1) % images.length);
         }, 4000);
-        const timer = setInterval(() => setNow(dayjs()), 1000);
+        const timerInterval = setInterval(() => setNow(dayjs()), 1000);
+
         return () => {
-            clearInterval(counter);
-            clearInterval(timer);
+            clearInterval(slideInterval);
+            clearInterval(timerInterval);
         };
     }, []);
 
-    let registrationNotOpened = false;
-    let countdownText = '';
-    let countdownParts: string[] = [];
-    if (activeEvent && activeEvent.registration_start) {
-        const regStart = dayjs(activeEvent.registration_start);
-        if (now.isBefore(regStart)) {
-            registrationNotOpened = true;
-            const diff = regStart.diff(now);
-            const d = dayjs.duration(diff);
-            const pad = (n: number) => n.toString().padStart(2, '0');
-            countdownParts = [pad(d.days()), pad(d.hours()), pad(d.minutes()), pad(d.seconds())];
-            countdownText = countdownParts.join(':');
-        }
-    }
+    // --- IMPROVED: The `mounted` class logic is now cleaner ---
+    const getTransitionClass = (delay = 0) =>
+        cn(
+            'transition-all duration-700',
+            mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0',
+            `delay-${delay}`,
+        );
 
     return (
-        <div className="flex h-screen flex-col items-center justify-center bg-black">
-            <div className="absolute top-0 left-0 size-full bg-slate-950">
-                {images.map((image) => (
+        <div className="flex h-screen flex-col items-center justify-center bg-slate-950">
+            {/* --- IMPROVED: Background opacity slightly increased for better visuals --- */}
+            <div className="absolute top-0 left-0 size-full">
+                {images.map((image, index) => (
                     <img
                         key={image}
                         className={cn(
                             'absolute top-0 left-0 size-full object-cover opacity-0 transition-opacity duration-1000',
-                            image === images[activeSlideIndex] && 'opacity-5',
+                            index === activeSlideIndex && 'opacity-10', // Was opacity-5
                         )}
-                        src={image}
+                        src={`/storage/${image}`}
+                        alt="Film festival background image"
                     />
                 ))}
             </div>
-            <SafeWidth className="relative z-[1] max-w-[65rem] space-y-6 pt-8 pb-8">
+
+            <SafeWidth className="relative z-[1] flex max-w-[65rem] flex-col items-center space-y-8 px-4 text-center">
                 <h1
                     className={cn(
-                        'font-luckiest bg-gradient-to-b from-blue-800 to-blue-500 bg-clip-text text-center text-7xl text-transparent drop-shadow-[0_0_1px_#1D4ED8] transition-all duration-700 sm:text-6xl md:text-9xl',
-                        mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0',
+                        'font-luckiest bg-gradient-to-b from-blue-700 to-blue-500 bg-clip-text text-7xl text-transparent drop-shadow-[0_0_1px_#1D4ED8] md:text-8xl lg:text-9xl',
+                        getTransitionClass(0),
                     )}
                 >
-                    Satu
-                    <br className="md:hidden" /> Layar,
+                    Satu Layar,
                     <br />
-                    Seribu
-                    <br className="md:hidden" /> Cerita
+                    Seribu Cerita
                 </h1>
-                <p
-                    className={cn(
-                        'text-center text-base text-white opacity-85 transition-all duration-700 sm:text-lg md:text-xl',
-                        mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0 delay-100',
-                    )}
-                >
+
+                <p className={cn('max-w-3xl text-lg text-white/80 md:text-xl', getTransitionClass(100))}>
                     Selamat datang di Film Festival Nitisara — sebuah selebrasi sinema yang menyatukan imajinasi,
                     budaya, dan suara generasi.
                 </p>
-                {activeEvent && (
-                    <div
-                        className={cn(
-                            'mx-auto flex w-full max-w-md flex-col items-end justify-center gap-x-0 gap-y-3 transition-all duration-700 sm:flex-row sm:gap-x-2 sm:gap-y-0 md:gap-x-4',
-                            mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0 delay-200',
-                        )}
-                    >
-                        <div className="flex w-full flex-col items-center gap-3 sm:w-auto">
-                            {registrationNotOpened && (
-                                <span className="mb-1 text-xs font-medium tracking-wide text-blue-300 uppercase">
-                                    Pendaftaran dibuka dalam:
-                                </span>
-                            )}
-                            {registrationNotOpened ? (
-                                <Button
-                                    className="flex w-full items-center gap-2 rounded-full bg-white py-4 text-lg font-semibold text-black shadow-md sm:w-auto md:p-8 md:text-xl"
-                                    disabled
-                                    aria-label="Countdown menuju pendaftaran"
-                                >
-                                    <span className="font-mono text-base tracking-widest tabular-nums md:text-xl">
-                                        {countdownText}
-                                    </span>
-                                </Button>
-                            ) : null}
-                            {/* Improved download button for guide document */}
-                            {activeEvent && activeEvent.event_guide_document && (
-                                <Button
-                                    className="flex w-full items-center gap-2 rounded-full bg-gray-300/20 px-8 py-4 text-white shadow-md backdrop-blur-2xl transition-transform hover:scale-105 active:scale-95 sm:w-auto md:p-8 md:text-xl"
-                                    size="default"
-                                    asChild
-                                    aria-label="Download Panduan Event"
-                                >
-                                    <a
-                                        href={route('admin.event-years.download-guide', activeEvent.id)}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-2"
-                                        style={{ boxShadow: '0 1px 6px 0 rgba(30,64,175,0.04)' }}
-                                    >
-                                        <span>Unduh Buku Panduan</span>
-                                    </a>
-                                </Button>
-                            )}
-                        </div>
-                        <div className="w-full sm:w-auto">
-                            {registrationNotOpened ? (
-                                <Button
-                                    className="flex w-full items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 py-4 text-lg text-white shadow-md sm:w-auto md:p-8 md:text-xl"
-                                    disabled
-                                    aria-label="Pendaftaran segera dibuka"
-                                >
-                                    Segera Dibuka
-                                </Button>
-                            ) : (
-                                <Button
-                                    className="flex w-full items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 py-4 text-lg text-white shadow-md transition-transform hover:scale-105 active:scale-95 sm:w-auto md:p-8 md:text-xl"
-                                    asChild
-                                    aria-label="Daftar sekarang"
-                                >
-                                    <a href="/registration">Daftar Sekarang!</a>
-                                </Button>
-                            )}
-                        </div>
+
+                <div className={cn('flex flex-col items-center gap-4 pt-4', getTransitionClass(200))}>
+                    {!registrationIsOpen && (
+                        <>
+                            <p className="mb-2 text-sm font-medium tracking-widest text-blue-300 uppercase">
+                                Pendaftaran Dibuka Dalam
+                            </p>
+                            <CountdownDisplay timeParts={countdownTimeParts} />
+                        </>
+                    )}
+
+                    <div className="mt-4">
+                        <CtaButtons activeEvent={activeEvent} registrationIsOpen={registrationIsOpen} />
                     </div>
-                )}
+                </div>
             </SafeWidth>
         </div>
     );
