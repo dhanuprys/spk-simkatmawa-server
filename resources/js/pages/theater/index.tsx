@@ -264,12 +264,14 @@ export default function TheaterIndex() {
             <TheaterHeader onSearch={handleSearch} isSearching={!!searchQuery} homeUrl="/" />
             <main className="pb-16">
                 <TheaterHero films={paginatedFilms} />
-                {ongoingFilms && ongoingFilms.length > 0 && <ComingSoonRow films={ongoingFilms} />}
-                {rows.length > 0 ? (
-                    rows.map((row, i) => <FilmRow key={i} title={row.title} films={row.films} />)
-                ) : (
-                    <EmptyState />
-                )}
+                <div className="bg-gradient-to-b from-black via-zinc-900 to-black pt-8">
+                    {ongoingFilms && ongoingFilms.length > 0 && <ComingSoonRow films={ongoingFilms} />}
+                    {rows.length > 0 ? (
+                        rows.map((row, i) => <FilmRow key={i} title={row.title} films={row.films} />)
+                    ) : (
+                        <EmptyState />
+                    )}
+                </div>
             </main>
             <footer className="bg-opacity-80 mt-8 w-full bg-black py-8 text-center text-xs text-zinc-500">
                 &copy; {new Date().getFullYear()} NITISARA Virtual Theater. Hak cipta dilindungi.

@@ -2,19 +2,22 @@ import { RecommendedFilms, TheaterHeader, type Film } from '@/components/theater
 import { Button } from '@/components/ui/button';
 import { Head, usePage } from '@inertiajs/react';
 import { motion } from 'motion/react';
-import { useState } from 'react';
 
 function ShareButton({ url, title }: { url: string; title: string }) {
     const handleShare = async () => {
         if (navigator.share) {
             try {
                 await navigator.share({ title, url });
-            } catch {}
+            } catch {
+                // silent
+            }
         } else {
             try {
                 await navigator.clipboard.writeText(url);
                 alert('Link berhasil disalin!');
-            } catch {}
+            } catch {
+                // silent
+            }
         }
     };
     return (
@@ -164,7 +167,7 @@ function FilmMeta({ film }: { film: Film }) {
                 <div className="mb-4">
                     <span className="mb-1 block font-medium text-gray-400">Pemeran:</span>
                     <ul className="space-y-1">
-                        {film.castings.map((c: any, idx: number) => (
+                        {film.castings.map((c, idx: number) => (
                             <li key={idx} className="flex items-center gap-2 text-sm text-gray-200">
                                 <span className="font-semibold text-white">{c.real_name}</span>
                                 <span className="text-gray-400">sebagai</span>
@@ -195,7 +198,6 @@ function FilmMeta({ film }: { film: Film }) {
 function FilmShow() {
     const { film, recommended } = usePage<{ film: Film; recommended: Film[] }>().props;
     const url = typeof window !== 'undefined' ? window.location.href : '';
-    const [searchQuery, setSearchQuery] = useState('');
 
     const handleSearch = (query: string) => {
         if (query.trim()) {
@@ -206,7 +208,7 @@ function FilmShow() {
     if (!film) {
         return (
             <div className="min-h-screen bg-gradient-to-b from-black via-zinc-900 to-black pt-24 text-white">
-                <TheaterHeader onSearch={handleSearch} isSearching={!!searchQuery} homeUrl="/theater" />
+                <TheaterHeader onSearch={handleSearch} isSearching={false} homeUrl="/theater" />
                 <main className="mx-auto max-w-6xl px-4 pb-16">
                     <div className="pt-6 md:pt-8">
                         <div className="mb-4 aspect-video w-full animate-pulse rounded-lg bg-zinc-800 md:mb-6"></div>
@@ -223,6 +225,7 @@ function FilmShow() {
 
     return (
         <div className="relative min-h-screen bg-gradient-to-b from-black via-zinc-900 to-black pt-24 text-white">
+            <Head title={`${film.title} | NITISARA Theater`} />
             <div className="absolute top-0 left-0 h-[70vh] w-full">
                 <motion.div
                     className="relative size-full"
@@ -234,13 +237,13 @@ function FilmShow() {
                         src={`/storage/${film.poster_landscape_file || film.poster_portrait_file || film.backdrop_file}`}
                         className="size-full object-cover opacity-15 sm:opacity-50"
                     />
+                    <div className="h-[250px] bg-gradient-to-b from-black to-transparent"></div>
                 </motion.div>
                 <div className="absolute top-0 left-0 z-[9] h-full w-full bg-gradient-to-b from-transparent via-transparent to-black"></div>
                 <div className="absolute bottom-0 left-0 z-[9] h-[50%] w-full translate-y-[40%] bg-gradient-to-b from-transparent via-black to-transparent opacity-50"></div>
                 <div className="absolute bottom-0 left-0 z-[9] h-[80%] w-full translate-y-[60%] bg-gradient-to-b from-transparent via-black to-transparent opacity-50"></div>
             </div>
-            <Head title={`${film.title} | NITISARA Theater`} />
-            <TheaterHeader onSearch={handleSearch} isSearching={!!searchQuery} homeUrl="/theater" />
+            <TheaterHeader onSearch={handleSearch} isSearching={false} homeUrl="/theater" />
             <main className="relative z-[10] mx-auto max-w-6xl px-4 pb-16">
                 <div className="md:pt-4">
                     <FilmPlayer film={film} />
