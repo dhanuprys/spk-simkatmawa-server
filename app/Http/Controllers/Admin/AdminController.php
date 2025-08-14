@@ -3,39 +3,25 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
-use App\Models\EventYear;
-use App\Services\StatisticsService;
+use App\Models\ObjectMetric;
+use App\Models\CriteriaTemplate;
+use App\Models\User;
 use Inertia\Inertia;
 
 class AdminController extends Controller
 {
-    public function __construct(
-        private StatisticsService $statisticsService
-    ) {
-    }
-
     public function dashboard()
     {
-        $stats = $this->statisticsService->getDashboardStats();
-        $recentParticipants = $this->statisticsService->getRecentParticipants();
-        $recentFilms = $this->statisticsService->getRecentFilms();
-        $categories = Category::withCount('participants')->get();
-        $eventYears = EventYear::withCount('participants')->get();
+        $stats = [
+            'total_metrics' => ObjectMetric::count(),
+            'total_templates' => CriteriaTemplate::count(),
+            'total_users' => User::count(),
+            'recent_metrics' => ObjectMetric::latest()->take(5)->get(),
+            'recent_templates' => CriteriaTemplate::latest()->take(5)->get(),
+        ];
 
         return Inertia::render('admin/dashboard', [
             'stats' => $stats,
-            'recent_participants' => $recentParticipants,
-            'recent_films' => $recentFilms,
-            'categories' => $categories,
-            'event_years' => $eventYears,
         ]);
-    }
-
-    public function statistics()
-    {
-        $statistics = $this->statisticsService->getDetailedStatistics();
-
-        return Inertia::render('admin/statistics', $statistics);
     }
 }

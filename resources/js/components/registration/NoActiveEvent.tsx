@@ -14,7 +14,7 @@ export default function NoActiveEvent() {
                             Pendaftaran Belum Dibuka
                         </h1>
                         <p className="max-w-xl text-lg text-gray-600 md:text-xl">
-                            Saat ini belum ada event NITISARA yang sedang membuka pendaftaran.
+                            Saat ini belum ada event SIMKATMAWA yang sedang membuka pendaftaran.
                             <br />
                             Silakan cek kembali nanti atau hubungi panitia untuk informasi lebih lanjut.
                         </p>

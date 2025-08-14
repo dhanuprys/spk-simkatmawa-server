@@ -28,9 +28,6 @@ class CreateUser extends Command
      */
     public function handle()
     {
-        $this->info('🎬 NITISARA Film Festival - User Creation');
-        $this->info('==========================================');
-
         // Get user input
         $name = $this->option('name') ?: $this->ask('Masukkan nama lengkap');
         $email = $this->option('email') ?: $this->ask('Masukkan alamat email');

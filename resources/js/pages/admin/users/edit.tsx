@@ -34,7 +34,7 @@ export default function UserEdit({ user }: Props) {
 
     return (
         <AdminLayout title={`Edit User: ${user.name}`} description="Edit user admin">
-            <Head title={`Edit ${user.name} - NITISARA Admin`} />
+            <Head title={`Edit ${user.name} - SIMKATMAWA Admin`} />
 
             <div className="space-y-6">
                 {/* Header */}

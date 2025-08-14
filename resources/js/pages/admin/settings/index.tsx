@@ -16,7 +16,7 @@ interface SettingsIndexProps {
 
 export default function SettingsIndex({ settings }: SettingsIndexProps) {
     const { data, setData, post, processing, errors } = useForm({
-        festival_name: settings.festival_name?.value || 'NITISARA Film Festival',
+        festival_name: settings.festival_name?.value || 'SIMKATMAWA Film Festival',
         festival_description: settings.festival_description?.value || '',
         contact_email: settings.contact_email?.value || '',
         contact_phone: settings.contact_phone?.value || '',
@@ -42,12 +42,12 @@ export default function SettingsIndex({ settings }: SettingsIndexProps) {
 
     return (
         <AdminLayout title="Pengaturan" description="Kelola pengaturan aplikasi">
-            <Head title="Pengaturan - NITISARA Admin" />
+            <Head title="Pengaturan - SIMKATMAWA Admin" />
 
             <div className="space-y-6">
                 <div>
                     <h1 className="text-2xl font-bold">Pengaturan</h1>
-                    <p className="text-muted-foreground">Konfigurasi aplikasi festival film NITISARA</p>
+                    <p className="text-muted-foreground">Konfigurasi aplikasi festival film SIMKATMAWA</p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
@@ -68,7 +68,7 @@ export default function SettingsIndex({ settings }: SettingsIndexProps) {
                                         id="festival_name"
                                         value={data.festival_name}
                                         onChange={(e) => setData('festival_name', e.target.value)}
-                                        placeholder="NITISARA Film Festival"
+                                        placeholder="SIMKATMAWA Film Festival"
                                     />
                                     {errors.festival_name && (
                                         <p className="text-sm text-red-600">{errors.festival_name}</p>
@@ -105,7 +105,7 @@ export default function SettingsIndex({ settings }: SettingsIndexProps) {
                                         type="email"
                                         value={data.contact_email}
                                         onChange={(e) => setData('contact_email', e.target.value)}
-                                        placeholder="contact@nitisara.com"
+                                        placeholder="contact@simkatmawa.com"
                                     />
                                     {errors.contact_email && (
                                         <p className="text-sm text-red-600">{errors.contact_email}</p>
@@ -156,7 +156,7 @@ export default function SettingsIndex({ settings }: SettingsIndexProps) {
                                         onChange={(e) =>
                                             setData('social_media', { ...data.social_media, facebook: e.target.value })
                                         }
-                                        placeholder="https://facebook.com/nitisara"
+                                        placeholder="https://facebook.com/simkatmawa"
                                     />
                                 </div>
 
@@ -168,7 +168,7 @@ export default function SettingsIndex({ settings }: SettingsIndexProps) {
                                         onChange={(e) =>
                                             setData('social_media', { ...data.social_media, instagram: e.target.value })
                                         }
-                                        placeholder="https://instagram.com/nitisara"
+                                        placeholder="https://instagram.com/simkatmawa"
                                     />
                                 </div>
 
@@ -180,7 +180,7 @@ export default function SettingsIndex({ settings }: SettingsIndexProps) {
                                         onChange={(e) =>
                                             setData('social_media', { ...data.social_media, twitter: e.target.value })
                                         }
-                                        placeholder="https://twitter.com/nitisara"
+                                        placeholder="https://twitter.com/simkatmawa"
                                     />
                                 </div>
 
@@ -192,7 +192,7 @@ export default function SettingsIndex({ settings }: SettingsIndexProps) {
                                         onChange={(e) =>
                                             setData('social_media', { ...data.social_media, youtube: e.target.value })
                                         }
-                                        placeholder="https://youtube.com/nitisara"
+                                        placeholder="https://youtube.com/simkatmawa"
                                     />
                                 </div>
                             </CardContent>

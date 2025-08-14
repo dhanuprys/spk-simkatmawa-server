@@ -14,7 +14,7 @@ export default function Hero({ eventYear }: HeroProps) {
                     <h1 className="font-luckiest mb-6 text-4xl text-gray-900 md:text-6xl">
                         Saatnya tampil di layar{' '}
                         <span className="from-primary bg-gradient-to-r to-blue-600 bg-clip-text text-transparent">
-                            NITISARA{eventYear ? ` ${eventYear}` : ''}
+                            SIMKATMAWA{eventYear ? ` ${eventYear}` : ''}
                         </span>
                     </h1>
 

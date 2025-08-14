@@ -1,8 +1,8 @@
-# User Management - NITISARA Film Festival
+# User Management - SIMKATMAWA Film Festival
 
 ## Overview
 
-User accounts for the NITISARA Film Festival admin panel are now managed through Laravel Console commands instead of a public registration system. This provides better security and control over who can access the admin panel.
+User accounts for the SIMKATMAWA Film Festival admin panel are now managed through Laravel Console commands instead of a public registration system. This provides better security and control over who can access the admin panel.
 
 ## Creating User Accounts
 
@@ -21,7 +21,7 @@ This will prompt you for:
 ### Non-Interactive Mode
 
 ```bash
-php artisan user:create --name="Admin Name" --email="admin@nitisara.com" --password="securepassword123"
+php artisan user:create --name="Admin Name" --email="admin@simkatmawa.com" --password="securepassword123"
 ```
 
 ## Command Features
@@ -37,21 +37,21 @@ php artisan user:create --name="Admin Name" --email="admin@nitisara.com" --passw
 ```bash
 # Interactive mode
 $ php artisan user:create
-🎬 NITISARA Film Festival - User Creation
+🎬 SIMKATMAWA Film Festival - User Creation
 ==========================================
-Masukkan nama lengkap: Admin Nitisara
-Masukkan alamat email: admin@nitisara.com
+Masukkan nama lengkap: Admin SIMKATMAWA
+Masukkan alamat email: admin@simkatmawa.com
 Masukkan kata sandi: ********
 ✅ User berhasil dibuat!
-📧 Email: admin@nitisara.com
-👤 Nama: Admin Nitisara
+📧 Email: admin@simkatmawa.com
+👤 Nama: Admin SIMKATMAWA
 🆔 ID: 1
 🎉 User dapat login ke panel admin sekarang!
 
 # Non-interactive mode
-$ php artisan user:create --name="John Doe" --email="john@nitisara.com" --password="mypassword123"
+$ php artisan user:create --name="John Doe" --email="john@simkatmawa.com" --password="mypassword123"
 ✅ User berhasil dibuat!
-📧 Email: john@nitisara.com
+📧 Email: john@simkatmawa.com
 👤 Nama: John Doe
 🆔 ID: 2
 🎉 User dapat login ke panel admin sekarang!

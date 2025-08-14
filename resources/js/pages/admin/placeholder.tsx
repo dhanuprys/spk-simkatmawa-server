@@ -14,7 +14,7 @@ export default function Placeholder({
 }: PlaceholderProps) {
     return (
         <AdminLayout title={title}>
-            <Head title={`${title} - NITISARA Admin`} />
+            <Head title={`${title} - SIMKATMAWA Admin`} />
 
             <div className="space-y-6">
                 <div>

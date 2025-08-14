@@ -2,15 +2,11 @@
 
 namespace App\Providers;
 
-use App\Services\CategoryService;
-use App\Services\EventYearService;
+use App\Models\ObjectMetric;
+use App\Modules\MagiqMarcos\MagiqMarcos;
+use App\Modules\MagiqMarcos\ObjectEntity;
 use App\Services\FileUploadService;
-use App\Services\FilmService;
-use App\Services\RegistrationService;
-use App\Services\StatisticsService;
-use App\Services\SubmissionService;
 use App\Services\UserService;
-use App\Services\TelegramService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,15 +18,36 @@ class AppServiceProvider extends ServiceProvider
     {
         // Register services
         $this->app->singleton(FileUploadService::class);
-        $this->app->singleton(EventYearService::class);
-        $this->app->singleton(StatisticsService::class);
-        $this->app->singleton(FilmService::class);
-        $this->app->singleton(CategoryService::class);
         $this->app->singleton(UserService::class);
-        $this->app->singleton(RegistrationService::class);
-        $this->app->singleton(SubmissionService::class);
-        $this->app->singleton(TelegramService::class, function ($app) {
-            return new TelegramService();
+        $this->app->singleton(MagiqMarcos::class, function () {
+            $objectMetrics = ObjectMetric::all()->map(
+                fn(ObjectMetric $objectMetric) => new ObjectEntity(
+                    id: $objectMetric->id,
+                    name: $objectMetric->name,
+                    l3_cg1_a: $objectMetric->l3_cg1_a,
+                    l3_cg1_b: $objectMetric->l3_cg1_b,
+                    l3_cg1_c: $objectMetric->l3_cg1_c,
+                    l3_cg2_a: $objectMetric->l3_cg2_a,
+                    l3_cg2_b: $objectMetric->l3_cg2_b,
+                    l2_cg1_a: $objectMetric->l2_cg1_a,
+                    l2_cg1_b: $objectMetric->l2_cg1_b,
+                    l2_cg1_c: $objectMetric->l2_cg1_c,
+                    l2_cg1_d: $objectMetric->l2_cg1_d,
+                    l2_cg1_e: $objectMetric->l2_cg1_e,
+                    l2_cg1_f: $objectMetric->l2_cg1_f,
+                    l2_cg1_g: $objectMetric->l2_cg1_g,
+                    l2_cg2_a: $objectMetric->l2_cg2_a,
+                    l2_cg2_b: $objectMetric->l2_cg2_b,
+                    l2_cg3_a: $objectMetric->l2_cg3_a,
+                    l2_cg3_b: $objectMetric->l2_cg3_b,
+                    l2_cg3_c: $objectMetric->l2_cg3_c,
+                    l2_cg3_d: $objectMetric->l2_cg3_d,
+                    l2_cg3_e: $objectMetric->l2_cg3_e,
+
+                )
+            )->toArray();
+
+            return new MagiqMarcos($objectMetrics);
         });
     }
 

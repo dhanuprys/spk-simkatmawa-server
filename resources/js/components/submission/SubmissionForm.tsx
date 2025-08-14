@@ -47,7 +47,7 @@ export default function SubmissionForm({
                     <FileVideo className="h-5 w-5" />
                     Submit Film
                 </CardTitle>
-                <CardDescription>Kirim film Anda untuk festival NITISARA</CardDescription>
+                <CardDescription>Kirim film Anda untuk festival SIMKATMAWA</CardDescription>
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleFilmSubmit} className="space-y-6">

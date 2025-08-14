@@ -41,7 +41,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
     return (
         <AuthLayout title="Masuk" description="Masukkan kredensial Anda untuk mengakses akun" hideDefaultHeader={true}>
-            <Head title="Admin Login - NITISARA" />
+            <Head title="Admin Login - SIMKATMAWA" />
 
             <div className="w-full max-w-md">
                 <div className="mb-6 text-center">
@@ -80,7 +80,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 autoComplete="email"
                                 value={data.email}
                                 onChange={(e) => setData('email', e.target.value)}
-                                placeholder="admin@nitisara.com"
+                                placeholder="admin@simkatmawa.com"
                                 className="h-12 text-base"
                             />
                             <InputError message={errors.email} />
@@ -169,8 +169,8 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     <div className="text-center">
                         <p className="text-muted-foreground text-sm">
                             Butuh bantuan? Hubungi{' '}
-                            <TextLink href="mailto:support@nitisara.com" className="text-primary">
-                                support@nitisara.com
+                            <TextLink href="mailto:support@simkatmawa.com" className="text-primary">
+                                support@simkatmawa.com
                             </TextLink>
                         </p>
                     </div>

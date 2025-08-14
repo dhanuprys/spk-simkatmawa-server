@@ -3,20 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { Head, Link, usePage } from '@inertiajs/react';
-import {
-    BarChart3,
-    Calendar,
-    FileVideo,
-    Home,
-    Key,
-    LogOut,
-    Menu,
-    Settings,
-    Shield,
-    User,
-    Users,
-    X,
-} from 'lucide-react';
+import { Database, FileText, Home, LogOut, Menu, Shield, User, X } from 'lucide-react';
 import { useState, type PropsWithChildren } from 'react';
 
 interface AdminLayoutProps {
@@ -26,14 +13,10 @@ interface AdminLayoutProps {
 
 const navigationMain = [
     { name: 'Dashboard', href: route('admin.dashboard'), icon: Home },
-    { name: 'Statistik', href: route('admin.statistics'), icon: BarChart3 },
-    { name: 'Peserta', href: route('admin.participants.index'), icon: Users },
-    { name: 'Film', href: route('admin.films.index'), icon: FileVideo },
-    { name: 'Tahun Event', href: route('admin.event-years.index'), icon: Calendar },
-    { name: 'PIN Page Login', href: route('admin.voting-pins.index'), icon: Key },
     { name: 'Users', href: route('admin.users.index'), icon: User },
+    { name: 'Metrik', href: route('admin.object-metrics.index'), icon: Database },
+    { name: 'Template Kriteria', href: route('admin.criteria-templates.index'), icon: FileText },
 ];
-const navigationSecondary = [{ name: 'Pengaturan', href: route('admin.settings.index'), icon: Settings }];
 
 export default function AdminLayout({ children, title, description }: PropsWithChildren<AdminLayoutProps>) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -55,7 +38,7 @@ export default function AdminLayout({ children, title, description }: PropsWithC
                     <div className="flex h-16 items-center justify-between border-b px-4">
                         <div className="flex items-center gap-2">
                             <AppLogoIcon className="h-8 w-8" />
-                            <span className="font-semibold">NITISARA Admin</span>
+                            <span className="font-semibold">SIMKATMAWA Admin</span>
                         </div>
                         <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(false)}>
                             <X className="h-4 w-4" />
@@ -83,28 +66,6 @@ export default function AdminLayout({ children, title, description }: PropsWithC
                                 </Link>
                             ))}
                         </div>
-                        <Separator className="my-2" />
-                        <div>
-                            <div className="text-muted-foreground px-3 py-1 text-xs font-semibold tracking-wider uppercase">
-                                Lainnya
-                            </div>
-                            {navigationSecondary.map((item) => (
-                                <Link
-                                    key={item.name}
-                                    href={item.href}
-                                    className={cn(
-                                        'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                                        isActive(item.href)
-                                            ? 'bg-primary text-primary-foreground'
-                                            : 'hover:bg-accent hover:text-accent-foreground',
-                                    )}
-                                    onClick={() => setSidebarOpen(false)}
-                                >
-                                    <item.icon className="h-4 w-4" />
-                                    {item.name}
-                                </Link>
-                            ))}
-                        </div>
                     </nav>
                 </div>
             </div>
@@ -114,7 +75,7 @@ export default function AdminLayout({ children, title, description }: PropsWithC
                 <div className="bg-background flex grow flex-col gap-y-5 overflow-y-auto border-r px-6">
                     <div className="flex h-16 items-center gap-2">
                         <AppLogoIcon className="h-8 w-8" />
-                        <span className="font-semibold">NITISARA Admin</span>
+                        <span className="font-semibold">SIMKATMAWA Admin</span>
                     </div>
                     <nav className="flex flex-1 flex-col">
                         <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -125,28 +86,6 @@ export default function AdminLayout({ children, title, description }: PropsWithC
                                             Manajemen
                                         </div>
                                         {navigationMain.map((item) => (
-                                            <li key={item.name}>
-                                                <Link
-                                                    href={item.href}
-                                                    className={cn(
-                                                        'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                                                        isActive(item.href)
-                                                            ? 'bg-primary text-primary-foreground'
-                                                            : 'hover:bg-accent hover:text-accent-foreground',
-                                                    )}
-                                                >
-                                                    <item.icon className="h-4 w-4" />
-                                                    {item.name}
-                                                </Link>
-                                            </li>
-                                        ))}
-                                    </div>
-                                    <Separator className="my-2" />
-                                    <div>
-                                        <div className="text-muted-foreground px-3 py-1 text-xs font-semibold tracking-wider uppercase">
-                                            Lainnya
-                                        </div>
-                                        {navigationSecondary.map((item) => (
                                             <li key={item.name}>
                                                 <Link
                                                     href={item.href}

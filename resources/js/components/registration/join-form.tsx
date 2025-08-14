@@ -47,7 +47,7 @@ interface JoinFormProps {
     }>;
 }
 
-const STORAGE_KEY = 'nitisara_registration_form';
+const STORAGE_KEY = 'simkatmawa_registration_form';
 
 // Debounce function to limit localStorage writes
 const debounce = <T extends (...args: any[]) => any>(func: T, wait: number): ((...args: Parameters<T>) => void) => {

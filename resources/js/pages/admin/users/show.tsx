@@ -60,7 +60,7 @@ export default function UserShow({ user }: Props) {
 
     return (
         <AdminLayout title={`User: ${user.name}`} description="Detail user admin">
-            <Head title={`${user.name} - NITISARA Admin`} />
+            <Head title={`${user.name} - SIMKATMAWA Admin`} />
 
             <div className="space-y-6">
                 {/* Header */}

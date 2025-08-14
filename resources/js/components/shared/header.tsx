@@ -53,7 +53,7 @@ export default function Header({ autoHide, alwaysSeamless, className }: HeaderPr
             <header className={cn('fixed z-10 w-full backdrop-blur-lg', className)}>
                 <section>
                     <SafeWidth className={cn('flex items-center justify-between py-4')}>
-                        <h1 className={cn('font-luckiest text-2xl')}>NITISARA</h1>
+                        <h1 className={cn('font-luckiest text-2xl')}>SIMKATMAWA</h1>
                         {isNavHide ? (
                             <ListIcon onClick={() => setNavHide(false)} />
                         ) : (
@@ -81,10 +81,10 @@ export default function Header({ autoHide, alwaysSeamless, className }: HeaderPr
 
     return (
         <header className={cn('fixed z-10 w-full backdrop-blur-lg', className)}>
-            {!isHide && <section className="font-luckiest py-6 text-center text-4xl">NITISARA</section>}
+            {!isHide && <section className="font-luckiest py-6 text-center text-4xl">SIMKATMAWA</section>}
             <section className={cn('py-4 transition-all', isHide && 'py-6')}>
                 <SafeWidth className={cn('flex justify-between', !isHide && '!justify-center')}>
-                    <h1 className={cn('font-luckiest text-2xl', !isHide && '!hidden')}>NITISARA</h1>
+                    <h1 className={cn('font-luckiest text-2xl', !isHide && '!hidden')}>SIMKATMAWA</h1>
                     <nav className="flex gap-x-8">
                         {navigations.map((nav) => (
                             <Link

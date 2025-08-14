@@ -19,7 +19,7 @@ interface UsersIndexProps {
 export default function UsersIndex({ users }: UsersIndexProps) {
     return (
         <AdminLayout title="Users" description="Kelola user admin">
-            <Head title="Users - NITISARA Admin" />
+            <Head title="Users - SIMKATMAWA Admin" />
 
             <div className="space-y-6">
                 <div className="flex items-center justify-between">

@@ -13,7 +13,7 @@ export default function Footer() {
                     <div className="lg:col-span-2">
                         <div className="mb-6 text-center md:text-left">
                             <h3 className="font-luckiest bg-gradient-to-r from-blue-400 to-blue-700 bg-clip-text text-3xl text-transparent md:text-4xl lg:text-5xl">
-                                NITISARA
+                                SIMKATMAWA
                             </h3>
                             <p className="mt-3 text-base text-slate-300 md:mt-4 md:text-lg">
                                 Festival Film Mahasiswa Terbesar di Indonesia
@@ -113,9 +113,9 @@ export default function Footer() {
                                 </div>
                                 <div>
                                     <p className="text-xs text-slate-400 md:text-sm">
-                                        info@nitisara.com
+                                        info@simkatmawa.com
                                         <br />
-                                        panitia@nitisara.com
+                                        panitia@simkatmawa.com
                                     </p>
                                 </div>
                             </div>
@@ -139,7 +139,7 @@ export default function Footer() {
                 <div className="mt-8 border-t border-slate-700 pt-6 md:mt-12 md:pt-8">
                     <div className="flex flex-col items-center gap-4 md:flex-row md:justify-between">
                         <div className="flex items-center gap-2 text-center text-xs text-slate-400 md:text-sm">
-                            <span>© {currentYear} NITISARA. Made with</span>
+                            <span>© {currentYear} SIMKATMAWA. Made with</span>
                             <Heart className="h-3 w-3 fill-current text-red-500 md:h-4 md:w-4" />
                             <span>by</span>
                             <span className="font-semibold text-white">Dedan Labs</span>

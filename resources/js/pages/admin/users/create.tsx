@@ -21,7 +21,7 @@ export default function UserCreate() {
 
     return (
         <AdminLayout title="Tambah User" description="Buat user admin baru">
-            <Head title="Tambah User - NITISARA Admin" />
+            <Head title="Tambah User - SIMKATMAWA Admin" />
 
             <div className="space-y-6">
                 {/* Header */}
