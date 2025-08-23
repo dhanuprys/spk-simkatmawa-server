@@ -32,9 +32,6 @@ class MagiqMarcos
             );
         }
 
-        // cut the limit
-        $flattenResult = array_slice($flattenResult, 0, $criteria->limit);
-
         // sorting
         if ($criteria->ascending) {
             usort(
@@ -49,6 +46,9 @@ class MagiqMarcos
                 $b->prefScore <=> $a->prefScore
             );
         }
+
+        // cut the limit
+        $flattenResult = array_slice($flattenResult, 0, $criteria->limit);
 
         return $flattenResult;
     }
