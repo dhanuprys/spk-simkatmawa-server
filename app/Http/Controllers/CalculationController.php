@@ -135,7 +135,7 @@ class CalculationController extends Controller
             'limit' => ['nullable', 'numeric', 'min:1', 'max:100']
         ]);
 
-        $template = CriteriaTemplate::find($request->template_id);
+        $template = CriteriaTemplate::findOrFail($request->template_id);
 
         $criteria = new UserCriteria(
             l3_cg1_a_value: $template->l3_cg1_a_value,
