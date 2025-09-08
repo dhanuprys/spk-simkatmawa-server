@@ -42,9 +42,9 @@ return new class extends Migration {
             $table->integer('l2_cg1_g');
 
             // Naskah GK
-            $table->integer('l2_cg2_a')->nullable();
+            $table->integer('l2_cg2_a');
             // Presentasi GK
-            $table->integer('l2_cg2_b')->nullable();
+            $table->integer('l2_cg2_b');
 
             // Content
             $table->integer('l2_cg3_a');

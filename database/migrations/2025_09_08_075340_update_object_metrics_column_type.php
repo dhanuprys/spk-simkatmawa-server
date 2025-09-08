@@ -11,25 +11,32 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('object_metrics', function (Blueprint $table) {
+            // Level 3 Criteria - Change integer to decimal(13,4)
+            $table->decimal('l3_cg1_a', 13, 4)->change(); // Penyajian
+            $table->decimal('l3_cg1_b', 13, 4)->change(); // Substansi
+            $table->decimal('l3_cg1_c', 13, 4)->change(); // Kualitas
+            $table->decimal('l3_cg2_a', 13, 4)->change(); // Presentasi
+            $table->decimal('l3_cg2_b', 13, 4)->change(); // Tanya Jawab
+
             // Level 2 Criteria Group 1 - Change integer to decimal(13,4)
-            $table->decimal('l2_cg1_a', 13, 4)->change(); // Ukuran File
-            $table->decimal('l2_cg1_b', 13, 4)->change(); // Total Rating
-            $table->decimal('l2_cg1_c', 13, 4)->change(); // User Rated
-            $table->decimal('l2_cg1_d', 13, 4)->change(); // Total Install
-            $table->decimal('l2_cg1_e', 13, 4)->change(); // Release Date
+            $table->decimal('l2_cg1_a', 13, 4)->change(); // Kompetisi
+            $table->decimal('l2_cg1_b', 13, 4)->change(); // Pengakuan
+            $table->decimal('l2_cg1_c', 13, 4)->change(); // Penghargaan
+            $table->decimal('l2_cg1_d', 13, 4)->change(); // Karier Organisasi
+            $table->decimal('l2_cg1_e', 13, 4)->change(); // Hasil Karya
+            $table->decimal('l2_cg1_f', 13, 4)->change(); // Pemberdayaan / Aksi Kemanusiaan
+            $table->decimal('l2_cg1_g', 13, 4)->change(); // Kewirausahaan
 
             // Level 2 Criteria Group 2 - Change integer to decimal(13,4)
-            $table->decimal('l2_cg2_a', 13, 4)->change(); // Giro
-            $table->decimal('l2_cg2_b', 13, 4)->change(); // Tabungan
-            $table->decimal('l2_cg2_c', 13, 4)->change(); // Deposito
-            $table->decimal('l2_cg2_d', 13, 4)->change(); // Laba Bersih
+            $table->decimal('l2_cg2_a', 13, 4)->change(); // Naskah GK
+            $table->decimal('l2_cg2_b', 13, 4)->change(); // Presentasi GK
 
             // Level 2 Criteria Group 3 - Change integer to decimal(13,4)
-            $table->decimal('l2_cg3_a', 13, 4)->change(); // Happiness
-            $table->decimal('l2_cg3_b', 13, 4)->change(); // Engagement
-            $table->decimal('l2_cg3_c', 13, 4)->change(); // Adoption
-            $table->decimal('l2_cg3_d', 13, 4)->change(); // Retention
-            $table->decimal('l2_cg3_e', 13, 4)->change(); // Task Success
+            $table->decimal('l2_cg3_a', 13, 4)->change(); // Content
+            $table->decimal('l2_cg3_b', 13, 4)->change(); // Accuracy
+            $table->decimal('l2_cg3_c', 13, 4)->change(); // Fluency
+            $table->decimal('l2_cg3_d', 13, 4)->change(); // Pronounciation
+            $table->decimal('l2_cg3_e', 13, 4)->change(); // Overall Performance
         });
     }
 
@@ -39,25 +46,32 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('object_metrics', function (Blueprint $table) {
+            // Level 3 Criteria - Revert decimal back to integer
+            $table->integer('l3_cg1_a')->change(); // Penyajian
+            $table->integer('l3_cg1_b')->change(); // Substansi
+            $table->integer('l3_cg1_c')->change(); // Kualitas
+            $table->integer('l3_cg2_a')->change(); // Presentasi
+            $table->integer('l3_cg2_b')->change(); // Tanya Jawab
+
             // Level 2 Criteria Group 1 - Revert decimal back to integer
-            $table->integer('l2_cg1_a')->change(); // Ukuran File
-            $table->integer('l2_cg1_b')->change(); // Total Rating
-            $table->integer('l2_cg1_c')->change(); // User Rated
-            $table->integer('l2_cg1_d')->change(); // Total Install
-            $table->integer('l2_cg1_e')->change(); // Release Date
+            $table->integer('l2_cg1_a')->change(); // Kompetisi
+            $table->integer('l2_cg1_b')->change(); // Pengakuan
+            $table->integer('l2_cg1_c')->change(); // Penghargaan
+            $table->integer('l2_cg1_d')->change(); // Karier Organisasi
+            $table->integer('l2_cg1_e')->change(); // Hasil Karya
+            $table->integer('l2_cg1_f')->change(); // Pemberdayaan / Aksi Kemanusiaan
+            $table->integer('l2_cg1_g')->change(); // Kewirausahaan
 
             // Level 2 Criteria Group 2 - Revert decimal back to integer
-            $table->integer('l2_cg2_a')->change(); // Giro
-            $table->integer('l2_cg2_b')->change(); // Tabungan
-            $table->integer('l2_cg2_c')->change(); // Deposito
-            $table->integer('l2_cg2_d')->change(); // Laba Bersih
+            $table->integer('l2_cg2_a')->change(); // Naskah GK
+            $table->integer('l2_cg2_b')->change(); // Presentasi GK
 
             // Level 2 Criteria Group 3 - Revert decimal back to integer
-            $table->integer('l2_cg3_a')->change(); // Happiness
-            $table->integer('l2_cg3_b')->change(); // Engagement
-            $table->integer('l2_cg3_c')->change(); // Adoption
-            $table->integer('l2_cg3_d')->change(); // Retention
-            $table->integer('l2_cg3_e')->change(); // Task Success
+            $table->integer('l2_cg3_a')->change(); // Content
+            $table->integer('l2_cg3_b')->change(); // Accuracy
+            $table->integer('l2_cg3_c')->change(); // Fluency
+            $table->integer('l2_cg3_d')->change(); // Pronounciation
+            $table->integer('l2_cg3_e')->change(); // Overall Performance
         });
     }
 };
