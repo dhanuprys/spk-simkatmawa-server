@@ -178,26 +178,26 @@ class ObjectMetricController extends Controller
 
             $imported = 0;
             while (($data = fgetcsv($handle)) !== false) {
-                if (count($data) >= 19) { // Ensure we have enough columns (reduced from 21 to 19)
+                if (count($data) >= 18) { // Ensure we have enough columns (reduced from 19 to 18)
                     ObjectMetric::create([
-                        'name' => $data[1] ?? '',
-                        'l2_cg1_a' => $data[2] ? (float) $data[2] : 0,
-                        'l2_cg1_b' => $data[3] ? (float) $data[3] : 0,
-                        'l2_cg1_c' => $data[4] ? (float) $data[4] : 0,
-                        'l2_cg1_d' => $data[5] ? (float) $data[5] : 0,
-                        'l2_cg1_e' => $data[6] ? (float) $data[6] : 0,
-                        'l2_cg1_f' => $data[7] ? (float) $data[7] : 0,
-                        'l2_cg1_g' => $data[8] ? (float) $data[8] : 0,
-                        'l2_cg3_a' => $data[9] ? (float) $data[9] : 0,
-                        'l2_cg3_b' => $data[10] ? (float) $data[10] : 0,
-                        'l2_cg3_c' => $data[11] ? (float) $data[11] : 0,
-                        'l2_cg3_d' => $data[12] ? (float) $data[12] : 0,
-                        'l2_cg3_e' => $data[13] ? (float) $data[13] : 0,
-                        'l3_cg1_a' => $data[14] ? (float) $data[14] : 0,
-                        'l3_cg1_b' => $data[15] ? (float) $data[15] : 0,
-                        'l3_cg1_c' => $data[16] ? (float) $data[16] : 0,
-                        'l3_cg2_a' => $data[17] ? (float) $data[17] : 0,
-                        'l3_cg2_b' => $data[18] ? (float) $data[18] : 0,
+                        'name' => $data[0] ?? '',
+                        'l2_cg1_a' => $data[1] ? (float) $data[1] : 0,
+                        'l2_cg1_b' => $data[2] ? (float) $data[2] : 0,
+                        'l2_cg1_c' => $data[3] ? (float) $data[3] : 0,
+                        'l2_cg1_d' => $data[4] ? (float) $data[4] : 0,
+                        'l2_cg1_e' => $data[5] ? (float) $data[5] : 0,
+                        'l2_cg1_f' => $data[6] ? (float) $data[6] : 0,
+                        'l2_cg1_g' => $data[7] ? (float) $data[7] : 0,
+                        'l2_cg3_a' => $data[8] ? (float) $data[8] : 0,
+                        'l2_cg3_b' => $data[9] ? (float) $data[9] : 0,
+                        'l2_cg3_c' => $data[10] ? (float) $data[10] : 0,
+                        'l2_cg3_d' => $data[11] ? (float) $data[11] : 0,
+                        'l2_cg3_e' => $data[12] ? (float) $data[12] : 0,
+                        'l3_cg1_a' => $data[13] ? (float) $data[13] : 0,
+                        'l3_cg1_b' => $data[14] ? (float) $data[14] : 0,
+                        'l3_cg1_c' => $data[15] ? (float) $data[15] : 0,
+                        'l3_cg2_a' => $data[16] ? (float) $data[16] : 0,
+                        'l3_cg2_b' => $data[17] ? (float) $data[17] : 0,
                     ]);
                     $imported++;
                 }
@@ -234,7 +234,6 @@ class ObjectMetricController extends Controller
 
             // Header row with descriptions
             fputcsv($file, [
-                'ID',
                 'Nama Mahasiswa',
                 'L2_CG1_A (Kompetisi)',
                 'L2_CG1_B (Pengakuan)',
@@ -257,7 +256,6 @@ class ObjectMetricController extends Controller
 
             // Sample data row
             fputcsv($file, [
-                '1',
                 'John Doe',
                 '8.5',
                 '7.2',

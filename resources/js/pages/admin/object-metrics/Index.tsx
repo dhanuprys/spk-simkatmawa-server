@@ -241,7 +241,6 @@ export default function Index({ objectMetrics, filters }: Props) {
                                                 <div>
                                                     <p className="font-medium text-muted-foreground">Informasi Dasar:</p>
                                                     <ul className="space-y-1 text-xs">
-                                                        <li>• ID - ID unik (opsional)</li>
                                                         <li>• Nama Mahasiswa - Nama lengkap mahasiswa</li>
                                                     </ul>
                                                 </div>
@@ -283,7 +282,7 @@ export default function Index({ objectMetrics, filters }: Props) {
                                                 <ul className="mt-1 space-y-1 text-blue-700">
                                                     <li>• Semua nilai harus berupa angka desimal (0-999999999.9999)</li>
                                                     <li>• Gunakan titik (.) sebagai pemisah desimal</li>
-                                                    <li>• Kolom ID akan diabaikan jika kosong</li>
+                                                    <li>• ID akan otomatis dibuat oleh sistem</li>
                                                     <li>• Nama mahasiswa wajib diisi</li>
                                                 </ul>
                                             </div>
