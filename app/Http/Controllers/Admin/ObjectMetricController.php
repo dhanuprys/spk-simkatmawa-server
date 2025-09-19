@@ -216,70 +216,67 @@ class ObjectMetricController extends Controller
         }
     }
 
-    /**
-     * Export object metrics to CSV
-     */
-    public function export()
-    {
-        $objectMetrics = ObjectMetric::all();
 
-        $filename = 'object_metrics_' . date('Y-m-d_H-i-s') . '.csv';
+    /**
+     * Download import template CSV
+     */
+    public function downloadTemplate()
+    {
+        $filename = 'object_metrics_template_' . date('Y-m-d_H-i-s') . '.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ];
 
-        $callback = function () use ($objectMetrics) {
+        $callback = function () {
             $file = fopen('php://output', 'w');
 
-            // Header row
+            // Header row with descriptions
             fputcsv($file, [
                 'ID',
-                'Nama',
-                'L2_CG1_A',
-                'L2_CG1_B',
-                'L2_CG1_C',
-                'L2_CG1_D',
-                'L2_CG1_E',
-                'L2_CG1_F',
-                'L2_CG1_G',
-                'L2_CG3_A',
-                'L2_CG3_B',
-                'L2_CG3_C',
-                'L2_CG3_D',
-                'L2_CG3_E',
-                'L3_CG1_A',
-                'L3_CG1_B',
-                'L3_CG1_C',
-                'L3_CG2_A',
-                'L3_CG2_B'
+                'Nama Mahasiswa',
+                'L2_CG1_A (Kompetisi)',
+                'L2_CG1_B (Pengakuan)',
+                'L2_CG1_C (Penghargaan)',
+                'L2_CG1_D (Karier Organisasi)',
+                'L2_CG1_E (Hasil Karya)',
+                'L2_CG1_F (Pemberdayaan / Aksi Kemanusiaan)',
+                'L2_CG1_G (Kewirausahaan)',
+                'L2_CG3_A (Content)',
+                'L2_CG3_B (Accuracy)',
+                'L2_CG3_C (Fluency)',
+                'L2_CG3_D (Pronounciation)',
+                'L2_CG3_E (Overall Performance)',
+                'L3_CG1_A (Penyajian)',
+                'L3_CG1_B (Substansi)',
+                'L3_CG1_C (Kualitas)',
+                'L3_CG2_A (Presentasi)',
+                'L3_CG2_B (Tanya Jawab)'
             ]);
 
-            // Data rows
-            foreach ($objectMetrics as $metric) {
-                fputcsv($file, [
-                    $metric->id,
-                    $metric->name,
-                    $metric->l2_cg1_a,
-                    $metric->l2_cg1_b,
-                    $metric->l2_cg1_c,
-                    $metric->l2_cg1_d,
-                    $metric->l2_cg1_e,
-                    $metric->l2_cg1_f,
-                    $metric->l2_cg1_g,
-                    $metric->l2_cg3_a,
-                    $metric->l2_cg3_b,
-                    $metric->l2_cg3_c,
-                    $metric->l2_cg3_d,
-                    $metric->l2_cg3_e,
-                    $metric->l3_cg1_a,
-                    $metric->l3_cg1_b,
-                    $metric->l3_cg1_c,
-                    $metric->l3_cg2_a,
-                    $metric->l3_cg2_b,
-                ]);
-            }
+            // Sample data row
+            fputcsv($file, [
+                '1',
+                'John Doe',
+                '8.5',
+                '7.2',
+                '9.1',
+                '6.8',
+                '8.9',
+                '7.5',
+                '8.0',
+                '7.8',
+                '8.2',
+                '7.9',
+                '8.1',
+                '7.7',
+                '8.3',
+                '7.6',
+                '8.4',
+                '7.8',
+                '8.0'
+            ]);
 
             fclose($file);
         };

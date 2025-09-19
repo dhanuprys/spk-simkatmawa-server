@@ -33,8 +33,6 @@ interface ObjectMetric {
     l2_cg1_e: number | null;
     l2_cg1_f: number | null;
     l2_cg1_g: number | null;
-    l2_cg2_a: number | null;
-    l2_cg2_b: number | null;
     l2_cg3_a: number | null;
     l2_cg3_b: number | null;
     l2_cg3_c: number | null;
@@ -113,8 +111,9 @@ export default function Index({ objectMetrics, filters }: Props) {
         }
     };
 
-    const handleExport = () => {
-        window.location.href = route('admin.object-metrics.export');
+
+    const handleDownloadTemplate = () => {
+        window.location.href = route('admin.object-metrics.template');
     };
 
     const handleMultipleDelete = () => {
@@ -193,23 +192,102 @@ export default function Index({ objectMetrics, filters }: Props) {
                                     Import
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent>
+                            <DialogContent className="max-w-2xl">
                                 <DialogHeader>
                                     <DialogTitle>Import Data Metrik</DialogTitle>
                                     <DialogDescription>
                                         Upload file CSV untuk mengimpor data metrik. Pastikan format sesuai dengan
-                                        template.
+                                        template yang disediakan.
                                     </DialogDescription>
                                 </DialogHeader>
-                                <div className="space-y-4">
-                                    <Input
-                                        type="file"
-                                        accept=".csv,.txt"
-                                        onChange={(e) => setData('csv_file', e.target.files?.[0] || null)}
-                                    />
-                                    <div className="text-muted-foreground text-sm">
-                                        <p>Format CSV yang diharapkan:</p>
-                                        <p>ID, Nama, L2_CG1_A, L2_CG1_B, ..., L3_CG2_B</p>
+                                <div className="space-y-6">
+                                    {/* Template Download Section */}
+                                    <div className="rounded-lg border bg-muted/50 p-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h4 className="font-medium">Template Import</h4>
+                                                <p className="text-muted-foreground text-sm">
+                                                    Download template CSV dengan format yang benar dan contoh data
+                                                </p>
+                                            </div>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={handleDownloadTemplate}
+                                                disabled={isDeleting}
+                                            >
+                                                <Download className="mr-2 h-4 w-4" />
+                                                Download Template
+                                            </Button>
+                                        </div>
+                                    </div>
+
+                                    {/* File Upload Section */}
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-sm font-medium">Pilih File CSV</label>
+                                            <Input
+                                                type="file"
+                                                accept=".csv,.txt"
+                                                onChange={(e) => setData('csv_file', e.target.files?.[0] || null)}
+                                                className="mt-1"
+                                            />
+                                        </div>
+
+                                        {/* Field Descriptions */}
+                                        <div className="rounded-lg border bg-muted/30 p-4">
+                                            <h4 className="mb-3 font-medium">Format Kolom yang Diperlukan:</h4>
+                                            <div className="grid grid-cols-1 gap-2 text-sm md:grid-cols-2">
+                                                <div>
+                                                    <p className="font-medium text-muted-foreground">Informasi Dasar:</p>
+                                                    <ul className="space-y-1 text-xs">
+                                                        <li>• ID - ID unik (opsional)</li>
+                                                        <li>• Nama Mahasiswa - Nama lengkap mahasiswa</li>
+                                                    </ul>
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium text-muted-foreground">L3 Criteria:</p>
+                                                    <ul className="space-y-1 text-xs">
+                                                        <li>• L3_CG1_A (Penyajian)</li>
+                                                        <li>• L3_CG1_B (Substansi)</li>
+                                                        <li>• L3_CG1_C (Kualitas)</li>
+                                                        <li>• L3_CG2_A (Presentasi)</li>
+                                                        <li>• L3_CG2_B (Tanya Jawab)</li>
+                                                    </ul>
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium text-muted-foreground">L2 CG1 (Kompetensi):</p>
+                                                    <ul className="space-y-1 text-xs">
+                                                        <li>• L2_CG1_A (Kompetisi)</li>
+                                                        <li>• L2_CG1_B (Pengakuan)</li>
+                                                        <li>• L2_CG1_C (Penghargaan)</li>
+                                                        <li>• L2_CG1_D (Karier Organisasi)</li>
+                                                        <li>• L2_CG1_E (Hasil Karya)</li>
+                                                        <li>• L2_CG1_F (Pemberdayaan)</li>
+                                                        <li>• L2_CG1_G (Kewirausahaan)</li>
+                                                    </ul>
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium text-muted-foreground">L2 CG3 (Bahasa Inggris):</p>
+                                                    <ul className="space-y-1 text-xs">
+                                                        <li>• L2_CG3_A (Content)</li>
+                                                        <li>• L2_CG3_B (Accuracy)</li>
+                                                        <li>• L2_CG3_C (Fluency)</li>
+                                                        <li>• L2_CG3_D (Pronounciation)</li>
+                                                        <li>• L2_CG3_E (Overall Performance)</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div className="mt-3 rounded bg-blue-50 p-3 text-xs">
+                                                <p className="font-medium text-blue-800">Catatan:</p>
+                                                <ul className="mt-1 space-y-1 text-blue-700">
+                                                    <li>• Semua nilai harus berupa angka desimal (0-999999999.9999)</li>
+                                                    <li>• Gunakan titik (.) sebagai pemisah desimal</li>
+                                                    <li>• Kolom ID akan diabaikan jika kosong</li>
+                                                    <li>• Nama mahasiswa wajib diisi</li>
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <DialogFooter>
@@ -217,7 +295,7 @@ export default function Index({ objectMetrics, filters }: Props) {
                                         Batal
                                     </Button>
                                     <Button onClick={handleImport} disabled={processing || !data.csv_file}>
-                                        {processing ? 'Mengimpor...' : 'Import'}
+                                        {processing ? 'Mengimpor...' : 'Import Data'}
                                     </Button>
                                 </DialogFooter>
                             </DialogContent>
@@ -283,17 +361,13 @@ export default function Index({ objectMetrics, filters }: Props) {
                                                 ? 'Menghapus...'
                                                 : 'Hapus'
                                             : deletingIds.includes(deleteDialogOpen || 0)
-                                              ? 'Menghapus...'
-                                              : 'Hapus'}
+                                                ? 'Menghapus...'
+                                                : 'Hapus'}
                                     </Button>
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>
 
-                        <Button onClick={handleExport} variant="outline" size="sm" disabled={isDeleting}>
-                            <Download className="mr-2 h-4 w-4" />
-                            Export
-                        </Button>
 
                         <Link href={route('admin.object-metrics.create')}>
                             <Button size="sm" disabled={isDeleting}>

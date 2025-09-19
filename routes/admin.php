@@ -16,7 +16,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // Object Metrics Management
     Route::resource('object-metrics', ObjectMetricController::class);
     Route::post('object-metrics/import', [ObjectMetricController::class, 'import'])->name('object-metrics.import');
-    Route::get('object-metrics/export', [ObjectMetricController::class, 'export'])->name('object-metrics.export');
+    Route::get('object-metrics/template', [ObjectMetricController::class, 'downloadTemplate'])->name('object-metrics.template');
     Route::delete('object-metrics/destroy-multiple', [ObjectMetricController::class, 'destroyMultiple'])->name('object-metrics.destroy-multiple');
 
     // Criteria Templates Management
