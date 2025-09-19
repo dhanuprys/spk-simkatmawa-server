@@ -17,8 +17,6 @@ interface ObjectMetric {
     l2_cg1_e: number | null;
     l2_cg1_f: number | null;
     l2_cg1_g: number | null;
-    l2_cg2_a: number | null;
-    l2_cg2_b: number | null;
     l2_cg3_a: number | null;
     l2_cg3_b: number | null;
     l2_cg3_c: number | null;
@@ -158,7 +156,7 @@ export default function Show({ objectMetric }: Props) {
                         <CardTitle>Kriteria Level 2 (L2)</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                             {/* CG1 - Kompetensi */}
                             <div>
                                 <h4 className="text-muted-foreground mb-4 text-sm font-medium tracking-wide uppercase">
@@ -196,22 +194,6 @@ export default function Show({ objectMetric }: Props) {
                                 </div>
                             </div>
 
-                            {/* CG2 - GK */}
-                            <div>
-                                <h4 className="text-muted-foreground mb-4 text-sm font-medium tracking-wide uppercase">
-                                    CG2 - GK
-                                </h4>
-                                <div className="space-y-3">
-                                    <div className="flex items-center justify-between">
-                                        <span>Naskah GK</span>
-                                        <Badge variant="outline">{objectMetric.l2_cg2_a || 0}</Badge>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <span>Presentasi GK</span>
-                                        <Badge variant="outline">{objectMetric.l2_cg2_b || 0}</Badge>
-                                    </div>
-                                </div>
-                            </div>
 
                             {/* CG3 - Bahasa Inggris */}
                             <div>
