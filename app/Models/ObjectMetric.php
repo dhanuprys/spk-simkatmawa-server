@@ -29,8 +29,6 @@ class ObjectMetric extends Model
         'l2_cg1_e', // Hasil Karya
         'l2_cg1_f', // Pemberdayaan / Aksi Kemanusiaan
         'l2_cg1_g', // Kewirausahaan
-        'l2_cg2_a', // Naskah GK
-        'l2_cg2_b', // Presentasi GK
         'l2_cg3_a', // Content
         'l2_cg3_b', // Accuracy
         'l2_cg3_c', // Fluency
@@ -51,8 +49,6 @@ class ObjectMetric extends Model
         'l2_cg1_e' => 'decimal:4',
         'l2_cg1_f' => 'decimal:4',
         'l2_cg1_g' => 'decimal:4',
-        'l2_cg2_a' => 'decimal:4',
-        'l2_cg2_b' => 'decimal:4',
         'l2_cg3_a' => 'decimal:4',
         'l2_cg3_b' => 'decimal:4',
         'l2_cg3_c' => 'decimal:4',
@@ -123,14 +119,6 @@ class ObjectMetric extends Model
                 'value' => $this->l2_cg1_g,
                 'label' => 'Kewirausahaan'
             ],
-            'cg2_a' => [
-                'value' => $this->l2_cg2_a,
-                'label' => 'Naskah GK'
-            ],
-            'cg2_b' => [
-                'value' => $this->l2_cg2_b,
-                'label' => 'Presentasi GK'
-            ],
             'cg3_a' => [
                 'value' => $this->l2_cg3_a,
                 'label' => 'Content'
@@ -170,7 +158,6 @@ class ObjectMetric extends Model
     {
         return $this->l2_cg1_a + $this->l2_cg1_b + $this->l2_cg1_c +
             $this->l2_cg1_d + $this->l2_cg1_e + $this->l2_cg1_f + $this->l2_cg1_g +
-            $this->l2_cg2_a + $this->l2_cg2_b +
             $this->l2_cg3_a + $this->l2_cg3_b + $this->l2_cg3_c +
             $this->l2_cg3_d + $this->l2_cg3_e;
     }

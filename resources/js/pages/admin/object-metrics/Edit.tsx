@@ -16,8 +16,6 @@ interface ObjectMetric {
     l2_cg1_e: number | null;
     l2_cg1_f: number | null;
     l2_cg1_g: number | null;
-    l2_cg2_a: number | null;
-    l2_cg2_b: number | null;
     l2_cg3_a: number | null;
     l2_cg3_b: number | null;
     l2_cg3_c: number | null;
@@ -53,8 +51,6 @@ export default function Edit({ objectMetric }: Props) {
         l2_cg1_e: objectMetric.l2_cg1_e,
         l2_cg1_f: objectMetric.l2_cg1_f,
         l2_cg1_g: objectMetric.l2_cg1_g,
-        l2_cg2_a: objectMetric.l2_cg2_a,
-        l2_cg2_b: objectMetric.l2_cg2_b,
         l2_cg3_a: objectMetric.l2_cg3_a,
         l2_cg3_b: objectMetric.l2_cg3_b,
         l2_cg3_c: objectMetric.l2_cg3_c,
@@ -67,8 +63,8 @@ export default function Edit({ objectMetric }: Props) {
         put(route('admin.object-metrics.update', objectMetric.id));
     };
 
-    const handleInputChange = (field: string, value: string) => {
-        setData(field, value === '' ? 0 : parseInt(value));
+    const handleInputChange = (field: keyof typeof data, value: string) => {
+        setData(field, value === '' ? '0' : value);
     };
 
     return (
@@ -104,8 +100,10 @@ export default function Edit({ objectMetric }: Props) {
                                     value={data.name}
                                     onChange={(e) => setData('name', e.target.value)}
                                     placeholder="Masukkan nama mahasiswa"
-                                    error={errors.name}
                                 />
+                                {errors.name && (
+                                    <p className="text-sm text-red-600">{errors.name}</p>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
@@ -131,7 +129,12 @@ export default function Edit({ objectMetric }: Props) {
                                                 onChange={(e) => handleInputChange('l3_cg1_a', e.target.value)}
                                                 placeholder="0"
                                                 min="0"
+                                                max="999999999.9999"
+                                                step="0.0001"
                                             />
+                                            {errors.l3_cg1_a && (
+                                                <p className="text-sm text-red-600">{errors.l3_cg1_a}</p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="l3_cg1_b">Substansi *</Label>
@@ -142,7 +145,12 @@ export default function Edit({ objectMetric }: Props) {
                                                 onChange={(e) => handleInputChange('l3_cg1_b', e.target.value)}
                                                 placeholder="0"
                                                 min="0"
+                                                max="999999999.9999"
+                                                step="0.0001"
                                             />
+                                            {errors.l3_cg1_b && (
+                                                <p className="text-sm text-red-600">{errors.l3_cg1_b}</p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="l3_cg1_c">Kualitas *</Label>
@@ -153,7 +161,12 @@ export default function Edit({ objectMetric }: Props) {
                                                 onChange={(e) => handleInputChange('l3_cg1_c', e.target.value)}
                                                 placeholder="0"
                                                 min="0"
+                                                max="999999999.9999"
+                                                step="0.0001"
                                             />
+                                            {errors.l3_cg1_c && (
+                                                <p className="text-sm text-red-600">{errors.l3_cg1_c}</p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -172,7 +185,12 @@ export default function Edit({ objectMetric }: Props) {
                                                 onChange={(e) => handleInputChange('l3_cg2_a', e.target.value)}
                                                 placeholder="0"
                                                 min="0"
+                                                max="999999999.9999"
+                                                step="0.0001"
                                             />
+                                            {errors.l3_cg2_a && (
+                                                <p className="text-sm text-red-600">{errors.l3_cg2_a}</p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="l3_cg2_b">Tanya Jawab *</Label>
@@ -183,7 +201,12 @@ export default function Edit({ objectMetric }: Props) {
                                                 onChange={(e) => handleInputChange('l3_cg2_b', e.target.value)}
                                                 placeholder="0"
                                                 min="0"
+                                                max="999999999.9999"
+                                                step="0.0001"
                                             />
+                                            {errors.l3_cg2_b && (
+                                                <p className="text-sm text-red-600">{errors.l3_cg2_b}</p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -197,7 +220,7 @@ export default function Edit({ objectMetric }: Props) {
                             <CardTitle>Kriteria Level 2 (L2)</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-6">
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                 {/* CG1 - Penilaian Kompetensi */}
                                 <div className="space-y-4">
                                     <h4 className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
@@ -213,7 +236,12 @@ export default function Edit({ objectMetric }: Props) {
                                                 onChange={(e) => handleInputChange('l2_cg1_a', e.target.value)}
                                                 placeholder="0"
                                                 min="0"
+                                                max="999999999.9999"
+                                                step="0.0001"
                                             />
+                                            {errors.l2_cg1_a && (
+                                                <p className="text-sm text-red-600">{errors.l2_cg1_a}</p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="l2_cg1_b">Pengakuan *</Label>
@@ -224,7 +252,12 @@ export default function Edit({ objectMetric }: Props) {
                                                 onChange={(e) => handleInputChange('l2_cg1_b', e.target.value)}
                                                 placeholder="0"
                                                 min="0"
+                                                max="999999999.9999"
+                                                step="0.0001"
                                             />
+                                            {errors.l2_cg1_b && (
+                                                <p className="text-sm text-red-600">{errors.l2_cg1_b}</p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="l2_cg1_c">Penghargaan *</Label>
@@ -235,7 +268,12 @@ export default function Edit({ objectMetric }: Props) {
                                                 onChange={(e) => handleInputChange('l2_cg1_c', e.target.value)}
                                                 placeholder="0"
                                                 min="0"
+                                                max="999999999.9999"
+                                                step="0.0001"
                                             />
+                                            {errors.l2_cg1_c && (
+                                                <p className="text-sm text-red-600">{errors.l2_cg1_c}</p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="l2_cg1_d">Karier Organisasi *</Label>
@@ -246,7 +284,12 @@ export default function Edit({ objectMetric }: Props) {
                                                 onChange={(e) => handleInputChange('l2_cg1_d', e.target.value)}
                                                 placeholder="0"
                                                 min="0"
+                                                max="999999999.9999"
+                                                step="0.0001"
                                             />
+                                            {errors.l2_cg1_d && (
+                                                <p className="text-sm text-red-600">{errors.l2_cg1_d}</p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="l2_cg1_e">Hasil Karya *</Label>
@@ -257,7 +300,12 @@ export default function Edit({ objectMetric }: Props) {
                                                 onChange={(e) => handleInputChange('l2_cg1_e', e.target.value)}
                                                 placeholder="0"
                                                 min="0"
+                                                max="999999999.9999"
+                                                step="0.0001"
                                             />
+                                            {errors.l2_cg1_e && (
+                                                <p className="text-sm text-red-600">{errors.l2_cg1_e}</p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="l2_cg1_f">Pemberdayaan / Aksi Kemanusiaan *</Label>
@@ -268,7 +316,12 @@ export default function Edit({ objectMetric }: Props) {
                                                 onChange={(e) => handleInputChange('l2_cg1_f', e.target.value)}
                                                 placeholder="0"
                                                 min="0"
+                                                max="999999999.9999"
+                                                step="0.0001"
                                             />
+                                            {errors.l2_cg1_f && (
+                                                <p className="text-sm text-red-600">{errors.l2_cg1_f}</p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="l2_cg1_g">Kewirausahaan *</Label>
@@ -279,41 +332,16 @@ export default function Edit({ objectMetric }: Props) {
                                                 onChange={(e) => handleInputChange('l2_cg1_g', e.target.value)}
                                                 placeholder="0"
                                                 min="0"
+                                                max="999999999.9999"
+                                                step="0.0001"
                                             />
+                                            {errors.l2_cg1_g && (
+                                                <p className="text-sm text-red-600">{errors.l2_cg1_g}</p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* CG2 - Penilaian GK */}
-                                <div className="space-y-4">
-                                    <h4 className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
-                                        CG2 - GK
-                                    </h4>
-                                    <div className="space-y-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="l2_cg2_a">Naskah GK *</Label>
-                                            <Input
-                                                id="l2_cg2_a"
-                                                type="number"
-                                                value={data.l2_cg2_a || ''}
-                                                onChange={(e) => handleInputChange('l2_cg2_a', e.target.value)}
-                                                placeholder="0"
-                                                min="0"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="l2_cg2_b">Presentasi GK *</Label>
-                                            <Input
-                                                id="l2_cg2_b"
-                                                type="number"
-                                                value={data.l2_cg2_b || ''}
-                                                onChange={(e) => handleInputChange('l2_cg2_b', e.target.value)}
-                                                placeholder="0"
-                                                min="0"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
 
                                 {/* CG3 - Penilaian Bahasa Inggris */}
                                 <div className="space-y-4">
@@ -330,7 +358,12 @@ export default function Edit({ objectMetric }: Props) {
                                                 onChange={(e) => handleInputChange('l2_cg3_a', e.target.value)}
                                                 placeholder="0"
                                                 min="0"
+                                                max="999999999.9999"
+                                                step="0.0001"
                                             />
+                                            {errors.l2_cg3_a && (
+                                                <p className="text-sm text-red-600">{errors.l2_cg3_a}</p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="l2_cg3_b">Accuracy *</Label>
@@ -341,7 +374,12 @@ export default function Edit({ objectMetric }: Props) {
                                                 onChange={(e) => handleInputChange('l2_cg3_b', e.target.value)}
                                                 placeholder="0"
                                                 min="0"
+                                                max="999999999.9999"
+                                                step="0.0001"
                                             />
+                                            {errors.l2_cg3_b && (
+                                                <p className="text-sm text-red-600">{errors.l2_cg3_b}</p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="l2_cg3_c">Fluency *</Label>
@@ -352,7 +390,12 @@ export default function Edit({ objectMetric }: Props) {
                                                 onChange={(e) => handleInputChange('l2_cg3_c', e.target.value)}
                                                 placeholder="0"
                                                 min="0"
+                                                max="999999999.9999"
+                                                step="0.0001"
                                             />
+                                            {errors.l2_cg3_c && (
+                                                <p className="text-sm text-red-600">{errors.l2_cg3_c}</p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="l2_cg3_d">Pronounciation *</Label>
@@ -363,7 +406,12 @@ export default function Edit({ objectMetric }: Props) {
                                                 onChange={(e) => handleInputChange('l2_cg3_d', e.target.value)}
                                                 placeholder="0"
                                                 min="0"
+                                                max="999999999.9999"
+                                                step="0.0001"
                                             />
+                                            {errors.l2_cg3_d && (
+                                                <p className="text-sm text-red-600">{errors.l2_cg3_d}</p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="l2_cg3_e">Overall Performance *</Label>
@@ -374,7 +422,12 @@ export default function Edit({ objectMetric }: Props) {
                                                 onChange={(e) => handleInputChange('l2_cg3_e', e.target.value)}
                                                 placeholder="0"
                                                 min="0"
+                                                max="999999999.9999"
+                                                step="0.0001"
                                             />
+                                            {errors.l2_cg3_e && (
+                                                <p className="text-sm text-red-600">{errors.l2_cg3_e}</p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
