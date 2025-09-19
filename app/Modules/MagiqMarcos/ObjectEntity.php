@@ -36,9 +36,9 @@ class ObjectEntity
         public int $l2_cg1_g,
 
         // Naskah GK
-        public int $l2_cg2_a,
+        public int $l2_cg2_a = 0,
         // Presentasi GK
-        public int $l2_cg2_b,
+        public int $l2_cg2_b = 0,
 
         // Content
         public int $l2_cg3_a,
