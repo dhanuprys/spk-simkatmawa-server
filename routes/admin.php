@@ -14,10 +14,10 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::resource('users', UserController::class);
 
     // Object Metrics Management
-    Route::resource('object-metrics', ObjectMetricController::class);
     Route::post('object-metrics/import', [ObjectMetricController::class, 'import'])->name('object-metrics.import');
     Route::get('object-metrics/template', [ObjectMetricController::class, 'downloadTemplate'])->name('object-metrics.template');
     Route::delete('object-metrics/destroy-multiple', [ObjectMetricController::class, 'destroyMultiple'])->name('object-metrics.destroy-multiple');
+    Route::resource('object-metrics', ObjectMetricController::class);
 
     // Criteria Templates Management
     Route::resource('criteria-templates', CriteriaTemplateController::class);
