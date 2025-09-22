@@ -149,23 +149,25 @@ export default function Index({ criteriaTemplates, filters }: Props) {
         if (selectedIds.length > 0) {
             console.log('Attempting to delete:', selectedIds);
             setDeletingIds(selectedIds);
-            router.delete(route('admin.criteria-templates.destroy-multiple'), {
-                data: { ids: selectedIds },
-                onSuccess: () => {
-                    console.log('Multiple delete successful');
-                    setSelectedIds([]);
-                    resetDeletingState();
-                    // Use visit instead of reload to avoid infinite loop
-                    router.visit(route('admin.criteria-templates.index'), {
-                        preserveScroll: true,
-                        preserveState: false,
-                    });
-                },
-                onError: (errors: any) => {
-                    console.error('Multiple delete failed:', errors);
-                    resetDeletingState();
-                },
-            });
+            router.post(route('admin.criteria-templates.destroy-multiple'),
+                { ids: selectedIds },
+                {
+                    onSuccess: () => {
+                        console.log('Multiple delete successful');
+                        setSelectedIds([]);
+                        resetDeletingState();
+                        // Use visit instead of reload to avoid infinite loop
+                        router.visit(route('admin.criteria-templates.index'), {
+                            preserveScroll: true,
+                            preserveState: false,
+                        });
+                    },
+                    onError: (errors: any) => {
+                        console.error('Multiple delete failed:', errors);
+                        resetDeletingState();
+                    },
+                }
+            );
         }
     };
 
@@ -312,8 +314,8 @@ export default function Index({ criteriaTemplates, filters }: Props) {
                                                 ? 'Menghapus...'
                                                 : 'Hapus'
                                             : deletingIds.includes(deleteDialogOpen || 0)
-                                              ? 'Menghapus...'
-                                              : 'Hapus'}
+                                                ? 'Menghapus...'
+                                                : 'Hapus'}
                                     </Button>
                                 </DialogFooter>
                             </DialogContent>
